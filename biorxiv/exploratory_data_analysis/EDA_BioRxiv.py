@@ -189,6 +189,7 @@ g = (
     + p9.coord_flip()
     + p9.theme_bw()
 )
+g.save("output/figures/preprint_category.png", dpi=500)
 print(g)
 
 
@@ -206,12 +207,24 @@ metadata_df["category"].value_counts()
 heading_list = metadata_df.heading.value_counts().index.tolist()[::-1]
 
 g = (
-    p9.ggplot(metadata_df, p9.aes(x="heading"))
+    p9.ggplot(
+        metadata_df
+        .rename({
+        "bioinformatics":"none",
+        "genomics": "none",
+        "zoology": "none",
+        "evolutionary_biology": "none",
+        "animal behavior and cognition": "none",
+        "ecology":"none"
+        }), 
+        p9.aes(x="heading")
+    )
     + p9.geom_bar(size=10)
     + p9.scale_x_discrete(limits=heading_list)
     + p9.coord_flip()
     + p9.theme_bw()
 )
+g.save("output/figures/preprint_headings.png", dpi=500)
 print(g)
 
 
@@ -223,7 +236,7 @@ metadata_df["heading"].value_counts()
 
 # # BioRxiv Section Articles
 
-# In[14]:
+# In[13]:
 
 
 section_list = sections_df.section.value_counts()
@@ -237,10 +250,11 @@ g = (
     + p9.coord_flip()
     + p9.theme_bw()
 )
+g.save("output/figures/preprint_sections.png", dpi=500)
 print(g)
 
 
-# In[17]:
+# In[14]:
 
 
 section_list = sections_df.section.value_counts()
