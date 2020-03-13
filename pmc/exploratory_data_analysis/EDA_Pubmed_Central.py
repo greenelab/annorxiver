@@ -1,6 +1,10 @@
 #!/usr/bin/env python
 # coding: utf-8
 
+# # Pubmed Central (PMC) Exploratory Data Analysis
+
+# This notebook is designed to generate descriptive statistics for the PMC repository.
+
 # In[1]:
 
 
@@ -16,10 +20,12 @@ import tqdm
 
 # # Journal Statistics
 
+# Gather a listing of journals contained in PMC.
+
 # In[2]:
 
 
-journals = Path("../biorxiv_articles").rglob("*.nxml")
+journals = Path("../journals").rglob("*.nxml")
 
 
 # In[3]:
@@ -46,6 +52,8 @@ journal_df = (
 journal_df.head()
 
 
+# ## Map Journals to PMC articles
+
 # In[5]:
 
 
@@ -65,7 +73,7 @@ for file in tqdm.tqdm_notebook(journals):
 
 
 journal_paper_df = pd.DataFrame.from_records(journal_type_records)
-journal_paper_df.to_csv("output/pubmed_central_journal_paper_map.tsv", sep="\t", index=False)
+journal_paper_df.to_csv("output/pubmed_central_journal_paper_map.tsv.xz", sep="\t", index=False, compression="xz")
 journal_paper_df.head()
 
 
@@ -74,6 +82,8 @@ journal_paper_df.head()
 
 journal_paper_df.journal.unique().shape
 
+
+# # Types of Articles Contained in PMC
 
 # In[9]:
 
@@ -88,5 +98,6 @@ g = (
     + p9.coord_flip()
     + p9.theme_bw()
 )
+g.save("output/figures/article_sections.png", dpi=500)
 print(g)
 
