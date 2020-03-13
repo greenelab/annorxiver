@@ -1,6 +1,16 @@
 #!/usr/bin/env python
 # coding: utf-8
 
+# # Exploratory Data Analysis-BioRxiv
+
+# This notebook is designed to generate descriptive statistics for a snapshot of the BioRxiv repository. The following information is obtained: 
+# 1. if the article is a research article
+# 2. if the article is a new, contradictory, or confirmatory analysis
+# 3. the category assigned to each research article (pi self assigns)
+# 4. the type of section headers contain in each research article
+
+# ## Load the environment to parse BioRxiv
+
 # In[1]:
 
 
@@ -20,7 +30,36 @@ from tqdm import tqdm_notebook
 biorxiv_files = Path("../biorxiv_articles").rglob("*.xml")
 
 
+# ## Parse BioRxiv
+
 # In[3]:
+
+
+def header_group_mapper(header):
+    if "method" in header:
+        return "material and methods"
+    if "abstract" in header:
+        return "abstract"
+    if "conclusion" in header:
+        return "conclusion"
+    if re.search(r"(supplementary|supplemental) material", header):
+        return "supplemental material"
+    if re.search(r"(declaration[s]?( of interest[s]?)?)|(competing (financial )?interest[s]?)", header):
+        return "conflict of interest"
+    if "additional information" in header:
+        return "supplemental information"
+    if re.search(r"author[s]?[']? contribution[s]?", header):
+        return "author contribution"
+    if re.search(r"(supplementary|supporting) information", header):
+        return "supplemental information"
+    if "data accessibility" in header:
+        return "data availability"
+    if re.search(r"experimental procedures", header):
+        return "material and methods"
+    return header
+
+
+# In[4]:
 
 
 article_metadata = []
@@ -31,21 +70,28 @@ type_mapper = {
     'heading':'heading',
     'hwp-journal-coll':'category'
 }
-
+xml_parser = ET.XMLParser(encoding='UTF-8', recover=True)
 for file in tqdm_notebook(biorxiv_files):
     article = file.with_suffix('').name
-    root = ET.parse(open(file, "rb")).getroot()
+    root = ET.parse(open(file, "rb"), parser=xml_parser).getroot()
     
     # Grab the subject category
     metadata = {
         type_mapper[x.attrib['subj-group-type']]:x.getchildren()[0].text.lower()
         for x in root.xpath('//subj-group')
     }
+    
     metadata.update({'document':f"{article}.xml", 'doi':root.xpath('//article-id')[0].text})
     article_metadata.append(metadata)
     
     # Grab the section titles 
-    section_objs = list(filter(lambda x: "id" in x.attrib and re.search(r"s[\d]+$", x.attrib['id']) is not None, root.xpath('//sec')))
+    section_objs = list(
+        filter(
+            lambda x: "id" in x.attrib and re.search(r"s[\d]+$", x.attrib['id']) is not None,
+            root.xpath('//sec')
+        )
+    )
+    
     title_objs = list(map(lambda x: x.xpath('title//text()'), section_objs))
     title_objs = list(filter(lambda x: len(x) > 0, title_objs))
     
@@ -53,6 +99,7 @@ for file in tqdm_notebook(biorxiv_files):
     # a tag contains the following: <title>A<sc>bstract</sc></title>
     # why is there a <sc> tag?
     if any(list(map(lambda x: len(x) > 1, title_objs))):
+    
         # filter out weird characters ⓘ
         # cant think of a better way to handle these types of edge cases
         title_objs = list(map(lambda headers: list(filter(lambda token: token != 'ⓘ', headers)), title_objs))
@@ -68,10 +115,16 @@ for file in tqdm_notebook(biorxiv_files):
         title_objs = title_objs + [abstract_section]
 
     title_objs = list(map(lambda x: x[0].rstrip().lower(), title_objs))
-    article_sections += list(map(lambda x: {'section':x[0],  'document':x[1]}, product(title_objs, [article])))
+    
+    article_sections += list(
+        map(
+            lambda x: {'section':header_group_mapper(x[0]), 'document':x[1]},
+            product(title_objs, [article])
+        )
+    )
 
 
-# In[4]:
+# In[5]:
 
 
 metadata_df = (
@@ -85,7 +138,7 @@ metadata_df.to_csv("output/biorxiv_article_metadata.tsv", sep="\t", index=False)
 metadata_df.head()
 
 
-# In[5]:
+# In[6]:
 
 
 sections_df = (
@@ -97,7 +150,11 @@ sections_df.to_csv("output/biorxiv_article_sections.tsv", sep="\t", index=False)
 sections_df.head()
 
 
-# In[6]:
+# # Regular Research Articles?
+
+# BioRxiv claims that each article should be a research article. The plot below mainly confirms that statement.
+
+# In[7]:
 
 
 g = (
@@ -108,7 +165,17 @@ g = (
 print(g)
 
 
-# In[7]:
+# In[8]:
+
+
+metadata_df["author_type"].value_counts()
+
+
+# # BioRxiv Research Article Categories
+
+# Categories assigned to each research article. Neuroscience dominates majority of the articles as expected.
+
+# In[9]:
 
 
 category_list = metadata_df.category.value_counts().index.tolist()[::-1]
@@ -125,7 +192,15 @@ g = (
 print(g)
 
 
-# In[8]:
+# In[10]:
+
+
+metadata_df["category"].value_counts()
+
+
+# # New, Confirmatory, Contradictory Results?
+
+# In[11]:
 
 
 heading_list = metadata_df.heading.value_counts().index.tolist()[::-1]
@@ -140,41 +215,34 @@ g = (
 print(g)
 
 
-# In[26]:
+# In[12]:
 
 
-def header_mapper(header):
-    if "method" in header:
-        return "material and methods"
-    if "abstract" in header:
-        return "abstract"
-    if "conclusion" in header:
-        return "conclusion"
-    return header
+metadata_df["heading"].value_counts()
 
 
-# In[27]:
+# # BioRxiv Section Articles
 
+# In[14]:
 
-sections_df = (
-    sections_df
-    .assign(
-        section=lambda x: x.section.apply(
-            lambda y: header_mapper(y)
-        )
-    )
-)
 
 section_list = sections_df.section.value_counts()
-section_list = section_list[section_list > 500].index.to_list()[::-1]
+section_list = section_list[section_list > 800].index.to_list()[::-1]
 
 g = (
     p9.ggplot(sections_df[sections_df.section.isin(section_list)])
     + p9.aes(x="section")
-    + p9.geom_bar()
+    + p9.geom_bar(position="dodge")
     + p9.scale_x_discrete(limits=section_list)
     + p9.coord_flip()
     + p9.theme_bw()
 )
 print(g)
+
+
+# In[17]:
+
+
+section_list = sections_df.section.value_counts()
+section_list[section_list > 800]
 
