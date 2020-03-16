@@ -7,14 +7,14 @@ import tqdm
 import pandas as pd
 
 
-files =(
+files = (
     list(Path("Back_Content").rglob("*.meca"))
     +
     list(Path("Current_Content").rglob("*.meca"))
 )
 
 doc_file_hash_mapper = []
-already_seen = set({})
+already_seen = set()
 
 for file_name in tqdm.tqdm(files):
     doc_hash = file_name.name
