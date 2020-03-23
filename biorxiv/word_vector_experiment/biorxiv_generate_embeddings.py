@@ -5,31 +5,33 @@
 
 # This notebook is designed to generate document embeddings for every article in bioRxiv.
 
-# In[2]:
+# In[1]:
 
 
 from pathlib import Path
 import os
+import re
 
 from gensim.models import Word2Vec
 from gensim.parsing.preprocessing import remove_stopwords
 import lxml.etree as ET
 import pandas as pd
+from sklearn.decomposition import PCA
 from sklearn.manifold import TSNE
 from tqdm import tqdm_notebook
 import umap
 
 
-# # Output Documents to File
-
-# This section dumps all of biorxiv text into a single document in order to train the word2vec model. This is for ease of training the model.
-
-# In[3]:
+# In[2]:
 
 
 journal_map_df = pd.read_csv("../exploratory_data_analysis/output/biorxiv_article_metadata.tsv", sep="\t")
 journal_map_df.head()
 
+
+# # Output Documents to File
+
+# This section dumps all of biorxiv text into a single document in order to train the word2vec model. This is for ease of training the model.
 
 # In[ ]:
 
@@ -275,5 +277,42 @@ for biorxiv_doc_vectors in Path().rglob("output/word2vec_output/biorxiv_all_arti
     tsne_df.to_csv(
         f"output/embedding_output/tsne/biorxiv_tsne_{model_dim}.tsv", 
         sep="\t", index=False,
+    )
+
+
+# # PCA the Documents
+
+# In[3]:
+
+
+n_components = 2
+random_state = 100
+
+
+# In[4]:
+
+
+for biorxiv_doc_vectors in Path().rglob("output/word2vec_output/biorxiv_all_articles*.tsv.xz"):
+    model_dim = int(re.search(r"(\d+)", biorxiv_doc_vectors.stem).group(1))
+    biorxiv_articles_df = pd.read_csv(str(biorxiv_doc_vectors.resolve()), sep="\t")
+    
+    reducer = PCA(
+        n_components = n_components,
+        random_state = random_state
+    )
+    
+    embedding = reducer.fit_transform(
+        biorxiv_articles_df[[f"feat_{idx}" for idx in range(model_dim)]].values
+    )
+    
+    pca_df = (
+        pd.DataFrame(embedding, columns=["pca1", "pca2"])
+        .assign(document=biorxiv_articles_df.document.values.tolist())
+        .merge(journal_map_df[["category", "document", "doi"]], on="document")
+    )
+    
+    pca_df.to_csv(
+        f"output/embedding_output/pca/biorxiv_pca_{model_dim}.tsv",
+        sep="\t", index=False
     )
 

@@ -72,13 +72,39 @@ biorxiv_tsne_models_lastest = {
         })
         .reset_index(drop=True)
     )
-    for key in biorxiv_umap_models
+    for key in biorxiv_tsne_models
+}
+
+
+# In[5]:
+
+
+biorxiv_pca_models = {
+    int(re.search(r"(\d+)", str(file)).group(1)):pd.read_csv(str(file), sep="\t")
+    for file in Path().rglob("output/embedding_output/pca/biorxiv_pca*tsv")
+}
+
+# Keep only current versions of articles
+biorxiv_pca_models_lastest = {
+    key: (
+        biorxiv_pca_models[key]
+        .groupby("doi")
+        .agg({
+            "doi": "last",
+            "document": "last",
+            "pca1": "last",
+            "pca2": "last",
+            "category":"last",
+        })
+        .reset_index(drop=True)
+    )
+    for key in biorxiv_pca_models
 }
 
 
 # # UMAP of the Documents
 
-# In[5]:
+# In[6]:
 
 
 g = (
@@ -94,7 +120,7 @@ g.save("output/embedding_output/umap/figures/biorxiv_umap_150.png", dpi=500)
 print(g)
 
 
-# In[6]:
+# In[7]:
 
 
 g = (
@@ -110,7 +136,7 @@ g.save("output/embedding_output/umap/figures/biorxiv_umap_250.png", dpi=500)
 print(g)
 
 
-# In[7]:
+# In[8]:
 
 
 g = (
@@ -130,7 +156,7 @@ print(g)
 
 # ## UMAP Outliers
 
-# In[8]:
+# In[9]:
 
 
 g = (
@@ -149,7 +175,7 @@ g = (
 print(g)
 
 
-# In[9]:
+# In[10]:
 
 
 (
@@ -160,7 +186,7 @@ print(g)
 
 # Using the doi link (doi.org/doi url) so far the bioinformatics papers should be reclassified as Epigenetics (10.1101/290825) and Cancer biology (10.1101/599225). The animal behavior and cognition category (10.1101/066423 and 10.1101/045062) has shockingly similar titles, which means I found a duplicate of preprints. The articles have two different ids, but have the same authors and unsurprisingly close titles. Lastly, the genetics (10.1101/045666) preprint sounds like it should be a neuroscience preprint. So far it seems like the outliers are category errors/mysterious duplication.
 
-# In[10]:
+# In[11]:
 
 
 g = (
@@ -177,7 +203,7 @@ g = (
 print(g)
 
 
-# In[11]:
+# In[12]:
 
 
 (
@@ -188,7 +214,7 @@ print(g)
 
 # This article is mainly about evolutionary biology; however, it discusses intellegency quotient (IQ). This means the outlier is a combination of both fields; hence the point is in close proximity of the evolutionary biology section. The cancer biology preprint (10.1101/034132) seems like a biophysics paper or something to that nature.
 
-# In[12]:
+# In[13]:
 
 
 g = (
@@ -204,7 +230,7 @@ g = (
 print(g)
 
 
-# In[13]:
+# In[14]:
 
 
 (
@@ -219,7 +245,7 @@ print(g)
 
 # # TSNE of the Documents
 
-# In[14]:
+# In[15]:
 
 
 g = (
@@ -235,7 +261,7 @@ g.save("output/embedding_output/tsne/figures/biorxiv_tsne_150.png", dpi=500)
 print(g)
 
 
-# In[15]:
+# In[16]:
 
 
 g = (
@@ -251,7 +277,7 @@ g.save("output/embedding_output/tsne/figures/biorxiv_tsne_250.png", dpi=500)
 print(g)
 
 
-# In[16]:
+# In[17]:
 
 
 g = (
@@ -271,7 +297,7 @@ print(g)
 
 # ## TSNE Outliers
 
-# In[17]:
+# In[18]:
 
 
 g = (
@@ -287,7 +313,7 @@ g = (
 print(g)
 
 
-# In[18]:
+# In[19]:
 
 
 (
@@ -302,7 +328,7 @@ print(g)
 
 # Looking into the bioinformatics blob approximately 370 articles are off category.
 
-# In[19]:
+# In[20]:
 
 
 (
@@ -315,7 +341,7 @@ print(g)
 
 # (10.1101/008896) is a bioinformatics and biophysics paper, but the authors didn't provide a category for the preprint. (10.1101/248898) is a preprint that monitors data availability, which suggests that it should have the bioinformatics category as well. (10.1101/377960) should have the bioinformatics category as well.
 
-# In[20]:
+# In[21]:
 
 
 g = (
@@ -331,7 +357,7 @@ g = (
 print(g)
 
 
-# In[21]:
+# In[22]:
 
 
 (
@@ -346,7 +372,7 @@ print(g)
 
 # Looking into the bioinformatics blob approximately 370 articles are off category.
 
-# In[22]:
+# In[23]:
 
 
 (
@@ -358,5 +384,55 @@ print(g)
 
 
 # (10.1101/374801) is a preprint on glucose monitoring in infants. Not sure how this preprint fell into the neurscience category or even in the bioinformatics category.. (10.1101/395293) is about using ultrasound to improve corticosteroid injection. Once again not sure how this paper got grouped with other neuroscience papers. (10.1101/574673) is a preprint about transcriptional profiling of cerebrovascular traits in mice (paraphrased). This paper could also receive a neuroscience label given that the cell location type is neuroscience related. 
+
+# # PCA of the Documents
+
+# In[25]:
+
+
+g = (
+    p9.ggplot(biorxiv_pca_models_lastest[150])
+    + p9.aes(x="pca1", y="pca2", color="factor(category)")
+    + p9.geom_point()
+    + p9.labs(
+        title="PCA of BioRxiv (150 dim)",
+        color="Article Category"
+    )
+)
+g.save("output/embedding_output/pca/figures/biorxiv_pca_150.png", dpi=500)
+print(g)
+
+
+# In[26]:
+
+
+g = (
+    p9.ggplot(biorxiv_pca_models_lastest[250])
+    + p9.aes(x="pca1", y="pca2", color="factor(category)")
+    + p9.geom_point()
+    + p9.labs(
+        title="PCA of BioRxiv (250 dim)",
+        color="Article Category"
+    )
+)
+g.save("output/embedding_output/pca/figures/biorxiv_pca_250.png", dpi=500)
+print(g)
+
+
+# In[27]:
+
+
+g = (
+    p9.ggplot(biorxiv_pca_models_lastest[300])
+    + p9.aes(x="pca1", y="pca2", color="factor(category)")
+    + p9.geom_point()
+    + p9.labs(
+        title="PCA of BioRxiv (300 dim)",
+        color="Article Category"
+    )
+)
+g.save("output/embedding_output/pca/figures/biorxiv_pca_300.png", dpi=500)
+print(g)
+
 
 # Overall, it seems that average word vectors can detect category errors within the biorxiv repository. Really cool given the fact that this technique can provide a elegant solution to a complex problem.
