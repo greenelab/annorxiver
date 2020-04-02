@@ -190,7 +190,7 @@ class PolarityColorFunc():
 
 
 pca_dimensions = [f"pca{dim}_cossim" for dim in range(1, n_components+1, 1)]
-for component in tqdm_notebook(pca_dimensions):
+for pc, component in tqdm_notebook(enumerate(pca_dimensions, start=1)):
     word_class_map = {}
     
     word_class_map['negative'] = (
@@ -217,6 +217,8 @@ for component in tqdm_notebook(pca_dimensions):
         for word_class in word_class_map
     })
     
+    pc = f"{pc}" if pc > 9 else f"0{pc}"
+    
     polarity_cloud = (
         wordcloud
         .WordCloud(background_color="white", width=1024, height=768, collocations=False)
@@ -226,7 +228,7 @@ for component in tqdm_notebook(pca_dimensions):
             for record in word_class_map[word_class]
         })
         .recolor(color_func=polarity_color_map)
-        .to_file(f"output/word_pca_similarity/figures/{component}_word_cloud.png")
+        .to_file(f"output/word_pca_similarity/figures/pca_{pc}_cossim_word_cloud.png")
     )
 
 
