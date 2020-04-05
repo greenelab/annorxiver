@@ -85,19 +85,20 @@ journal_paper_df.journal.unique().shape
 
 # # Types of Articles Contained in PMC
 
-# In[9]:
+# In[3]:
 
 
 journal_article_type_list = journal_paper_df['article_type'].value_counts().index.tolist()[::-1]
+journal_article_type_list = journal_article_type_list[-15:]
 
 g = (
-    p9.ggplot(journal_paper_df)
+    p9.ggplot(journal_paper_df.query(f"article_type in {journal_article_type_list}"))
     + p9.aes(x="article_type")
     + p9.geom_bar(position="dodge")
     + p9.scale_x_discrete(limits=journal_article_type_list)
     + p9.coord_flip()
     + p9.theme_bw()
 )
-g.save("output/figures/article_sections.png", dpi=500)
+g.save("output/figures/article_type.png", dpi=500)
 print(g)
 
