@@ -234,7 +234,7 @@ for pc, component in tqdm_notebook(enumerate(pca_dimensions, start=1)):
 
 # # Document Centroid Cosine Similarity
 
-# Finally this section calculates document centroid to principal component associations. This means the higher score the higher the association a document is with a given principal component.
+# Finally this section calculates document centroid to principal component associations. This means the higher score the higher the association is between a document category and given principal component.
 
 # In[11]:
 

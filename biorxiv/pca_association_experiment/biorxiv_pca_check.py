@@ -3,7 +3,9 @@
 
 # # Determine Word to PCA Associations
 
-# This notebook is designed to check if there is a bug for the PCA plots. Turns out there isn't a bug the signal captured in the first two components is quite strong.
+# This notebook is designed to check if there is a bug for the PCA plots. Discovered in [greenelab/annorxiver#2](https://github.com/greenelab/annorxiver/pull/2) the PCA plots there look practically the same. This highlights that there might be a bug when trying to train a PCA model (i.e. feeding the same embeddings into the PCA model (300 dim instead of the intended 150 dim). 
+# 
+# Conclusion: turns out there isn't a bug and the signal captured in the first two components is quite strong.
 
 # In[1]:
 
@@ -24,7 +26,7 @@ journal_map_df.head()
 
 # # PCA the Documents
 
-# Run PCA over the documents. Generates 50 principal components, but can generate more or less.
+# Run PCA over the documents. Generates 2 principal components as in [greenelab/annorxiver#2](https://github.com/greenelab/annorxiver/pull/2). Needed to make sure PCA is trained with the same hyperparamter.
 
 # In[3]:
 
@@ -85,6 +87,8 @@ for embedding_dim in biorxiv_articles_dict:
 
 # # PCA Embedding Check
 
+# The sanity check here is to make sure the values of pca1 and pca2 are not the exact same. If they were then there is a bug somewhere above.
+
 # In[11]:
 
 
@@ -104,6 +108,8 @@ pca_dict[300].head(3)
 
 
 # # PCA Plots
+
+# This is the biggest test. If any of these plots look drastically different than in [greenelab/annorxiver#2](https://github.com/greenelab/annorxiver/pull/2) that would mean there is a bug I would have to go find. Luckily, there isn't a bug as the PCs captured here are the same regardless of embedding dimensions.
 
 # In[14]:
 
