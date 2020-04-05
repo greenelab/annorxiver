@@ -36,25 +36,25 @@ biorxiv_files = Path("../biorxiv_articles").rglob("*.xml")
 
 
 def header_group_mapper(header):
-    if "method" in header:
+    if re.search("method", header, flags=re.I):
         return "material and methods"
-    if "abstract" in header:
+    if re.search("abstract", header, flags=re.I):
         return "abstract"
-    if "conclusion" in header:
+    if re.search("conclusion", header, flags=re.I):
         return "conclusion"
-    if re.search(r"(supplementary|supplemental) material", header):
+    if re.search(r"(supplementary|supplemental) material", header, flags=re.I):
         return "supplemental material"
-    if re.search(r"(declaration[s]?( of interest[s]?)?)|(competing (financial )?interest[s]?)", header):
+    if re.search(r"(declaration[s]?( of interest[s]?)?)|(competing (financial )?interest[s]?)", header, flags=re.I):
         return "conflict of interest"
-    if "additional information" in header:
+    if re.search("additional information", header, flags=re.I):
         return "supplemental information"
-    if re.search(r"author[s]?[']? contribution[s]?", header):
+    if re.search(r"author[s]?[']? contribution[s]?", header, flags=re.I):
         return "author contribution"
-    if re.search(r"(supplementary|supporting) information", header):
+    if re.search(r"(supplementary|supporting) information", header, flags=re.I):
         return "supplemental information"
-    if "data accessibility" in header:
+    if re.search("data accessibility", header, flags=re.I):
         return "data availability"
-    if re.search(r"experimental procedures", header):
+    if re.search(r"experimental procedures", header, flags=re.I):
         return "material and methods"
     return header
 
@@ -132,6 +132,19 @@ metadata_df = (
     .from_records(article_metadata)
     .fillna({"category":'none', 'author_type':'none', 'heading':'none'})
     .assign(category=lambda x:x.category.apply(lambda x: " ".join(x.split("_")) if "_" in x else x))
+    .replace(
+        {'heading':
+              {
+                "bioinformatics":"none",
+                "genomics": "none",
+                "zoology": "none",
+                "evolutionary biology": "none",
+                "animal behavior and cognition": "none",
+                "ecology":"none",
+                "genetics":"none"
+              }
+        }
+    )
 )
 
 metadata_df.to_csv("output/biorxiv_article_metadata.tsv", sep="\t", index=False)
@@ -208,15 +221,7 @@ heading_list = metadata_df.heading.value_counts().index.tolist()[::-1]
 
 g = (
     p9.ggplot(
-        metadata_df
-        .rename({
-        "bioinformatics":"none",
-        "genomics": "none",
-        "zoology": "none",
-        "evolutionary_biology": "none",
-        "animal behavior and cognition": "none",
-        "ecology":"none"
-        }), 
+        metadata_df, 
         p9.aes(x="heading")
     )
     + p9.geom_bar(size=10)
