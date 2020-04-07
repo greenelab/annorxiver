@@ -22,9 +22,117 @@ biorxiv_sections_df = (
 biorxiv_sections_df.head()
 
 
-# # TSNE Embeddings for BioRxiv
+# # PCA Embeddings for bioRxiv
 
 # In[3]:
+
+
+biorxiv_embeddings_df = pd.read_csv(
+    "../word_vector_experiment/output/embedding_output/pca/biorxiv_pca_300.tsv", 
+    sep="\t"
+)
+biorxiv_embeddings_df.head()
+
+
+# In[4]:
+
+
+biorxiv_pca_method_section_df = (
+    pd.merge(
+        biorxiv_embeddings_df, 
+        biorxiv_sections_df.query("section=='material and methods'").drop_duplicates(),
+        on="document",
+        how="left"
+    )
+    .assign(section=lambda x: x.section.apply(lambda x: "has_methods" if x=="material and methods" else "no_methods"))
+    .groupby("doi")
+    .agg({
+        "doi": "last",
+        "document": "last",
+        "pca1": "last",
+        "pca2": "last",
+        "category":"last",
+        "section": "last",
+    })
+    .reset_index(drop=True)
+)
+biorxiv_pca_method_section_df.head()
+
+
+# ## Global View of PCA plot
+
+# In[5]:
+
+
+g = (
+    p9.ggplot(
+        biorxiv_pca_method_section_df
+    )
+    + p9.aes(x="pca1", y="pca2", color="category")
+    + p9.geom_point()
+    + p9.theme_bw()
+    + p9.labs(
+        title="TSNE Methods Section (300 dim)"
+    )
+)
+print(g)
+
+
+# ## Neuroscience Methods Section
+
+# In[6]:
+
+
+g = (
+    p9.ggplot(
+        biorxiv_pca_method_section_df
+        .query("category=='neuroscience'")
+    )
+    + p9.aes(x="pca1", y="pca2", color="section")
+    + p9.geom_point(position=p9.position_dodge(width=0.2))
+    + p9.facet_wrap("section")
+    + p9.theme_bw()
+    + p9.theme(
+        subplots_adjust={'wspace':0.10}
+    )
+    + p9.scale_color_manual({
+        "has_methods": "#d8b365",
+        "no_methods": "#5ab4ac"
+    })
+    + p9.labs(
+        title="Neuroscience Methods Section"
+    )
+)
+g.save("output/pca/neuroscience_missing_methods.png", dpi=500)
+print(g)
+
+
+# In[7]:
+
+
+g = (
+    p9.ggplot(
+        biorxiv_pca_method_section_df
+        .query("category=='neuroscience'")
+    )
+    + p9.aes(x="pca1", y="pca2", color="section")
+    + p9.geom_point(position=p9.position_dodge(width=0.2))
+    + p9.theme_bw()
+    + p9.scale_color_manual({
+        "has_methods": "#d8b365",
+        "no_methods": "#5ab4ac"
+    })
+    + p9.labs(
+        title="Neuroscience Methods Section"
+    )
+)
+g.save("output/pca/neuroscience_missing_methods_overlapped.png", dpi=500)
+print(g)
+
+
+# # TSNE Embeddings for bioRxiv
+
+# In[8]:
 
 
 biorxiv_embeddings_df = pd.read_csv(
@@ -34,7 +142,7 @@ biorxiv_embeddings_df = pd.read_csv(
 biorxiv_embeddings_df.head()
 
 
-# In[4]:
+# In[9]:
 
 
 biorxiv_tsne_method_section_df = (
@@ -61,7 +169,7 @@ biorxiv_tsne_method_section_df.head()
 
 # ## Global View of tSNE plot
 
-# In[5]:
+# In[10]:
 
 
 g = (
@@ -80,7 +188,7 @@ print(g)
 
 # ## Neuroscience Methods Section
 
-# In[6]:
+# In[11]:
 
 
 g = (
@@ -103,11 +211,11 @@ g = (
         title="Neuroscience Methods Section"
     )
 )
-g.save("output/neuroscience_missing_methods.png", dpi=500)
+g.save("output/tsne/neuroscience_missing_methods.png", dpi=500)
 print(g)
 
 
-# In[7]:
+# In[12]:
 
 
 g = (
@@ -126,11 +234,11 @@ g = (
         title="Neuroscience Methods Section"
     )
 )
-g.save("output/neuroscience_missing_methods_overlapped.png", dpi=500)
+g.save("output/tsne/neuroscience_missing_methods_overlapped.png", dpi=500)
 print(g)
 
 
-# In[8]:
+# In[13]:
 
 
 g = (
@@ -153,7 +261,7 @@ g = (
 print(g)
 
 
-# In[9]:
+# In[14]:
 
 
 (
@@ -177,7 +285,7 @@ print(g)
 
 # ## Bioinformatics Methods Section
 
-# In[10]:
+# In[15]:
 
 
 g = (
@@ -197,11 +305,11 @@ g = (
         title="Bioinformatics Methods Section"
     )
 )
-g.save("output/bioinformatics_missing_methods_overlapped.png", dpi=500)
+g.save("output/tsne/bioinformatics_missing_methods_overlapped.png", dpi=500)
 print(g)
 
 
-# In[11]:
+# In[16]:
 
 
 g = (
@@ -224,7 +332,7 @@ g = (
 print(g)
 
 
-# In[12]:
+# In[17]:
 
 
 (
@@ -245,7 +353,7 @@ print(g)
 # | [10.1101/392944](https://doi.org/10.1101/392944) | Statistics for microbe growth modeling. It talks about a software package, so no direct methods section |
 # | [10.1101/835181](https://doi.org/10.1101/835181) | has a method section, so this is a false positive. Could be an xml parsing issue. | 
 
-# In[13]:
+# In[18]:
 
 
 g = (
@@ -268,7 +376,7 @@ g = (
 print(g)
 
 
-# In[14]:
+# In[19]:
 
 
 (
@@ -294,7 +402,7 @@ print(g)
 
 # ## Microbiology Methods Section
 
-# In[15]:
+# In[20]:
 
 
 g = (
@@ -317,7 +425,7 @@ g = (
 print(g)
 
 
-# In[16]:
+# In[21]:
 
 
 (
@@ -342,7 +450,7 @@ print(g)
 
 # # UMAP Embeddings for BioRxiv
 
-# In[17]:
+# In[22]:
 
 
 biorxiv_embeddings_df = pd.read_csv(
@@ -352,7 +460,7 @@ biorxiv_embeddings_df = pd.read_csv(
 biorxiv_embeddings_df.head()
 
 
-# In[18]:
+# In[23]:
 
 
 biorxiv_umap_method_section_df = (
@@ -379,7 +487,7 @@ biorxiv_umap_method_section_df.head()
 
 # ## Global View of Umap Plot
 
-# In[19]:
+# In[24]:
 
 
 g = (
@@ -398,7 +506,7 @@ print(g)
 
 # ## Neuroscience Methods Section
 
-# In[20]:
+# In[25]:
 
 
 g = (
@@ -421,7 +529,7 @@ g = (
 print(g)
 
 
-# In[21]:
+# In[26]:
 
 
 (
@@ -443,7 +551,7 @@ print(g)
 # | [10.1101/347070](https://doi.org/10.1101/347070) | has methods section labeled as "the proposed approach". It also seems like this paper should belong in PsyRxiv rather than biorxiv |
 # | [10.1101/541243](https://doi.org/10.1101/541243) | has a methods section, but labeled as something else, which is why I couldn't detect it with my parser |
 
-# In[22]:
+# In[27]:
 
 
 g = (
@@ -466,7 +574,7 @@ g = (
 print(g)
 
 
-# In[23]:
+# In[28]:
 
 
 (
@@ -490,7 +598,7 @@ print(g)
 
 # ## Bioinformatics Method Section
 
-# In[24]:
+# In[29]:
 
 
 g = (
@@ -513,7 +621,7 @@ g = (
 print(g)
 
 
-# In[25]:
+# In[30]:
 
 
 (
@@ -534,7 +642,7 @@ print(g)
 # | [10.1101/134288](https://doi.org/10.1101/134288) | is a weirdly formatted paper, but I didn't see a methods section in sight. |
 # | [10.1101/140376](https://doi.org/10.1101/140376) | is a borderline article where it is written like a literature survey, but has analysis and results. No method section though. |
 
-# In[26]:
+# In[31]:
 
 
 g = (
@@ -557,7 +665,7 @@ g = (
 print(g)
 
 
-# In[27]:
+# In[32]:
 
 
 (
@@ -580,7 +688,7 @@ print(g)
 
 # ## Microbiology Methods Section
 
-# In[28]:
+# In[33]:
 
 
 g = (
@@ -603,7 +711,7 @@ g = (
 print(g)
 
 
-# In[29]:
+# In[34]:
 
 
 (
