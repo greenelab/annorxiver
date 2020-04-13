@@ -112,7 +112,7 @@ g = (
     + p9.aes(x="umap1", y="umap2", color="factor(category)")
     + p9.geom_point()
     + p9.labs(
-        title="UMAP of BioRxiv (150 dim)",
+        title="UMAP of BioRxiv (Word dim: 150)",
         color="Article Category"
     )
 )
@@ -128,7 +128,7 @@ g = (
     + p9.aes(x="umap1", y="umap2", color="factor(category)")
     + p9.geom_point()
     + p9.labs(
-        title="UMAP of BioRxiv (250 dim)",
+        title="UMAP of BioRxiv (Word dim: 250)",
         color="Article Category"
     )
 )
@@ -144,7 +144,7 @@ g = (
     + p9.aes(x="umap1", y="umap2", color="factor(category)")
     + p9.geom_point()
     + p9.labs(
-        title="UMAP of BioRxiv (300 dim)",
+        title="UMAP of BioRxiv (Word dim: 300)",
         color="Article Category"
     )
 )
@@ -168,7 +168,7 @@ g = (
     + p9.annotate("segment", x=7.5, y=-2.2, xend=6.2, yend=-2.2, arrow=p9.arrow(), color="red")
     + p9.annotate("segment", x=7.5, y=1.5, xend=5.7, yend=1.5, arrow=p9.arrow(), color="red")
     + p9.labs(
-        title="Outlier Detection of BioRxiv UMAP (300 dim)",
+        title="Outlier Detection of BioRxiv UMAP (Word dim: 300)",
         color="Article Category"
     )
 )
@@ -196,7 +196,7 @@ g = (
     + p9.annotate("segment", x=-5.5, y=5, xend=-5.6, yend=2.5, arrow=p9.arrow(), color="red")
     + p9.annotate("segment", x=-4.8, y=5, xend=-4.8, yend=3.6, arrow=p9.arrow(), color="red")
     + p9.labs(
-        title="Outlier Detection of BioRxiv UMAP (300 dim)",
+        title="Outlier Detection of BioRxiv UMAP (Word dim: 300)",
         color="Article Category"
     )
 )
@@ -223,7 +223,7 @@ g = (
     + p9.geom_point()
     + p9.annotate("rect", xmin=0, xmax=3, ymin=7.5, ymax=9.5, alpha = 0.4)
     + p9.labs(
-        title="Outlier Detection of BioRxiv UMAP (300 dim)",
+        title="Outlier Detection of BioRxiv UMAP (Word dim: 300)",
         color="Article Category"
     )
 )
@@ -253,7 +253,7 @@ g = (
     + p9.aes(x="tsne1", y="tsne2", color="factor(category)")
     + p9.geom_point()
     + p9.labs(
-        title="TSNE of BioRxiv (150 dim)",
+        title="TSNE of BioRxiv (Word dim: 150)",
         color="Article Category"
     )
 )
@@ -269,7 +269,7 @@ g = (
     + p9.aes(x="tsne1", y="tsne2", color="factor(category)")
     + p9.geom_point()
     + p9.labs(
-        title="TSNE of BioRxiv (250 dim)",
+        title="TSNE of BioRxiv (Word dim: 250)",
         color="Article Category"
     )
 )
@@ -285,7 +285,7 @@ g = (
     + p9.aes(x="tsne1", y="tsne2", color="factor(category)")
     + p9.geom_point()
     + p9.labs(
-        title="TSNE of BioRxiv (300 dim)",
+        title="TSNE of BioRxiv (Word dim: 300)",
         color="Article Category"
     )
 )
@@ -306,7 +306,7 @@ g = (
     + p9.geom_point()
     + p9.annotate("segment", x=60, y=60, xend=45, yend=45, arrow=p9.arrow(), color="red")
     + p9.labs(
-        title="Outlier Detection of BioRxiv TSNE (300 dim)",
+        title="Outlier Detection of BioRxiv TSNE (Word dim: 300)",
         color="Article Category"
     )
 )
@@ -350,7 +350,7 @@ g = (
     + p9.geom_point()
     + p9.annotate("rect", xmin=-30, xmax=-20, ymin=40, ymax=55, alpha=0.4)
     + p9.labs(
-        title="Outlier Detection of BioRxiv TSNE (300 dim)",
+        title="Outlier Detection of BioRxiv TSNE (Word dim: 300)",
         color="Article Category"
     )
 )
@@ -395,7 +395,7 @@ g = (
     + p9.aes(x="pca1", y="pca2", color="factor(category)")
     + p9.geom_point()
     + p9.labs(
-        title="PCA of BioRxiv (150 dim)",
+        title="PCA of BioRxiv (Word dim: 150)",
         color="Article Category"
     )
 )
@@ -411,7 +411,7 @@ g = (
     + p9.aes(x="pca1", y="pca2", color="factor(category)")
     + p9.geom_point()
     + p9.labs(
-        title="PCA of BioRxiv (250 dim)",
+        title="PCA of BioRxiv (Word dim: 250)",
         color="Article Category"
     )
 )
@@ -427,7 +427,7 @@ g = (
     + p9.aes(x="pca1", y="pca2", color="factor(category)")
     + p9.geom_point()
     + p9.labs(
-        title="PCA of BioRxiv (300 dim)",
+        title="PCA of BioRxiv (Word dim: 300)",
         color="Article Category"
     )
 )
