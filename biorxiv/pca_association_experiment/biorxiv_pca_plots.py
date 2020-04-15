@@ -8,47 +8,14 @@
 # In[1]:
 
 
-get_ipython().run_line_magic('matplotlib', 'inline')
-from pathlib import Path
-import os
-import re
-
-from gensim.models import Word2Vec
-import itertools
-from IPython.display import HTML, display
-import matplotlib.pyplot as plt
 import pandas as pd
-import plotnine as p9
-from PIL import ImageColor
 from scipy.spatial.distance import cdist
 from sklearn.decomposition import PCA
-from tqdm import tqdm_notebook
-import wordcloud
+
+from pca_plot_helper import *
 
 
 # In[2]:
-
-
-def display_clouds(pc_cloud_1, pc_cloud_2):
-    return display(
-        HTML(
-            f"""
-            <table>
-                <tr>
-                    <td>
-                    <img src={pc_cloud_1}>
-                    </td>
-                    <td>
-                    <img src={pc_cloud_2}>
-                    </td>
-                </tr>
-            </table>
-            """
-        )
-    )
-
-
-# In[3]:
 
 
 journal_map_df = pd.read_csv("../exploratory_data_analysis/output/biorxiv_article_metadata.tsv", sep="\t")
@@ -59,14 +26,14 @@ journal_map_df.head()
 
 # Run PCA over the documents. Generates 50 principal components, but can generate more or less.
 
-# In[4]:
+# In[3]:
 
 
 n_components = 50
 random_state = 100
 
 
-# In[5]:
+# In[4]:
 
 
 biorxiv_articles_df = pd.read_csv(
@@ -75,7 +42,7 @@ biorxiv_articles_df = pd.read_csv(
 )
 
 
-# In[6]:
+# In[5]:
 
 
 reducer = PCA(
@@ -108,17 +75,30 @@ pca_df = (
     .reset_index(drop=True)
 )
 
+pca_df.head()
 
-# In[7]:
+
+# In[6]:
 
 
 reducer.explained_variance_
 
 
-# In[8]:
+# In[7]:
 
 
 reducer.explained_variance_ratio_
+
+
+# In[8]:
+
+
+(
+    pca_df
+    .category
+    .sort_values()
+    .unique()
+)
 
 
 # # Plot the PCA axes
@@ -140,40 +120,68 @@ reducer.explained_variance_ratio_
 # | PCA4 | Microbiology vs Cell Biology |
 # | PCA5 | RNA-seq vs Evolutional Biology | 
 
+# In[9]:
+
+
+global_color_palette = [
+    '#a6cee3','#1f78b4',
+    '#b2df8a','#33a02c',
+    '#fb9a99'
+]
+
+
 # ### PCA1 vs PCA2
 
-# In[9]:
+# In[10]:
 
 
 display_clouds(
     'output/word_pca_similarity/figures/pca_01_cossim_word_cloud.png',
-    'output/word_pca_similarity/figures/pca_02_cossim_word_cloud.png',
+    'output/word_pca_similarity/figures/pca_02_cossim_word_cloud.png'
 )
 
 
 # These word clouds depict the following concepts: quantitative biology vs molecular biology (left) and genomics vs neuroscience (right). The cells below provide evidence for the previous claim
 
-# In[10]:
+# In[11]:
 
 
-g = (
-    p9.ggplot(pca_df)
-    + p9.aes(x="pca1", y="pca2", color="factor(category)")
-    + p9.geom_point()
-    + p9.labs(
-        title="PCA of BioRxiv (Word Dim: 300)",
-        color="Article Category"
-    )
+selected_categories = [
+    'biochemistry', 'bioinformatics',
+    'cell biology', 'neuroscience',
+    'scientific communication'
+]
+
+
+# In[12]:
+
+
+generate_scatter_plots(
+    pca_df,
+    x="pca1", y="pca2",
+    nsample=200, random_state=100,
+    selected_categories=selected_categories,
+    color_palette=global_color_palette,
+    save_file_path="output/pca_plots/scatterplot_files/pca01_v_pca02.png"
 )
-g.save("output/pca_plots/pca01_v_pca02.png", dpi=500)
-print(g)
+
+
+# In[13]:
+
+
+plot_scatter_clouds(
+    scatter_plot_path = "output/pca_plots/scatterplot_files/pca01_v_pca02.png", 
+    word_cloud_x_path = "output/word_pca_similarity/figures/pca_01_cossim_word_cloud.png",
+    word_cloud_y_path = "output/word_pca_similarity/figures/pca_02_cossim_word_cloud.png",
+    final_figure_path = "output/pca_plots/figures/pca01_v_pca02_figure.png"
+)
 
 
 # Take note that pca2 clusters neruoscience papers on the negative axis while genomics papers are on the positive axis (up and down). PCA 1 places papers that are more focused on quantitative biology on the right and molecular biology to the left. Hence why bioinforamtics papers are shifted more to the right and cell biology papers are shifted more to the left. This plot visually confirms the above finding.
 
 # ### PCA1 vs PCA 3
 
-# In[11]:
+# In[14]:
 
 
 display_clouds(
@@ -184,27 +192,45 @@ display_clouds(
 
 # These word clouds depict the following concepts: quantitative biology vs molecular biology (left) and disease vs sequencing (right)
 
-# In[12]:
+# In[15]:
 
 
-g = (
-    p9.ggplot(pca_df)
-    + p9.aes(x="pca1", y="pca3", color="factor(category)")
-    + p9.geom_point()
-    + p9.labs(
-        title="PCA of BioRxiv (Word Dim: 300)",
-        color="Article Category"
-    )
+selected_categories = [
+    'bioinformatics','epidemiology', 
+    'genetics', 'paleontology',
+    'pathology'
+]
+
+
+# In[16]:
+
+
+generate_scatter_plots(
+    pca_df,
+    x="pca1", y="pca3",
+    nsample=200, random_state=100,
+    selected_categories=selected_categories,
+    color_palette=global_color_palette,
+    save_file_path="output/pca_plots/scatterplot_files/pca01_v_pca03.png"
 )
-g.save("output/pca_plots/pca01_v_pca03.png", dpi=500)
-print(g)
+
+
+# In[17]:
+
+
+plot_scatter_clouds(
+    scatter_plot_path = "output/pca_plots/scatterplot_files/pca01_v_pca03.png", 
+    word_cloud_x_path = "output/word_pca_similarity/figures/pca_01_cossim_word_cloud.png",
+    word_cloud_y_path = "output/word_pca_similarity/figures/pca_03_cossim_word_cloud.png",
+    final_figure_path = "output/pca_plots/figures/pca01_v_pca03_figure.png"
+)
 
 
 # Take note that pca3 clusters sequencing based papers on the negative axis (down) while disease papers are on the positive axis (up). When plotted against PCA1 it looks like epidemiology papers dominate the top right quadrant, while bottom right quadrant contains bioinformatics papers. This makes sense as many bioinformatic papers consist of some sort of sequencing technologies, while epidemiology is focused on measuring disease and its progression. Both take quantitative views, which is why they are on the positive size of PCA1.
 
 # ### PCA2 vs PCA3
 
-# In[13]:
+# In[18]:
 
 
 display_clouds(
@@ -215,27 +241,45 @@ display_clouds(
 
 # These word clouds depict the following concepts: neuroscience to genomics (left) and disease vs sequencing (right)
 
-# In[14]:
+# In[19]:
 
 
-g = (
-    p9.ggplot(pca_df)
-    + p9.aes(x="pca2", y="pca3", color="factor(category)")
-    + p9.geom_point()
-    + p9.labs(
-        title="PCA of BioRxiv (Word Dim: 300)",
-        color="Article Category"
-    )
+selected_categories = [
+    'epidemiology', 'genetics', 
+    'genomics', 'neuroscience',
+    'pathology'
+]
+
+
+# In[20]:
+
+
+generate_scatter_plots(
+    pca_df,
+    x="pca2", y="pca3",
+    nsample=200, random_state=100,
+    selected_categories=selected_categories,
+    color_palette=global_color_palette,
+    save_file_path="output/pca_plots/scatterplot_files/pca02_v_pca03.png"
 )
-g.save("output/pca_plots/pca02_v_pca03.png", dpi=500)
-print(g)
+
+
+# In[21]:
+
+
+plot_scatter_clouds(
+    scatter_plot_path = "output/pca_plots/scatterplot_files/pca02_v_pca03.png", 
+    word_cloud_x_path = "output/word_pca_similarity/figures/pca_02_cossim_word_cloud.png",
+    word_cloud_y_path = "output/word_pca_similarity/figures/pca_03_cossim_word_cloud.png",
+    final_figure_path = "output/pca_plots/figures/pca02_v_pca03_figure.png"
+)
 
 
 # Note that bottom right quadrant comprises of mainly bioinformatics papers, which makes sense given that quadrant represents sequencing and genomics related papers (hence bioinformatics). The bottom left quadrant contains papers that have sequencing terms mentioned, but are more related to neuroscience than genomics (thats what forms the biophysics clusters). The top left are papers that relate to neuroscience and focused on disease while top right are genomics related papers that focus on disease.
 
 # ### PCA3 vs PCA5 
 
-# In[15]:
+# In[22]:
 
 
 display_clouds(
@@ -246,23 +290,41 @@ display_clouds(
 
 # These word clouds depict the following concepts: sequencing vs disease (left) and RNA-seq vs evolutionary biology (right)
 
-# In[16]:
+# In[23]:
 
 
-g = (
-    p9.ggplot(pca_df)
-    + p9.aes(x="pca3", y="pca5", color="factor(category)")
-    + p9.geom_point()
-    + p9.labs(
-        title="PCA of BioRxiv (Word Dim: 300)",
-        color="Article Category"
-    )
+selected_categories = [
+    'bioinformatics', 'evolutionary biology',
+    'epidemiology','paleontology',
+    'palentology'
+]
+
+
+# In[24]:
+
+
+generate_scatter_plots(
+    pca_df,
+    x="pca3", y="pca5",
+    nsample=200, random_state=100,
+    selected_categories=selected_categories,
+    color_palette=global_color_palette,
+    save_file_path="output/pca_plots/scatterplot_files/pca03_v_pca05.png"
 )
-g.save("output/pca_plots/pca03_v_pca05.png", dpi=500)
-print(g)
 
 
-# In[17]:
+# In[25]:
+
+
+plot_scatter_clouds(
+    scatter_plot_path = "output/pca_plots/scatterplot_files/pca03_v_pca05.png", 
+    word_cloud_x_path = "output/word_pca_similarity/figures/pca_03_cossim_word_cloud.png",
+    word_cloud_y_path = "output/word_pca_similarity/figures/pca_05_cossim_word_cloud.png",
+    final_figure_path = "output/pca_plots/figures/pca03_v_pca05_figure.png"
+)
+
+
+# In[26]:
 
 
 (
@@ -274,7 +336,7 @@ print(g)
 )
 
 
-# In[18]:
+# In[27]:
 
 
 (
@@ -290,7 +352,7 @@ print(g)
 
 # ### PCA1 vs PCA4
 
-# In[19]:
+# In[28]:
 
 
 display_clouds(
@@ -299,25 +361,43 @@ display_clouds(
 )
 
 
-# These word cloud produces the following concepts: qunatitative biology vs molecular biology (left) and marine biology vs cell biology (right).
+# These word cloud produces the following concepts: qunatitative biology vs molecular biology (left) and microbiology vs cell biology (right).
 
-# In[20]:
+# In[29]:
 
 
-g = (
-    p9.ggplot(pca_df)
-    + p9.aes(x="pca1", y="pca4", color="factor(category)")
-    + p9.geom_point()
-    + p9.labs(
-        title="PCA of BioRxiv (Word Dim: 300)",
-        color="Article Category"
-    )
+selected_categories = [
+    'cell biology', 'epidemiology',
+    'immunology', 'microbiology',
+    'systems biology'
+]
+
+
+# In[30]:
+
+
+generate_scatter_plots(
+    pca_df,
+    x="pca1", y="pca4",
+    nsample=200, random_state=100,
+    selected_categories=selected_categories,
+    color_palette=global_color_palette,
+    save_file_path="output/pca_plots/scatterplot_files/pca01_v_pca04.png"
 )
-g.save("output/pca_plots/pca01_v_pca04.png", dpi=500)
-print(g)
 
 
-# In[21]:
+# In[31]:
+
+
+plot_scatter_clouds(
+    scatter_plot_path = "output/pca_plots/scatterplot_files/pca01_v_pca04.png", 
+    word_cloud_x_path = "output/word_pca_similarity/figures/pca_01_cossim_word_cloud.png",
+    word_cloud_y_path = "output/word_pca_similarity/figures/pca_04_cossim_word_cloud.png",
+    final_figure_path = "output/pca_plots/figures/pca01_v_pca04_figure.png"
+)
+
+
+# In[32]:
 
 
 (
@@ -330,7 +410,7 @@ print(g)
 )
 
 
-# In[22]:
+# In[33]:
 
 
 (
@@ -351,7 +431,7 @@ print(g)
 
 # ## PCA1 vs PCA6
 
-# In[23]:
+# In[34]:
 
 
 display_clouds(
@@ -362,23 +442,41 @@ display_clouds(
 
 # The right word cloud appears to represent mathematics vs scientific communication or at least popular buzz words scientist used to promote their research. The next few cells will look more into it.
 
-# In[24]:
+# In[35]:
 
 
-g = (
-    p9.ggplot(pca_df)
-    + p9.aes(x="pca1", y="pca6", color="factor(category)")
-    + p9.geom_point()
-    + p9.labs(
-        title="PCA of BioRxiv (Word Dim: 300)",
-        color="Article Category"
-    )
+selected_categories = [
+    'biophysics', 'bioengineering',
+    'clinical trials', 'scientific communication', 
+    'synthetic biology'
+]
+
+
+# In[36]:
+
+
+generate_scatter_plots(
+    pca_df,
+    x="pca1", y="pca6",
+    nsample=200, random_state=100,
+    selected_categories=selected_categories,
+    color_palette=global_color_palette,
+    save_file_path="output/pca_plots/scatterplot_files/pca01_v_pca06.png"
 )
-g.save("output/pca_plots/pca01_v_pca06.png", dpi=500)
-print(g)
 
 
-# In[25]:
+# In[37]:
+
+
+plot_scatter_clouds(
+    scatter_plot_path = "output/pca_plots/scatterplot_files/pca01_v_pca06.png", 
+    word_cloud_x_path = "output/word_pca_similarity/figures/pca_01_cossim_word_cloud.png",
+    word_cloud_y_path = "output/word_pca_similarity/figures/pca_06_cossim_word_cloud.png",
+    final_figure_path = "output/pca_plots/figures/pca01_v_pca06_figure.png"
+)
+
+
+# In[38]:
 
 
 (
@@ -391,7 +489,7 @@ print(g)
 )
 
 
-# In[26]:
+# In[39]:
 
 
 (
@@ -406,7 +504,7 @@ print(g)
 
 # Looking at the top categories for the top and bottom right quadrants it seems that the papers follow the patterns captures by the word clouds above; however the positive axis still remains difficult to judge without taking a look at the individual papers.
 
-# In[27]:
+# In[40]:
 
 
 (
@@ -420,7 +518,7 @@ print(g)
 
 # ## PCA2 vs PCA15
 
-# In[28]:
+# In[41]:
 
 
 display_clouds(
@@ -431,25 +529,44 @@ display_clouds(
 
 # The word cloud on the right seems to contain the following concepts: facial recognition and behavior vs neuron biochemistry.
 
-# In[29]:
+# In[42]:
 
 
-g = (
-    p9.ggplot(pca_df)
-    + p9.aes(x="pca2", y="pca15", color="factor(category)")
-    + p9.geom_point()
-    + p9.labs(
-        title="PCA of BioRxiv (Word Dim: 300)",
-        color="Article Category"
-    )
+selected_categories = [
+    'animal behavior and cognition',
+    'biochemistry','cell biology',
+    'molecular biology',
+    'neuroscience'
+]
+
+
+# In[43]:
+
+
+generate_scatter_plots(
+    pca_df,
+    x="pca2", y="pca15",
+    nsample=200, random_state=100,
+    selected_categories=selected_categories,
+    color_palette=global_color_palette,
+    save_file_path="output/pca_plots/scatterplot_files/pca02_v_pca15.png"
 )
-g.save("output/pca_plots/pca02_v_pca15.png", dpi=500)
-print(g)
+
+
+# In[44]:
+
+
+plot_scatter_clouds(
+    scatter_plot_path = "output/pca_plots/scatterplot_files/pca02_v_pca15.png", 
+    word_cloud_x_path = "output/word_pca_similarity/figures/pca_02_cossim_word_cloud.png",
+    word_cloud_y_path = "output/word_pca_similarity/figures/pca_15_cossim_word_cloud.png",
+    final_figure_path = "output/pca_plots/figures/pca02_v_pca15_figure.png"
+)
 
 
 # This graph depicts diversity within the neuroscience field as some papers are about facial recognition (negative) and other papers are about biochemistry (positive).
 
-# In[30]:
+# In[45]:
 
 
 (
@@ -460,7 +577,7 @@ print(g)
 )
 
 
-# In[31]:
+# In[46]:
 
 
 (
@@ -473,9 +590,9 @@ print(g)
 
 # These papers confirm that the negative axis of PCA15 is facial recognition.
 
-# ## PCA1 vs PCA8
+# ## PCA2 vs PCA8
 
-# In[32]:
+# In[47]:
 
 
 display_clouds(
@@ -486,23 +603,41 @@ display_clouds(
 
 # The wordcloud on the right seems to represent the following concept:  biochemistry vs developmental biology. Main evidence for this appears in the plot below.
 
-# In[33]:
+# In[48]:
 
 
-g = (
-    p9.ggplot(pca_df)
-    + p9.aes(x="pca2", y="pca8", color="factor(category)")
-    + p9.geom_point()
-    + p9.labs(
-        title="PCA of BioRxiv (Word Dim: 300)",
-        color="Article Category"
-    )
+selected_categories = [
+    'biochemistry', 'biophysics',
+    'cell biology', 'developmental biology', 
+    'plant biology'
+]
+
+
+# In[49]:
+
+
+generate_scatter_plots(
+    pca_df,
+    x="pca2", y="pca8",
+    nsample=200, random_state=100,
+    selected_categories=selected_categories,
+    color_palette=global_color_palette,
+    save_file_path="output/pca_plots/scatterplot_files/pca02_v_pca08.png"
 )
-g.save("output/pca_plots/pca02_v_pca08.png", dpi=500)
-print(g)
 
 
-# In[34]:
+# In[50]:
+
+
+plot_scatter_clouds(
+    scatter_plot_path = "output/pca_plots/scatterplot_files/pca02_v_pca08.png", 
+    word_cloud_x_path = "output/word_pca_similarity/figures/pca_02_cossim_word_cloud.png",
+    word_cloud_y_path = "output/word_pca_similarity/figures/pca_08_cossim_word_cloud.png",
+    final_figure_path = "output/pca_plots/figures/pca02_v_pca08_figure.png"
+)
+
+
+# In[51]:
 
 
 (
@@ -515,7 +650,7 @@ print(g)
 )
 
 
-# In[35]:
+# In[52]:
 
 
 (
@@ -530,9 +665,9 @@ print(g)
 
 # Looking at the top left and bottom left quadrants the top categories are: biochemistry and developmental biology. Based on this confirmation I'd argue that pca8 covers both of these concepts.
 
-# ## PCA3 VS PCA13
+# ## PCA2 VS PCA13
 
-# In[36]:
+# In[53]:
 
 
 display_clouds(
@@ -543,23 +678,41 @@ display_clouds(
 
 # Based on a quick google search the wordcloud on the right represents: viruses (immunology) vs model organisms.
 
-# In[37]:
+# In[54]:
 
 
-g = (
-    p9.ggplot(pca_df)
-    + p9.aes(x="pca2", y="pca13", color="factor(category)")
-    + p9.geom_point()
-    + p9.labs(
-        title="PCA of BioRxiv (Word Dim: 300)",
-        color="Article Category"
-    )
+selected_categories = [
+    'animal behavior and cognition', 'genetics',
+    'immunology', 'microbiology', 
+    'pathology'
+]
+
+
+# In[55]:
+
+
+generate_scatter_plots(
+    pca_df,
+    x="pca2", y="pca13",
+    nsample=200, random_state=100,
+    selected_categories=selected_categories,
+    color_palette=global_color_palette,
+    save_file_path="output/pca_plots/scatterplot_files/pca02_v_pca13.png"
 )
-g.save("output/pca_plots/pca02_v_pca13.png", dpi=500)
-print(g)
 
 
-# In[38]:
+# In[56]:
+
+
+plot_scatter_clouds(
+    scatter_plot_path = "output/pca_plots/scatterplot_files/pca02_v_pca13.png", 
+    word_cloud_x_path = "output/word_pca_similarity/figures/pca_02_cossim_word_cloud.png",
+    word_cloud_y_path = "output/word_pca_similarity/figures/pca_13_cossim_word_cloud.png",
+    final_figure_path = "output/pca_plots/figures/pca02_v_pca13_figure.png"
+)
+
+
+# In[57]:
 
 
 (
@@ -570,7 +723,7 @@ print(g)
 )
 
 
-# In[39]:
+# In[58]:
 
 
 (
@@ -583,9 +736,9 @@ print(g)
 
 # Looking at the extremes values along PCA13, the categories seem to confirm my suspicions.
 
-# ## PCA17 vs PCA20
+# ## PCA04 vs PCA20
 
-# In[40]:
+# In[59]:
 
 
 display_clouds(
@@ -596,23 +749,41 @@ display_clouds(
 
 # PCA20 represents the following concepts: immunology and cancer biology.
 
-# In[41]:
+# In[60]:
 
 
-g = (
-    p9.ggplot(pca_df)
-    + p9.aes(x="pca4", y="pca20", color="factor(category)")
-    + p9.geom_point()
-    + p9.labs(
-        title="PCA of BioRxiv (Word Dim: 300)",
-        color="Article Category"
-    )
+selected_categories = [
+    'cancer biology', 'immunology',
+    'molecular biology','microbiology',
+    'neuroscience'
+]
+
+
+# In[61]:
+
+
+generate_scatter_plots(
+    pca_df,
+    x="pca4", y="pca20",
+    nsample=200, random_state=100,
+    selected_categories=selected_categories,
+    color_palette=global_color_palette,
+    save_file_path="output/pca_plots/scatterplot_files/pca04_v_pca20.png"
 )
-g.save("output/pca_plots/pca04_v_pca20.png", dpi=500)
-print(g)
 
 
-# In[42]:
+# In[62]:
+
+
+plot_scatter_clouds(
+    scatter_plot_path = "output/pca_plots/scatterplot_files/pca04_v_pca20.png", 
+    word_cloud_x_path = "output/word_pca_similarity/figures/pca_04_cossim_word_cloud.png",
+    word_cloud_y_path = "output/word_pca_similarity/figures/pca_20_cossim_word_cloud.png",
+    final_figure_path = "output/pca_plots/figures/pca04_v_pca20_figure.png"
+)
+
+
+# In[63]:
 
 
 (
@@ -625,7 +796,7 @@ print(g)
 )
 
 
-# In[43]:
+# In[64]:
 
 
 (

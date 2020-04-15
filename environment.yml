@@ -18,3 +18,5 @@ dependencies:
   - tqdm=4.35.0
   - pip:
     - spacy==2.2.3
+    - svgutils==0.3.1
+    - git+https://github.com/amueller/word_cloud.git
