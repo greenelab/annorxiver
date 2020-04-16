@@ -8,6 +8,9 @@
 # In[1]:
 
 
+get_ipython().run_line_magic('load_ext', 'autoreload')
+get_ipython().run_line_magic('autoreload', '2')
+
 import pandas as pd
 from scipy.spatial.distance import cdist
 from sklearn.decomposition import PCA
@@ -294,9 +297,9 @@ display_clouds(
 
 
 selected_categories = [
-    'bioinformatics', 'evolutionary biology',
-    'epidemiology','paleontology',
-    'palentology'
+    'bioinformatics','ecology',
+    'evolutionary biology','epidemiology',
+    'paleontology'
 ]
 
 
@@ -682,9 +685,9 @@ display_clouds(
 
 
 selected_categories = [
-    'animal behavior and cognition', 'genetics',
-    'immunology', 'microbiology', 
-    'pathology'
+    'animal behavior and cognition','developmental biology'
+    'genetics', 'immunology',
+    'microbiology'
 ]
 
 

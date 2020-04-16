@@ -4,6 +4,7 @@ import matplotlib.image as mpimg
 import matplotlib.pyplot as plt
 from pathlib import Path
 import plotnine as p9
+import re
 import svgutils.transform as sg
 
 def display_clouds(pc_cloud_1, pc_cloud_2):
@@ -79,6 +80,33 @@ def plot_scatter_clouds(
     text_C = sg.TextElement(510, 390, "C", size=20, weight="bold")
     
     fig.append([text_A, text_B, text_C])
+    
+    second_pc = int(
+        re
+        .search(r"pca_(\d+)", word_cloud_y.stem)
+        .group(1)
+    )
+    
+    first_pc = int(
+        re
+        .search(r"pca_(\d+)", word_cloud_x.stem)
+        .group(1)
+    )
+    
+    
+    word_cloud_title_1 = sg.TextElement(
+        200, 370, 
+        f"pca{second_pc}", size=22, 
+        weight="bold"
+    )
+    
+    word_cloud_title_2 = sg.TextElement(
+        713, 760, 
+        f"pca{first_pc}", size=22, 
+        weight="bold"
+    )
+    
+    fig.append([word_cloud_title_1, word_cloud_title_2])
 
     # save generated SVG files
     svg2png(
