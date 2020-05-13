@@ -3,3 +3,9 @@
 
 # Ignore ghost files
 *~
+
+# Ignore pycache
+__pycache__/
+
+# Ignore compiled python files
+*.pyc
