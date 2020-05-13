@@ -15,6 +15,7 @@ filter_tag_list = [
     "thead", "tbody",
     "caption", "tr", "td"
 ]
+parser = ET.XMLParser(encoding='UTF-8', recover=True)
 
 def dump_article_text(file_path, xpath_str, filter_tags=filter_tag_list, remove_stop_words=True):
     """
@@ -28,8 +29,7 @@ def dump_article_text(file_path, xpath_str, filter_tags=filter_tag_list, remove_
         filter_tag_list - the list of tags to strip from the xml document
         remove_stop_words - a flag to indicate if stop words should be removed
     """
-    
-    parser = ET.XMLParser(encoding='UTF-8', recover=True)
+
     tree = (
         ET.parse(
             open(file_path, "rb"),
@@ -77,8 +77,7 @@ def generate_doc_vector(model, document_path, xpath, filter_tags=filter_tag_list
         xpath_str - the xpath string to extract tags from the xml document
         filter_tag_list - the list of tags to strip from the xml document
     """
-    
-    parser = ET.XMLParser(encoding='UTF-8', recover=True)
+
     word_vectors = []
 
     tree = (
