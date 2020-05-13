@@ -1,6 +1,9 @@
+import re
+
+from gensim.parsing.preprocessing import remove_stopwords
 import lxml.etree as ET
 import pandas as pd
-import re
+
 
 filter_tag_list = [
     "sc", "italic", 
