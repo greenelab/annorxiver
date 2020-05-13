@@ -111,7 +111,7 @@ def plot_scatter_clouds(
     )
     
     fig.append([word_cloud_title_1, word_cloud_title_2])
-    #print(fig.to_str())
+
     # save generated SVG files
     svg2png(
         bytestring=fig.to_str(), 
