@@ -439,7 +439,27 @@ published_comparison_stats_df.head()
 
 (
     published_comparison_stats_df
+    .sort_values("log_likelihood", ascending=True)
+    .head(20)
+)
+
+
+# In[32]:
+
+
+(
+    published_comparison_stats_df
     .sort_values("odds_ratio", ascending=False)
+    .head(20)
+)
+
+
+# In[33]:
+
+
+(
+    published_comparison_stats_df
+    .sort_values("odds_ratio", ascending=True)
     .head(20)
 )
 
