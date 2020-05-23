@@ -8,6 +8,8 @@
 # In[1]:
 
 
+import json
+
 from habanero import Crossref
 import pandas as pd
 from ratelimit import limits, sleep_and_retry
@@ -36,7 +38,12 @@ print(len(dois))
 # In[4]:
 
 
-cf = Crossref(mailto="dnicholson329@gmail.com")
+credentials = json.load("credentials.json")
+
+if "@" not in credentials:
+    raise Exception("Please input a valid email address.")
+    
+cf = Crossref(mailto=credentials['email'])
 
 
 # In[5]:

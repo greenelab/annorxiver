@@ -159,6 +159,8 @@ pickle.dump(pmc_corpus_count, open("output/pmc_total_count.pkl", "wb"))
 
 # ## Analysis without Stop Words
 
+# The goal here is to compare word frequencies between bioRxiv and pubmed central. The problem when comparing word frequencies is that non-meaningful words (aka stopwords) such as the, of, and, be, etc., appear the most often. To account for this problem the first step here is to remove those words from analyses. 
+
 # In[5]:
 
 
@@ -274,14 +276,34 @@ total_word_stats_df.head()
 
 (
     total_word_stats_df
+    .sort_values("log_likelihood", ascending=True)
+    .head(20)
+)
+
+
+# In[17]:
+
+
+(
+    total_word_stats_df
     .sort_values("odds_ratio", ascending=False)
+    .head(20)
+)
+
+
+# In[18]:
+
+
+(
+    total_word_stats_df
+    .sort_values("odds_ratio", ascending=True)
     .head(20)
 )
 
 
 # # Preprint to Published View
 
-# In[17]:
+# In[19]:
 
 
 mapped_doi_df = (
@@ -304,14 +326,14 @@ mapped_doi_df = (
 mapped_doi_df.tail()
 
 
-# In[18]:
+# In[20]:
 
 
 print(f"Total # of Preprints Mapped: {mapped_doi_df.shape[0]}")
 print(f"Total % of Mapped: {mapped_doi_df.shape[0]/71118}")
 
 
-# In[19]:
+# In[21]:
 
 
 preprint_count = aggregate_word_counts([
@@ -321,7 +343,7 @@ preprint_count = aggregate_word_counts([
 ])
 
 
-# In[20]:
+# In[22]:
 
 
 published_count = aggregate_word_counts([
@@ -331,7 +353,7 @@ published_count = aggregate_word_counts([
 ])
 
 
-# In[21]:
+# In[23]:
 
 
 preprint_count, published_count = remove_stop_words(
@@ -340,21 +362,21 @@ preprint_count, published_count = remove_stop_words(
 )
 
 
-# In[22]:
+# In[24]:
 
 
 top_hundred_preprint = preprint_count.most_common(100)
 top_hundred_preprint[0:10]
 
 
-# In[23]:
+# In[25]:
 
 
 top_hundred_published = published_count.most_common(100)
 top_hundred_published[0:10]
 
 
-# In[24]:
+# In[26]:
 
 
 print("Number of words in preprint but not in published version:")
@@ -362,7 +384,7 @@ preprint_difference = set(list(preprint_count.keys())) - set(list(published_coun
 print(len(preprint_difference))
 
 
-# In[25]:
+# In[27]:
 
 
 [
@@ -371,7 +393,7 @@ print(len(preprint_difference))
 ]
 
 
-# In[26]:
+# In[28]:
 
 
 print("Number of words in published version but not in preprint:")
@@ -379,7 +401,7 @@ published_difference = set(list(published_count.keys())) - set(list(preprint_cou
 print(len(published_difference))
 
 
-# In[27]:
+# In[29]:
 
 
 [
@@ -388,7 +410,7 @@ print(len(published_difference))
 ]
 
 
-# In[28]:
+# In[30]:
 
 
 total_words = set(list(dict(top_hundred_preprint).keys()) + list(dict(top_hundred_published).keys()))
@@ -413,7 +435,7 @@ for word in tqdm_notebook(total_words):
     })
 
 
-# In[29]:
+# In[31]:
 
 
 published_comparison_stats_df = pd.DataFrame.from_records(data)
@@ -424,7 +446,7 @@ published_comparison_stats_df.to_csv(
 published_comparison_stats_df.head()
 
 
-# In[30]:
+# In[32]:
 
 
 (
@@ -434,7 +456,7 @@ published_comparison_stats_df.head()
 )
 
 
-# In[31]:
+# In[33]:
 
 
 (
@@ -444,7 +466,7 @@ published_comparison_stats_df.head()
 )
 
 
-# In[32]:
+# In[34]:
 
 
 (
@@ -454,7 +476,7 @@ published_comparison_stats_df.head()
 )
 
 
-# In[33]:
+# In[35]:
 
 
 (
@@ -463,3 +485,12 @@ published_comparison_stats_df.head()
     .head(20)
 )
 
+
+# Main takeaways from this analysis:
+# 1. On a global scale bioRxiv contains more field specific articles as top words consist of: neuron, gene, genome, network
+# 2. "Patients" appear more correlated with PMC as most preprints involving patients are shipped over to medRxiv.
+# 3. Many words associated with PMC are health related which ties back to the medRxiv note.
+# 4. Citation styles change as preprints transition to published versions. Et Al. has a greater association within bioRxiv compared to PMC.
+# 5. On a local scale published articles contain more statistical concepts (e.g., t-test) as well as quantitative measures (e.g. degree signs). (High associated lemmas are t, -, degree sign etc.)
+# 6. Publish articles have a focus shift on mentioning figures, adding supplementary data etc compared to preprints.
+# 7. Preprints have a universal way of citing published works by using the et al. citation. Hard to pinpoint if leading factor is because of peer review or journal style, but it will be an interesting point to discuss in the paper.

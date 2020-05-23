@@ -33,6 +33,26 @@ lemma_model = spacy.load("en_core_web_sm")
 lemma_model.max_length = 9000000 
 
 
+# In[ ]:
+
+
+def fix_pronouns(x):
+    """
+    Spacy replaces pronouns with -pron- when
+    processing pronouns, which makes analysis difficult
+    as "me" would be the same as "I" or "we".
+    This lambda function is designed to fix that issue.
+    
+    Arguments: 
+        x - the token parsed by spacy
+    """
+    return (
+        x.lemma_.lower() 
+        if x.lemma_.lower() != '-pron-' 
+        else x.text.lower()
+    )
+
+
 # # Calculate Word Frequency of bioRxiv
 
 # In[3]:
@@ -73,11 +93,7 @@ for document in tqdm_notebook(biorxiv_map_df.document.tolist()):
         lemma_freq = Counter(
             list(
                 map(
-                    lambda x: (
-                        x.lemma_.lower() 
-                        if x.lemma_.lower() != '-pron-' 
-                        else x.text.lower()
-                    ), 
+                    fix_pronouns, 
                     tokens
                 )
             )
@@ -138,11 +154,7 @@ for document in tqdm_notebook(pmc_map_df[["journal", "pmcid"]].values.tolist()):
         lemma_freq = Counter(
             list(
                 map(
-                    lambda x: (
-                        x.lemma_.lower() 
-                        if x.lemma_.lower() != '-pron-' 
-                        else x.text.lower()
-                    ), 
+                    fix_pronouns,
                     tokens
                 )
             )
