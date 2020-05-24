@@ -8,7 +8,6 @@
 # In[1]:
 
 
-import os
 from pathlib import Path 
 from collections import Counter
 
@@ -25,13 +24,13 @@ import tqdm
 # In[2]:
 
 
-journals = Path("../journals").rglob("*.nxml")
+journals = list(Path("../journals").rglob("*.nxml"))
 
 
 # In[3]:
 
 
-journal_paper_count = Counter(map(lambda x: os.path.dirname(x).split("/")[1], journals))
+journal_paper_count = Counter(map(lambda x: x.parent.stem, journals))
 journal_records = [{
     'journal':item[0],
     'article_count':item[1]
@@ -59,13 +58,18 @@ journal_df.head()
 
 journal_type_records = []
 for file in tqdm.tqdm_notebook(journals):
-    journal = os.path.dirname(file).split("/")[1]
-    tree = ET.parse(file)
+    journal = file.parent.stem
+    tree = ET.parse(str(file.resolve()))
     root = tree.getroot()
     journal_type_records.append({
         'journal': journal,
         'article_type': root.attrib['article-type'].strip(),
-        'pmcid':os.path.splitext(os.path.basename(file))[0]
+        'doi':(
+            root.xpath("//article-meta/article-id[@pub-id-type='doi']")[0].text
+            if len(root.xpath("//article-meta/article-id[@pub-id-type='doi']")) > 0
+            else ""
+        ),
+        'pmcid':file.stem
     })
 
 
@@ -85,7 +89,7 @@ journal_paper_df.journal.unique().shape
 
 # # Types of Articles Contained in PMC
 
-# In[3]:
+# In[8]:
 
 
 journal_article_type_list = journal_paper_df['article_type'].value_counts().index.tolist()[::-1]
