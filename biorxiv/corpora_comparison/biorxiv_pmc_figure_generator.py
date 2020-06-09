@@ -84,7 +84,7 @@ fig.update_layout(
     height=720,
     treemapcolorway=["#a6cee3", "#b2df8a"],
     title={
-        'text':f"Comparison of Top {plot_df.shape[0]} Words between bioRxiv and Pubmed Central (PMC)",
+        'text':f"Comparison of Top {plot_df.shape[0]} Most Frequent Words between bioRxiv and Pubmed Central (PMC)",
         'y':0.9,
         'x':0.5,
         'xanchor': 'center',
@@ -165,7 +165,10 @@ g = (
         axis_title=p9.element_text(size=15),
         axis_text_x=p9.element_text(size=11, weight="bold")
     )
-    + p9.labs(x=None)
+    + p9.labs(
+        x=None,
+        y="bioRxiv vs PMC Odds Ratio"
+    )
 )
 g.save("output/svg_files/biorxiv_pmc_frequency_odds.svg", dpi=75)
 print(g)
@@ -316,7 +319,7 @@ fig.update_layout(
     height=720,
     treemapcolorway=["#a6cee3", "#b2df8a"],
     title={
-        'text':f"Comparison of Top {plot_df.shape[0]} Words between Preprints and Published Papers",
+        'text':f"Comparison of Top {plot_df.shape[0]} Most Frequent Words between Preprints and Published Papers",
         'y':0.9,
         'x':0.5,
         'xanchor': 'center',
@@ -395,7 +398,10 @@ g = (
         axis_title=p9.element_text(size=15),
         axis_text_x=p9.element_text(size=11, weight="bold")
     )
-    + p9.labs(x=None)
+    + p9.labs(
+        x=None,
+        y="Preprint vs Published Odds Ratio"
+    )
 )
 g.save("output/svg_files/preprint_published_frequency_odds.svg", dpi=75)
 print(g)
