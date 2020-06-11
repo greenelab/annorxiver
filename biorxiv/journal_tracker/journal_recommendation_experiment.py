@@ -16,6 +16,7 @@ from pathlib import Path
 
 import numpy as np
 import pandas as pd
+from sklearn.decomposition import PCA
 from sklearn.dummy import DummyClassifier
 from sklearn.neighbors import KNeighborsClassifier
 from tqdm import tqdm_notebook
@@ -53,7 +54,7 @@ biorxiv_journal_df.head()
 # Count number of Non-NaN elements
 print(f"Number of Non-NaN entries: {biorxiv_journal_df.pmcid.count()}")
 print(f"Total number of entries: {biorxiv_journal_df.shape[0]}")
-print(f"Percent Covered: {biorxiv_journal_df.pmcid.count()/biorxiv_journal_df.shape[0]:.2f}")
+print(f"Percent Covered: {(biorxiv_journal_df.pmcid.count()/biorxiv_journal_df.shape[0])*100:.2f}%")
 
 
 # In[4]:
@@ -100,7 +101,12 @@ pmc_articles_df.head()
 
 
 pmc_embedding_dict = {
-    int(path.stem[-7:-4]):pd.read_csv(
+    int(
+        path
+        .stem
+        .split(".")[0]
+        .split("_")[-1]
+    ):pd.read_csv(
         str(path), 
         sep="\t"
     )
@@ -253,7 +259,107 @@ accs = [
 
 
 print(f"{np.sum(accs)} out of {len(accs)}")
-print(f"{np.mean(accs)}% correct")
+print(f"{np.mean(accs)*100}% correct")
+
+
+# ## KNearestNeighbors Manhattan Distance - Paper by Paper
+
+# In[13]:
+
+
+knn_model = KNeighborsClassifier(
+    n_neighbors=10,
+    metric="manhattan"
+)
+
+
+# In[14]:
+
+
+fold_predictions = (
+    cross_validation(
+        knn_model, subsampled_training_dataset[300], 
+        knn_evaluate, cv=10, 
+        random_state=100
+    )
+)
+
+
+# ## KNearestNeighbors Manhattan Distance - Centroid
+
+# In[15]:
+
+
+predictions, true_labels = (
+    knn_centroid_evaluate(
+        knn_model,
+        full_training_dataset[300], 
+        subsampled_training_dataset[300]
+    )
+)
+
+
+# In[16]:
+
+
+accs = [
+    (
+         1 if true_labels[data_idx] in prediction_row 
+         else 0 
+     )
+     for data_idx, prediction_row in enumerate(predictions)
+]
+
+
+# In[17]:
+
+
+print(f"{np.sum(accs)} out of {len(accs)}")
+print(f"{np.mean(accs)*100}% correct")
+
+
+# ## KNearestNeighbors - PCA'd Paper prediction
+
+# In[11]:
+
+
+knn_model = KNeighborsClassifier(n_neighbors=10)
+pca = PCA(n_components=10)
+
+
+# In[12]:
+
+
+pca_subsampled_training_dataset = pca.fit_transform(
+    subsampled_training_dataset[300]
+    .drop("journal", axis=1)
+    .values
+)
+
+
+# In[13]:
+
+
+new_dataset = (
+    pd.DataFrame(
+        pca_subsampled_training_dataset, 
+        columns = [f"pca_{comp+1}" for comp in range(10)]
+    )
+    .assign(journal=subsampled_training_dataset[300].journal.values.tolist())
+)
+new_dataset.head()
+
+
+# In[14]:
+
+
+fold_predictions = (
+    cross_validation(
+        knn_model, new_dataset, 
+        knn_evaluate, cv=10, 
+        random_state=100
+    )
+)
 
 
 # # Golden Set Analysis
@@ -311,7 +417,7 @@ accs = [
 
 
 print(f"{np.sum(accs)} out of {len(accs)}")
-print(f"{np.mean(accs)}% correct")
+print(f"{np.mean(accs)*100}% correct")
 
 
 # ## Subsampled Paper Analysis
@@ -344,7 +450,7 @@ accs = [
 
 
 print(f"{np.sum(accs)} out of {len(accs)}")
-print(f"{np.mean(accs)}% correct")
+print(f"{np.mean(accs)*100}% correct")
 
 
 # Conclusions for this notebook:
