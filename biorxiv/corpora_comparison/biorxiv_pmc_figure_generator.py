@@ -235,7 +235,7 @@ fig.append([etree.Element("rect", {"width":"100%", "height":"100%", "fill":"whit
 
 fig1 = sg.fromfile("output/svg_files/biorxiv_pmc_frequency_odds.svg")
 plot1 = fig1.getroot()
-plot1.moveto(-20, 25, scale=1.2)
+plot1.moveto(0, 25, scale=1.2)
 
 fig2 = sg.fromfile("output/svg_files/biorxiv_pmc_frequency_bar.svg")
 plot2 = fig2.getroot()
@@ -459,7 +459,7 @@ g.save("output/svg_files/preprint_published_frequency_bar.svg", dpi=75)
 print(g)
 
 
-# In[24]:
+# In[25]:
 
 
 fig_output_path = "output/figures/preprint_published_comparison.png"
@@ -468,7 +468,7 @@ fig.append([etree.Element("rect", {"width":"100%", "height":"100%", "fill":"whit
 
 fig1 = sg.fromfile("output/svg_files/preprint_published_frequency_odds.svg")
 plot1 = fig1.getroot()
-plot1.moveto(-50, 25, scale=1.2)
+plot1.moveto(0, 25, scale=1.2)
 
 fig2 = sg.fromfile("output/svg_files/preprint_published_frequency_bar.svg")
 plot2 = fig2.getroot()
