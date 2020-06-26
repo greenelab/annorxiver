@@ -13,6 +13,7 @@ import json
 from habanero import Crossref
 import pandas as pd
 from ratelimit import limits, sleep_and_retry
+import requests
 import tqdm
 from urllib.error import HTTPError
 
@@ -38,10 +39,13 @@ print(len(dois))
 # In[4]:
 
 
-credentials = json.load("credentials.json")
+credentials = json.load(open("credentials.json", "r"))
 
-if "@" not in credentials:
+if "@" not in credentials['email']:
     raise Exception("Please input a valid email address.")
+    
+if credentials['tool_name'] == 'insert tool name here':
+    raise Exception("Please input a name for the tool you are using.")
     
 cf = Crossref(mailto=credentials['email'])
 
@@ -68,6 +72,25 @@ def call_crossref(doi_ids):
             })
         
     return responses
+
+
+# In[6]:
+
+
+TEN_MINUTES = 600
+
+@sleep_and_retry
+@limits(calls=50, period=TEN_MINUTES)
+def call_pmc(doi_ids):
+    query = (
+        "https://www.ncbi.nlm.nih.gov/pmc/utils/idconv/v1.0/?"
+        f"ids={','.join(doi_ids)}"
+        f"&tool={credentials['tool_name']}"
+        f"&email={credentials['email']}"
+        "&format=json"
+    )
+    
+    return requests.get(query)
 
 
 # # Map preprint DOIs to Published DOIs
@@ -170,14 +193,14 @@ final_df.to_csv("output/mapped_published_doi.tsv", sep="\t", index=False)
 
 # # Map Published Articles to PMC
 
-# In[6]:
+# In[7]:
 
 
-preprint_df = pd.read_csv("output/mapped_published_doi.tsv", sep="\t")
+preprint_df = pd.read_csv("output/mapped_published_doi.tsv", sep="\t").drop("pmcid", axis=1)
 preprint_df.head()
 
 
-# In[7]:
+# In[8]:
 
 
 pmc_df = pd.read_csv(
@@ -187,13 +210,14 @@ pmc_df = pd.read_csv(
 pmc_df.head()
 
 
-# In[8]:
+# In[9]:
 
 
 final_df = (
     preprint_df
+    .assign(published_doi=preprint_df.published_doi.str.lower())
     .merge(
-        pmc_df[["doi", "pmcid"]].dropna(), 
+        pmc_df[["doi", "pmcid"]].assign(doi=pmc_df.doi.str.lower()).dropna(), 
         how="left", left_on="published_doi", 
         right_on="doi"
     )
@@ -203,8 +227,55 @@ final_df = (
 final_df.head()
 
 
-# In[9]:
+# In[10]:
 
 
-final_df.to_csv("output/mapped_published_doi.tsv", sep="\t", index=False)
+# Fill in missing links
+missing_ids = (
+    final_df
+    .query("published_doi.notnull()&pmcid.isnull()")
+    .published_doi
+    .unique()
+)
+print(len(missing_ids))
+
+
+# In[12]:
+
+
+chunksize=100
+data = []
+for chunk in tqdm.tqdm(range(0, len(missing_ids), chunksize)):
+    query_ids = missing_ids[chunk:chunk+chunksize]
+    response = call_pmc(query_ids).json()
+    
+    for potential_match in response['records']:
+        if "pmcid" not in potential_match:
+            continue
+            
+        final_df.loc[
+            final_df["published_doi"] == potential_match['doi'], 
+            "pmcid"
+        ] = potential_match["pmcid"]
+
+
+# In[13]:
+
+
+final_df.head()
+
+
+# In[17]:
+
+
+(
+    final_df
+    .assign(
+        pmcoa=final_df.pmcid.isin(pmc_df.pmcid.values.tolist())
+    )
+    .to_csv(
+        "output/mapped_published_doi.tsv",
+        sep="\t", index=False
+    )
+)
 
