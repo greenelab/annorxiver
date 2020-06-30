@@ -35,6 +35,7 @@ biorxiv_journal_df = (
         "doi":"last",
         "published_doi":"first",  
         "pmcid":"first", 
+        "pmcoa":"first"
     })
     .reset_index(drop=True)
 )
@@ -59,7 +60,7 @@ biorxiv_embed_df.head()
 
 
 biorxiv_journal_mapped_df = (
-    biorxiv_journal_df[["document", "pmcid"]]
+    biorxiv_journal_df[["document", "published_doi", "pmcid", "pmcoa"]]
     .merge(biorxiv_embed_df, on="document")
 )
 biorxiv_journal_mapped_df.head()
@@ -100,7 +101,7 @@ pmc_embed_df.head()
 
 
 pmc_journal_mapped_df = (
-    pmc_articles_df[["journal", "pmcid"]]
+    pmc_articles_df[["journal", "doi", "pmcid"]]
     .merge(pmc_embed_df, left_on="pmcid", right_on="document")
     .drop("pmcid", axis=1)
 )
@@ -117,6 +118,7 @@ pmc_journal_mapped_df.head()
 biorxiv_published = (
     biorxiv_journal_mapped_df
     .query("pmcid.notnull()")
+    .query("pmcoa == True")
     .sort_values("pmcid", ascending=True)
     .drop_duplicates("pmcid")
     .set_index("pmcid")
@@ -142,14 +144,14 @@ PMC_pubished.head()
 article_distances = cdist(
     biorxiv_published
     .loc[PMC_pubished.index.tolist()]
-    .drop("document", axis=1), 
-    PMC_pubished.drop("journal", axis=1),
+    .drop(["document", "published_doi", "pmcoa"], axis=1), 
+    PMC_pubished.drop(["journal", "doi"], axis=1),
     'euclidean'
 )
 article_distances.shape
 
 
-# In[11]:
+# In[12]:
 
 
 articles_distance_df = (
@@ -167,11 +169,12 @@ articles_distance_df.head()
 
 # ## biorxiv -> random paper same journal
 
-# In[12]:
+# In[13]:
 
 
 PMC_off_published = (
     pmc_journal_mapped_df
+    .drop("doi", axis=1)
     .query(f"document not in {biorxiv_published.reset_index().pmcid.tolist()}")
     .query(f"journal in {articles_distance_df.journal.unique().tolist()}")
     .groupby("journal", group_keys=False)
@@ -181,7 +184,7 @@ PMC_off_published = (
 PMC_off_published.head()
 
 
-# In[13]:
+# In[14]:
 
 
 journal_mapper = {
@@ -191,20 +194,20 @@ journal_mapper = {
 list(journal_mapper.items())[0:10]
 
 
-# In[14]:
+# In[17]:
 
 
 off_article_dist = cdist(
     biorxiv_published
     .loc[PMC_pubished.index.tolist()]
-    .drop("document", axis=1), 
+    .drop(["document", "published_doi", "pmcoa"], axis=1), 
     PMC_off_published.drop("journal", axis=1),
     'euclidean'
 )
 off_article_dist.shape
 
 
-# In[15]:
+# In[18]:
 
 
 data = []
@@ -226,7 +229,7 @@ for idx, row in tqdm.tqdm(articles_distance_df.iterrows()):
         )
 
 
-# In[16]:
+# In[19]:
 
 
 final_df = (
@@ -241,7 +244,7 @@ final_df = (
 final_df.head()
 
 
-# In[17]:
+# In[20]:
 
 
 final_df = (
@@ -254,7 +257,7 @@ final_df.head()
 
 # # Distribution plot
 
-# In[18]:
+# In[21]:
 
 
 g = (
@@ -271,17 +274,19 @@ print(g)
 
 # # Find bioRxiv unpublished ->  published PMC articles
 
-# In[19]:
+# In[31]:
 
 
 biorxiv_unpublished = (
     biorxiv_journal_mapped_df
-    .query("pmcid.isnull()")
+    .query("published_doi.isnull()")
+    .drop(["published_doi", "pmcid", "pmcoa"], axis=1)
 )
+print(biorxiv_unpublished.shape)
 biorxiv_unpublished.head()
 
 
-# In[20]:
+# In[23]:
 
 
 PMC_unlinked = (
@@ -297,10 +302,11 @@ PMC_unlinked = (
         """
     )
 )
+print(PMC_unlinked.shape)
 PMC_unlinked.head()
 
 
-# In[21]:
+# In[24]:
 
 
 cutoff_score = (
@@ -312,7 +318,7 @@ cutoff_score = (
 cutoff_score
 
 
-# In[22]:
+# In[27]:
 
 
 chunksize=100
@@ -322,7 +328,7 @@ chunk_iterator = range(
 )
 
 
-# In[23]:
+# In[32]:
 
 
 for idx, chunk in tqdm.tqdm(enumerate(chunk_iterator)):
@@ -335,8 +341,8 @@ for idx, chunk in tqdm.tqdm(enumerate(chunk_iterator)):
     
     # Calculate distances
     paper_distances = cdist(
-        biorxiv_subset.drop(["document", "pmcid"], axis=1), 
-        PMC_unlinked.drop(["journal", "document"], axis=1),
+        biorxiv_subset.drop(["document"], axis=1), 
+        PMC_unlinked.drop(["journal", "document", "doi"], axis=1),
         'euclidean'
     )
     
@@ -389,7 +395,7 @@ for idx, chunk in tqdm.tqdm(enumerate(chunk_iterator)):
 
 # # Bin Potential Matches
 
-# In[62]:
+# In[33]:
 
 
 potential_matches_df = pd.read_csv(
@@ -399,12 +405,13 @@ potential_matches_df = pd.read_csv(
 potential_matches_df.head()
 
 
-# In[63]:
+# In[34]:
 
 
 potential_matches_df = (
     potential_matches_df
     .rename(index=str, columns={"doi":"biorxiv_doi"})
+    .drop_duplicates(["document", "biorxiv_doi","pmcid"])
     .assign(
         pmcid_url=lambda x:(
             x
@@ -426,7 +433,7 @@ potential_matches_df = (
 potential_matches_df.head()
 
 
-# In[64]:
+# In[35]:
 
 
 distance_bins = np.squeeze(
@@ -455,7 +462,7 @@ distance_bins = np.append(
 distance_bins
 
 
-# In[65]:
+# In[36]:
 
 
 potential_matches_df = (
