@@ -12,6 +12,7 @@ import numpy as np
 import pandas as pd
 import plotnine as p9
 from scipy.spatial.distance import cdist
+from sklearn.linear_model import LogisticRegressionCV
 import tqdm
 
 
@@ -129,13 +130,13 @@ biorxiv_published.head()
 # In[9]:
 
 
-PMC_pubished = (
+PMC_published = (
     pmc_journal_mapped_df
-    .query(f"document in {biorxiv_published.reset_index().pmcid.tolist()}")
+    .query(f"document in {biorxiv_published.index.tolist()}")
     .sort_values("document", ascending=True)
     .set_index("document")
 )
-PMC_pubished.head()
+PMC_published.head()
 
 
 # In[10]:
@@ -143,25 +144,26 @@ PMC_pubished.head()
 
 article_distances = cdist(
     biorxiv_published
-    .loc[PMC_pubished.index.tolist()]
+    .loc[PMC_published.index.tolist()]
     .drop(["document", "published_doi", "pmcoa"], axis=1), 
-    PMC_pubished.drop(["journal", "doi"], axis=1),
+    PMC_published
+    .drop(["doi","journal"], axis=1),
     'euclidean'
 )
 article_distances.shape
 
 
-# In[12]:
+# In[11]:
 
 
 articles_distance_df = (
     biorxiv_published
-    .loc[PMC_pubished.index.tolist()]
+    .loc[PMC_published.index.tolist()]
     .reset_index()
     [["document", "pmcid"]]
     .assign(
             distance=np.diag(article_distances, k=0),
-            journal=PMC_pubished.journal.tolist()
+            journal=PMC_published.journal.tolist()
     )
 )
 articles_distance_df.head()
@@ -169,22 +171,21 @@ articles_distance_df.head()
 
 # ## biorxiv -> random paper same journal
 
-# In[13]:
+# In[12]:
 
 
 PMC_off_published = (
     pmc_journal_mapped_df
     .drop("doi", axis=1)
-    .query(f"document not in {biorxiv_published.reset_index().pmcid.tolist()}")
+    .query(f"document not in {biorxiv_published.index.tolist()}")
     .query(f"journal in {articles_distance_df.journal.unique().tolist()}")
     .groupby("journal", group_keys=False)
     .apply(lambda x: x.sample(1, random_state=100))
-    .set_index("document")
 )
 PMC_off_published.head()
 
 
-# In[14]:
+# In[13]:
 
 
 journal_mapper = {
@@ -194,20 +195,23 @@ journal_mapper = {
 list(journal_mapper.items())[0:10]
 
 
-# In[17]:
+# In[14]:
 
 
 off_article_dist = cdist(
     biorxiv_published
-    .loc[PMC_pubished.index.tolist()]
-    .drop(["document", "published_doi", "pmcoa"], axis=1), 
-    PMC_off_published.drop("journal", axis=1),
+    .loc[PMC_published.index.tolist()]
+    .drop(["document", "published_doi", "pmcoa"], axis=1)
+    .values, 
+    PMC_off_published
+    .drop(["document", "journal"], axis=1)
+    .values,
     'euclidean'
 )
 off_article_dist.shape
 
 
-# In[18]:
+# In[15]:
 
 
 data = []
@@ -229,7 +233,7 @@ for idx, row in tqdm.tqdm(articles_distance_df.iterrows()):
         )
 
 
-# In[19]:
+# In[16]:
 
 
 final_df = (
@@ -244,7 +248,7 @@ final_df = (
 final_df.head()
 
 
-# In[20]:
+# In[17]:
 
 
 final_df = (
@@ -257,14 +261,13 @@ final_df.head()
 
 # # Distribution plot
 
-# In[21]:
+# In[18]:
 
 
 g = (
     p9.ggplot(final_df)
     + p9.aes(x="label",y="distance")
-    + p9.geom_boxplot()
-    + p9.coord_flip()
+    + p9.geom_violin()
     + p9.theme_seaborn()
 )
 g.save("output/biorxiv_article_distance.svg", dpi=500)
@@ -272,9 +275,118 @@ g.save("output/biorxiv_article_distance.png", dpi=500)
 print(g)
 
 
+# # Logistic Regression bioRxiv preprints -> published PMC articles
+
+# In[19]:
+
+
+model = LogisticRegressionCV(
+    Cs=5, cv=10, random_state=100,
+    penalty='elasticnet', solver='saga',
+    l1_ratios=[0.1, 0.5, 0.8], verbose=2
+)
+
+
+# In[20]:
+
+
+training_dataset=(
+    (
+        biorxiv_published
+        .dropna()
+        .drop(["document", "published_doi", "pmcoa"], axis=1)
+        -
+        PMC_published
+        .loc[biorxiv_published.index.tolist()]
+        .dropna()
+        .drop(["journal", "doi"], axis=1)
+    )
+    .assign(
+        biorxiv_document=biorxiv_published.document.values,
+        true_link=1
+    )
+)
+training_dataset.head()
+
+
+# In[21]:
+
+
+journals = (
+    PMC_published
+    .loc[biorxiv_published.index.tolist()]
+    .query(f"journal in {PMC_off_published.journal.tolist()}")
+    .journal
+    .values
+    .tolist()
+)
+
+
+# In[22]:
+
+
+off_documents = (
+    PMC_published
+    .loc[biorxiv_published.index.tolist()]
+    .query(f"journal in {PMC_off_published.journal.tolist()}")
+    .index
+    .tolist()
+)
+
+
+# In[23]:
+
+
+training_dataset=(
+    training_dataset
+    .append(
+        pd.DataFrame(
+            biorxiv_published
+            .loc[off_documents]
+            .drop(["document", "published_doi", "pmcoa"], axis=1)
+            .values 
+            -
+            PMC_off_published
+            .iloc[list(map(lambda x: journal_mapper[x], journals))]
+            .set_index("journal")
+            .drop("document", axis=1)
+            .values,
+            columns=[f"feat_{idx}" for idx in range(300)]
+        )
+        .assign(true_link=-1)
+    )
+    .reset_index(drop=True)
+    .drop("biorxiv_document", axis=1)
+    .dropna()
+)
+training_dataset.head()
+
+
+# In[24]:
+
+
+fit_model = model.fit(
+    training_dataset.sample(frac=1, random_state=100).drop("true_link", axis=1), 
+    training_dataset.sample(frac=1, random_state=100).true_link
+)
+
+
+# In[25]:
+
+
+fit_model.scores_
+
+
+# In[28]:
+
+
+import pickle
+pickle.dump(fit_model, open("output/optimized_model.pkl", "wb"))
+
+
 # # Find bioRxiv unpublished ->  published PMC articles
 
-# In[31]:
+# In[26]:
 
 
 biorxiv_unpublished = (
@@ -286,7 +398,7 @@ print(biorxiv_unpublished.shape)
 biorxiv_unpublished.head()
 
 
-# In[23]:
+# In[27]:
 
 
 PMC_unlinked = (
@@ -306,7 +418,7 @@ print(PMC_unlinked.shape)
 PMC_unlinked.head()
 
 
-# In[24]:
+# In[28]:
 
 
 cutoff_score = (
@@ -318,7 +430,7 @@ cutoff_score = (
 cutoff_score
 
 
-# In[27]:
+# In[29]:
 
 
 chunksize=100
@@ -328,7 +440,7 @@ chunk_iterator = range(
 )
 
 
-# In[32]:
+# In[30]:
 
 
 for idx, chunk in tqdm.tqdm(enumerate(chunk_iterator)):
@@ -395,7 +507,7 @@ for idx, chunk in tqdm.tqdm(enumerate(chunk_iterator)):
 
 # # Bin Potential Matches
 
-# In[33]:
+# In[31]:
 
 
 potential_matches_df = pd.read_csv(
@@ -405,7 +517,7 @@ potential_matches_df = pd.read_csv(
 potential_matches_df.head()
 
 
-# In[34]:
+# In[32]:
 
 
 potential_matches_df = (
@@ -433,7 +545,7 @@ potential_matches_df = (
 potential_matches_df.head()
 
 
-# In[35]:
+# In[33]:
 
 
 distance_bins = np.squeeze(
@@ -462,7 +574,7 @@ distance_bins = np.append(
 distance_bins
 
 
-# In[36]:
+# In[34]:
 
 
 potential_matches_df = (
