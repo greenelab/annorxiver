@@ -21,11 +21,19 @@ from tqdm import tqdm_notebook
 # In[2]:
 
 
-journal_map_df = pd.read_csv(
-    Path("..")/
-    Path("exploratory_data_analysis")/
-    Path("output/biorxiv_article_metadata.tsv"), 
-    sep="\t"
+journal_map_df = (
+    pd.read_csv(
+        Path("..")/
+        Path("exploratory_data_analysis")/
+        Path("output/biorxiv_article_metadata.tsv"), 
+        sep="\t"
+    )
+    .groupby("doi")
+    .agg({
+        "doi":"last",
+        "document":"first",
+        "category":"last",
+    })
 )
 journal_map_df.head()
 
@@ -87,6 +95,14 @@ boostraped_iterations = 10000
 pc_1 = []
 pc_2 = []
 
+# The for loop performs the following algorithm to estimate 95% confidence intervals:
+# 
+# 1. Group document embeddings by category
+# 2. Randomly sample a document from each category
+# 3. Calculate the similarity scores between the documents and the first two principal components
+# 4. Repeat the above steps for 10000 iterations.
+# 5. Finally take the 25th percentile and the 97.5th percentile to make up the interval
+
 for iteration in tqdm_notebook(range(boostraped_iterations)):
     sampled_df = (
         document_categories_df
@@ -98,9 +114,11 @@ for iteration in tqdm_notebook(range(boostraped_iterations)):
     
     document_distance = (
         1 - cdist(
-            sampled_df
-            .drop(["document", "category"], axis=1)
-            .values, 
+            (
+                sampled_df
+                .drop(["document", "category"], axis=1)
+                .values
+            ), 
             reducer.components_[0:2], 
             'cosine'
         )
@@ -175,7 +193,7 @@ category_sim_df.to_csv(
 )
 
 
-# In[14]:
+# In[11]:
 
 
 g = (
@@ -187,7 +205,7 @@ g = (
     + p9.geom_pointrange()
     + p9.coord_flip()
     + p9.theme_bw()
-    #+ p9.scale_x_discrete(limits=category_sim_df.category.tolist()[::-1])
+    + p9.scale_x_discrete(limits=category_sim_df.category.tolist()[::-1])
     + p9.theme(
         figure_size=(11, 7),
         text=p9.element_text(size=12),
@@ -202,7 +220,7 @@ g.save("output/pca_plots/figures/category_pca1_95_ci.png", dpi=500)
 print(g)
 
 
-# In[13]:
+# In[12]:
 
 
 g = (
