@@ -76,8 +76,6 @@ reducer.fit(
 )
 
 
-# # Bootstrap 95% Confidence Intervals Cosine sim
-
 # In[6]:
 
 
@@ -87,6 +85,8 @@ document_categories_df = (
 )
 document_categories_df.head()
 
+
+# # Bootstrap 95% Confidence Intervals Cosine sim
 
 # In[7]:
 
@@ -244,5 +244,98 @@ g = (
 )
 g.save("output/pca_plots/figures/category_pca2_95_ci.svg", dpi=500)
 g.save("output/pca_plots/figures/category_pca2_95_ci.png", dpi=500)
+print(g)
+
+
+# # Plot Documents Projected on PCs Grouped by Category
+
+# In[13]:
+
+
+projected_documents = reducer.transform(
+    document_categories_df[[f"feat_{idx}" for idx in range(300)]]
+)
+projected_documents.shape
+
+
+# In[14]:
+
+
+projected_documents_df = (
+    pd.DataFrame(
+        projected_documents,
+        columns=[f"PC_{dim+1}" for dim in range(n_components)]
+    )
+    .assign(
+        category = document_categories_df.category.tolist(),
+        document = document_categories_df.document.tolist()
+    )
+)
+projected_documents_df
+
+
+# In[15]:
+
+
+g = (
+    p9.ggplot(projected_documents_df)
+    + p9.aes(x="factor(category)", y="PC_1")
+    + p9.geom_boxplot()
+    + p9.coord_flip()
+    + p9.theme(
+        figure_size=(11, 11),
+        text=p9.element_text(size=12),
+        panel_grid_major_y=p9.element_blank()
+    )
+    + p9.scale_x_discrete(
+        limits=(
+            projected_documents_df
+            .sort_values("category")
+            .category
+            .unique()
+            .tolist()
+            [::-1]
+         )
+    )
+    + p9.labs(
+        x = "Article Category",
+        y = "PC1"
+    )
+)
+g.save("output/pca_plots/figures/category_box_plot_pc1.png", dpi=500)
+g.save("output/pca_plots/figures/category_box_plot_pc1.svg", dpi=500)
+print(g)
+
+
+# In[17]:
+
+
+g = (
+    p9.ggplot(projected_documents_df)
+    + p9.aes(x="factor(category)", y="PC_2")
+    + p9.geom_boxplot()
+    + p9.coord_flip()
+    + p9.theme(
+        figure_size=(11, 11),
+        text=p9.element_text(size=12),
+        panel_grid_major_y=p9.element_blank()
+    )
+    + p9.scale_x_discrete(
+        limits=(
+            projected_documents_df
+            .sort_values("category")
+            .category
+            .unique()
+            .tolist()
+            [::-1]
+         )
+    )
+    + p9.labs(
+        x = "Article Category",
+        y = "PC2"
+    )
+)
+g.save("output/pca_plots/figures/category_box_plot_pc2.png", dpi=500)
+g.save("output/pca_plots/figures/category_box_plot_pc2.svg", dpi=500)
 print(g)
 
