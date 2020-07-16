@@ -373,6 +373,7 @@ def dump_figures_and_table(
             doi=lambda x: x.doi.apply(lambda link: f"[@doi:{link}]"),
             figure=lambda x: x.document.apply(lambda doc: f"![](table_figures/{document_figure_selector[doc]})")
         )
+        .drop("document", axis=1)
         .to_csv(f"{output_path}.tsv", sep="\t", index=False)
     )
 
