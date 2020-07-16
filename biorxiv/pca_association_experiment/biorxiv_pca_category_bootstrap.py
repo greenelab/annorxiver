@@ -9,6 +9,7 @@
 
 
 from pathlib import Path
+import subprocess
 
 import numpy as np
 import pandas as pd
@@ -290,12 +291,14 @@ g = (
     + p9.scale_x_discrete(
         limits=(
             projected_documents_df
-            .sort_values("category")
+            .groupby("category")
+            .agg({"PC_1":"median"})
+            .sort_values("PC_1", ascending=False)
+            .reset_index()
             .category
-            .unique()
             .tolist()
             [::-1]
-         )
+        )
     )
     + p9.labs(
         x = "Article Category",
@@ -307,7 +310,7 @@ g.save("output/pca_plots/figures/category_box_plot_pc1.svg", dpi=500)
 print(g)
 
 
-# In[17]:
+# In[16]:
 
 
 g = (
@@ -323,12 +326,14 @@ g = (
     + p9.scale_x_discrete(
         limits=(
             projected_documents_df
-            .sort_values("category")
+            .groupby("category")
+            .agg({"PC_2":"median"})
+            .sort_values("PC_2", ascending=False)
+            .reset_index()
             .category
-            .unique()
             .tolist()
             [::-1]
-         )
+        )
     )
     + p9.labs(
         x = "Article Category",
@@ -338,4 +343,225 @@ g = (
 g.save("output/pca_plots/figures/category_box_plot_pc2.png", dpi=500)
 g.save("output/pca_plots/figures/category_box_plot_pc2.svg", dpi=500)
 print(g)
+
+
+# # Tables with Figures
+
+# In[17]:
+
+
+def dump_figures_and_table(
+    table_df, figure_selector, 
+    output_path="output/table", 
+    column_value="PC_1"
+):
+    
+    # Output figures to folder
+    for idx, row in table_df.iterrows():
+        subprocess.Popen([
+            "unzip", "-j",
+            Path("..")/Path(row['hash']), 
+            Path("content")/Path(figure_selector[row['document']]),
+            "-d", Path("output/table_figures")
+        ])
+        
+    # Output table
+    (
+        table_df
+        [["document", "doi", column_value]]
+        .assign(
+            doi=lambda x: x.doi.apply(lambda link: f"[@doi:{link}]"),
+            figure=lambda x: x.document.apply(lambda doc: f"![](table_figures/{document_figure_selector[doc]})")
+        )
+        .to_csv(f"{output_path}.tsv", sep="\t", index=False)
+    )
+
+
+# In[18]:
+
+
+document_hash_df = pd.read_csv(
+    "../biorxiv_doc_hash_mapper.tsv", sep="\t"
+)
+document_hash_df.head()
+
+
+# ## Top PC1
+
+# In[19]:
+
+
+top_pc1_documents = (
+    journal_map_df
+    [["document", "doi"]]
+    .merge(
+        projected_documents_df
+        .query("category=='systems biology'")
+        .sort_values("PC_1", ascending=False)
+        .head(),
+        on='document'
+    )
+    .merge(document_hash_df, left_on="document", right_on="doc_number")
+)
+top_pc1_documents
+
+
+# In[20]:
+
+
+document_figure_selector = {
+    "044818_v1.xml": "044818_fig1.tif",
+    "107250_v1.xml": "107250_fig1.tif",
+    "197400_v1.xml": "197400_fig1.tif",
+    "769299_v1.xml": "769299v1_fig1.tif",
+    "825943_v1.xml": "825943v1_fig1.tif"
+}
+
+
+# In[21]:
+
+
+dump_figures_and_table(
+    top_pc1_documents, 
+    document_figure_selector,
+    output_path="output/tables/top_pc1_table",
+    column_value="PC_1"
+)
+
+
+# ## Bottom PC1
+
+# In[22]:
+
+
+bottom_pc1_documents = (
+    journal_map_df
+    [["document", "doi"]]
+    .merge(
+        projected_documents_df
+        .query("category=='systems biology'")
+        .sort_values("PC_1", ascending=True)
+        .head(),
+        on='document'
+    )
+    .merge(
+        document_hash_df, 
+        left_on="document", 
+        right_on="doc_number"
+    )
+)
+bottom_pc1_documents
+
+
+# In[23]:
+
+
+document_figure_selector = {
+    "371922_v1.xml": "371922_fig1.tif",
+    "455048_v1.xml": "455048_fig1.tif",
+    "733162_v1.xml": "733162v1_fig1.tif",
+    "745943_v1.xml": "745943v1_fig1.tif",
+    "754572_v1.xml": "754572v1_fig1.tif"
+}
+
+
+# In[24]:
+
+
+dump_figures_and_table(
+    bottom_pc1_documents, 
+    document_figure_selector,
+    output_path="output/tables/bottom_pc1_table",
+    column_value="PC_1"
+)
+
+
+# ## Top PC2
+
+# In[25]:
+
+
+top_pc2_documents = (
+    journal_map_df
+    [["document", "doi"]]
+    .merge(
+        projected_documents_df
+        .query("category=='systems biology'")
+        .sort_values("PC_2", ascending=False)
+        .head(),
+        on='document'
+    )
+    .merge(
+        document_hash_df, 
+        left_on="document", 
+        right_on="doc_number"
+    )
+)
+top_pc2_documents
+
+
+# In[26]:
+
+
+document_figure_selector = {
+    "220152_v1.xml": "220152_fig3.tif",
+    "328591_v1.xml": "328591_fig1.tif",
+    "392779_v1.xml": "392779_fig1.tif",
+    "484204_v2.xml": "484204v2_fig1.tif",
+    "781328_v1.xml": "781328v1_fig3.tif"
+}
+
+
+# In[27]:
+
+
+dump_figures_and_table(
+    top_pc2_documents, 
+    document_figure_selector,
+    output_path="output/tables/top_pc2_table",
+    column_value="PC_2"
+)
+
+
+# ## Bottom PC2
+
+# In[28]:
+
+
+bottom_pc2_documents = (
+    journal_map_df
+    [["document", "doi"]]
+    .merge(
+        projected_documents_df
+        .query("category=='systems biology'")
+        .sort_values("PC_2", ascending=True)
+        .head(),
+        on='document'
+    )
+    .merge(document_hash_df, left_on="document", right_on="doc_number")
+)
+bottom_pc2_documents
+
+
+# In[29]:
+
+
+document_figure_selector = {
+    "019687_v1.xml": "019687_fig1.tif",
+    "301051_v1.xml": "301051_fig3.tif",
+    "357939_v1.xml": "357939_fig4.tif",
+    "386367_v3.xml": "386367v3_fig1.tif",
+    "840280_v1.xml": "840280v1_fig1.tif"
+}
+
+
+# In[30]:
+
+
+dump_figures_and_table(
+    bottom_pc2_documents, 
+    document_figure_selector,
+    output_path="output/tables/bottom_pc2_table",
+    column_value="PC_2"
+)
 
