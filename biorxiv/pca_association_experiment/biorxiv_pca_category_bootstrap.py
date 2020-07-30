@@ -365,10 +365,14 @@ def dump_figures_and_table(
             "-d", Path("output/table_figures")
         ])
         
-    # Output table
+    # Output table in Manubot format
+    # to make incorporating this figure much easier in text
+    # http://greenelab.github.io/annorxiver_manuscript
     (
         table_df
         [["document", "doi", column_value]]
+        # doi - a manubot formatted doi link. Manubot creaes citations via [@doi:doi_link]
+        # figure - a markdown formmated link to show figure images within a given table.
         .assign(
             doi=lambda x: x.doi.apply(lambda link: f"[@doi:{link}]"),
             figure=lambda x: x.document.apply(lambda doc: f"![](table_figures/{document_figure_selector[doc]})")
