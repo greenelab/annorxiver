@@ -5,7 +5,7 @@
 
 # The goal of this notebook is to help users know which journal would be most appropriate for their preprint. The central idea is to use euclidean distance between documents to gauge which journal similar works have been sent.
 
-# In[1]:
+# In[4]:
 
 
 get_ipython().run_line_magic('load_ext', 'autoreload')
@@ -33,7 +33,13 @@ from annorxiver_modules.journal_rec_helper import (
 
 
 biorxiv_journal_df = (
-    pd.read_csv("output/mapped_published_doi.tsv", sep="\t")
+    pd.read_csv(
+        Path("../..")/
+        Path("biorxiv")/
+        Path("journal_tracker")/
+        Path("output/mapped_published_doi.tsv"),
+        sep="\t"
+    )
     .groupby("doi")
     .agg({
         "document":"last",
@@ -71,7 +77,9 @@ golden_set_df.head()
 
 pmc_articles_df = (
     pd.read_csv(
-        "../../pmc/exploratory_data_analysis/output/pubmed_central_journal_paper_map.tsv.xz", 
+        Path("../exploratory_data_analysis")/
+        Path("output")/
+        Path("pubmed_central_journal_paper_map.tsv.xz"), 
         sep="\t"
     )
     .query("article_type=='research-article'")
@@ -110,7 +118,7 @@ pmc_embedding_dict = {
         str(path), 
         sep="\t"
     )
-    for path in Path("../../pmc/word_vector_experiment/output/").rglob("*tsv.xz")
+    for path in Path("../word_vector_experiment/output/").rglob("*tsv.xz")
 }
 pmc_embedding_dict[300].head()
 
@@ -368,7 +376,10 @@ fold_predictions = (
 
 
 biorxiv_embeddings_df = pd.read_csv(
-    Path("../word_vector_experiment/output/word2vec_output/biorxiv_all_articles_300.tsv.xz")
+    Path("../..")/
+    Path("word_vector_experiment")/
+    Path("output/word2vec_output")/
+    Path("biorxiv_all_articles_300.tsv.xz")
     .resolve(),
     sep="\t"
 )
@@ -451,6 +462,21 @@ accs = [
 
 print(f"{np.sum(accs)} out of {len(accs)}")
 print(f"{np.mean(accs)*100}% correct")
+
+
+# # Save Best Dataset
+
+# In[ ]:
+
+
+# Save best dataset for future experiments
+(
+    full_training_dataset[300]
+    .to_csv(
+        "output/paper_dataset/paper_dataset_full.tsv.xz",
+        sep="\t", compression="xz", index=False
+    )
+)
 
 
 # Conclusions for this notebook:
