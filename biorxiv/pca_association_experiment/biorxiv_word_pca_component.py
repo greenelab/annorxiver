@@ -74,13 +74,19 @@ n_components = 50
 random_state = 100
 
 
-# In[4]:
-
-
-biorxiv_articles_df = pd.read_csv("output/word2vec_output/biorxiv_all_articles_300.tsv.xz", sep="\t")
-
-
 # In[5]:
+
+
+biorxiv_articles_df = pd.read_csv(
+    Path("..")/
+    Path("word_vector_experiment")/
+    Path("output/word2vec_output")/
+    Path("biorxiv_all_articles_300.tsv.xz"), 
+    sep="\t"
+)
+
+
+# In[6]:
 
 
 reducer = PCA(
@@ -96,6 +102,21 @@ pca_df = (
     pd.DataFrame(embedding, columns=[f"pca{dim}" for dim in range(1, n_components+1, 1)])
     .assign(document=biorxiv_articles_df.document.values.tolist())
     .merge(journal_map_df[["category", "document", "doi"]], on="document")
+)
+
+
+# In[8]:
+
+
+(
+    pd.DataFrame(
+        reducer.components_,
+        columns=[f"{dim+1}" for dim in range(reducer.components_.shape[1])]
+    )
+    .to_csv(
+        "output/word_pca_similarity/pca_components.tsv", 
+        sep="\t", index=False
+    )
 )
 
 
