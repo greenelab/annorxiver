@@ -233,6 +233,12 @@ def KL_divergence(corpus_top, corpus_bottom, num_terms=100, pseudo_count=1):
     return kl_div.sum()
 
 def calculate_confidence_intervals(data_df):
+    """
+    Calculates the 95% confidence intervals for the odds ratio
+    Arguments:
+        data_df - the dataframe used to calculate the bars
+    """
+    
     ci_df = (
         data_df
         .assign(
@@ -256,7 +262,15 @@ def calculate_confidence_intervals(data_df):
     )
     return ci_df
 
-def create_lemma_count_plot(data_df, corpus_one_label, corpus_two_label):
+def create_lemma_count_df(data_df, corpus_one_label, corpus_two_label):
+    """
+    Creates the dataframe that contains lemmas a the counts
+    Arguments:
+        data_df - the dataframe to convert
+        corpus_one_label - the label for the first corpus
+        corpus_two_label - the label for the second corpus
+    """
+    
     count_plot_df = (
         pd.DataFrame(
             list(
@@ -283,6 +297,13 @@ def create_lemma_count_plot(data_df, corpus_one_label, corpus_two_label):
     
     
 def plot_pointplot(plot_df, y_axis_label="", use_log10=False):
+    """
+    Plots the pointplot
+    Arguments:
+        plot_df - the dataframe that contains the odds ratio and lemmas
+        y_axis_label - the label for the y axis
+        use_log10 - use log10 for the y axis?
+    """
     graph = (
         p9.ggplot(plot_df, p9.aes(x="lemma", y="odds_ratio"))
         + p9.geom_pointrange(
@@ -325,6 +346,13 @@ def plot_pointplot(plot_df, y_axis_label="", use_log10=False):
     return graph
 
 def plot_bargraph(count_plot_df, plot_df):
+    """
+    Plots the bargraph 
+    Arguments:
+        count_plot_df - The dataframe that contains lemma counts
+        plot_df - the dataframe that contains the odds ratio and lemmas
+    """
+    
     graph = (
         p9.ggplot(count_plot_df.astype({"count":int}), p9.aes(x="lemma", y="count"))
         + p9.geom_col(position=p9.position_dodge(width=0.5))
@@ -355,6 +383,13 @@ def plot_bargraph(count_plot_df, plot_df):
 
 
 def plot_point_bar_figure(figure_one_path, figure_two_path):
+    """
+    Combines the pointplot and bargraph together using svg magic
+    Arguments:
+        figure_one_path - The pointplot figure
+        figure_two_path - The barplot figure
+    """
+    
     fig = sg.SVGFigure("2080", "768")
     fig.append([etree.Element("rect", {"width":"100%", "height":"100%", "fill":"white"})])
 
