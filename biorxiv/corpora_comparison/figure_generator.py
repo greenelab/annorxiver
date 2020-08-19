@@ -50,7 +50,7 @@ g = (
     p9.ggplot(
         kl_divergence_df.replace({
         "biorxiv_vs_nytac":"biorxiv_vs_reference",
-        "pmc_nytac": "pmc_vs_reference"
+        "pmc_vs_nytac": "pmc_vs_reference"
         })
     )
     + p9.aes(x="factor(num_terms)", y="KL_divergence", fill="comparison")
@@ -406,4 +406,3 @@ svg2png(
 )
 
 Image(fig_output_path)
-
