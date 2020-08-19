@@ -392,6 +392,18 @@ nytac_data = {
 # In[12]:
 
 
+# This dataframe contains document statistics for each Corpus
+# document count - the number of documents within the corpus
+# Sentence count - the number of sentences within the corpus
+# Token count - the number of tokens within the corpus
+# Stop word counts - the number of stop words within the corpus
+# Average document length - the average number of sentences within a document for a given corpus
+# Average sentence length - the average number of words within a sentence for a given corpus
+# Negatives - the number of negations (e.g. placing not in within a sentence) within a given corpus 
+# Coordinating Conjunctions - the number of coordinating conjunctions (and, but, for etc.) within a given corpus 
+# Pronouns - the number of pronouns within a given corpus 
+# Passive - the number of passive words within a given corpus 
+
 token_stats_df = (
     pd.DataFrame
     .from_records(

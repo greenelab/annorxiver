@@ -16,12 +16,25 @@ def aggregate_word_counts(doc_iterator):
     This function aggregates the word count tsv files.
     Arguments:
         doc_iterator - a pathlib generator that returns file paths to be parsed
+        
+    
+    Example tsv file:
+     
+    | lemma | pos_tag | dep_tag | count | 
+    | --- | --- | --- | --- | 
+    | genome | NOUN | compound | 23 |
+    ...
     """
     global_word_counter = Counter()
     
     for doc in tqdm_notebook(doc_iterator):
         with open(doc, "r") as tsvfile:
             reader = csv.DictReader(tsvfile, delimiter="\t")
+            
+            # create keys with the following types
+            # lemma - the token string
+            # pos_tag - the part of speech tag
+            # dep_tag - the dependency path tag
             global_word_counter.update({
                 (
                     row['lemma'], 
@@ -33,6 +46,70 @@ def aggregate_word_counts(doc_iterator):
 
     return global_word_counter
 
+def calculate_confidence_intervals(data_df):
+    """
+    Calculates the 95% confidence intervals for the odds ratio
+    Arguments:
+        data_df - the dataframe used to calculate the bars
+    """
+    
+    ci_df = (
+        data_df
+        .assign(
+            lower_odds=lambda x: np.exp(
+                np.log(x.odds_ratio) - 1.96*(
+                    # log(odds) - z_alpha/2*sqrt(1/a+1/b+1/c+1/d)
+                    np.sqrt(
+                        1/x.corpus_one_a + 1/x.corpus_two_b + 1/x.corpus_one_c + 1/x.corpus_two_d
+                    )
+                )
+            ),
+            upper_odds=lambda x: np.exp(
+                np.log(x.odds_ratio) + 1.96*(
+                    # log(odds)+ z_alpha/2*sqrt(1/a+1/b+1/c+1/d)
+                    np.sqrt(
+                        1/x.corpus_one_a + 1/x.corpus_two_b + 1/x.corpus_one_c + 1/x.corpus_two_d
+                    )
+                )
+            )
+        )
+    )
+    return ci_df
+
+def create_lemma_count_df(data_df, corpus_one_label, corpus_two_label):
+    """
+    Creates a dataframe that contains lemmas (tokens in base form)and their respective counts
+    Arguments:
+        data_df - the dataframe to convert
+        corpus_one_label - the label for the first corpus
+        corpus_two_label - the label for the second corpus
+    """
+    
+    count_plot_df = (
+        pd.DataFrame(
+            list(
+                zip(
+                    data_df.lemma.tolist(), 
+                    data_df.corpus_one_a.tolist(), 
+                    data_df.assign(label=corpus_one_label).label.tolist()
+
+                )
+            )
+            +
+            list(
+                zip(
+                    data_df.lemma.tolist(), 
+                    data_df.corpus_two_b.tolist(), 
+                    data_df.assign(label=corpus_two_label).label.tolist()
+
+                )
+            ),
+            columns=["lemma", "count", "repository"]
+        )
+    )
+    return count_plot_df
+
+
 def dump_to_dataframe(count_dict, file_name):
     """
     This function outputs the counter data object in
@@ -43,7 +120,12 @@ def dump_to_dataframe(count_dict, file_name):
         count_dict - the counter object to be outputted
         file_name - the name of the file for the output to be written to
     """
-    # Avoids memory issues
+
+    # Avoids memory issues especially with the PMC.
+    # A dictionary form of PMC tokens cannot be picked 
+    # without ram > 64GB.
+    # This solution prevents crashes and is quite convenient to 
+    # work with.
     with open(file_name, "w") as tsvfile:
         reader = csv.DictWriter(
             tsvfile, 
@@ -148,6 +230,67 @@ def get_term_statistics(corpus_one, corpus_two, freq_num, psudeocount=1):
         
     return pd.DataFrame.from_records(term_data)
 
+def get_word_stats(
+    document_list, document_folder, 
+    tag_path, output_folder, 
+    skip_condition=lambda folder, document: False
+):
+    """
+    This function calculates the token statistics for each corpus
+    
+    Arguments:
+        document_list - the list of document paths
+        document_folder - the folder to look for each document
+        tag_path - the xpath used to parse the xml files
+        output_folder - the folder to contain individual file stats
+        skip_condition - a lambda function that skips files based on user input
+    """
+    sentence_length = {}
+    for document in tqdm_notebook(document_list):
+        
+        if skip_condition(document_folder, document):
+            continue
+        
+        document_text = dump_article_text(
+            file_path=f"{document_folder}/{document}",
+            xpath_str=tag_path,
+            remove_stop_words=False
+        )
+
+        doc = lemma_model(
+            " ".join(document_text),  
+            disable = ['ner']
+        )
+
+        tokens = [
+            (str(tok).lower(), tok.pos_, tok.dep_) 
+            for tok in doc 
+            if tok.text.lower() not in string.punctuation
+        ]
+
+        sentence_length[document] = [len(sent) for sent in doc.sents]
+
+        with open(f"{output_folder}/{document}.tsv", "w") as file:
+            writer = csv.DictWriter(
+                file, fieldnames=["lemma", "pos_tag", "dep_tag", "count"],
+                delimiter="\t"
+            )
+
+            writer.writeheader()
+
+            lemma_stats = Counter(tokens)          
+            writer.writerows([
+                {
+                    "lemma":val[0][0],
+                    "pos_tag":val[0][1],
+                    "dep_tag":val[0][2],
+                    "count":val[1]
+                }
+                for val in lemma_stats.items()
+            ])  
+
+    return sentence_length
+
 def KL_divergence(corpus_top, corpus_bottom, num_terms=100, pseudo_count=1):
     """
     This function calculates the KL divergence between two corpora
@@ -232,70 +375,42 @@ def KL_divergence(corpus_top, corpus_bottom, num_terms=100, pseudo_count=1):
     
     return kl_div.sum()
 
-def calculate_confidence_intervals(data_df):
+def plot_bargraph(count_plot_df, plot_df):
     """
-    Calculates the 95% confidence intervals for the odds ratio
+    Plots the bargraph 
     Arguments:
-        data_df - the dataframe used to calculate the bars
+        count_plot_df - The dataframe that contains lemma counts
+        plot_df - the dataframe that contains the odds ratio and lemmas
     """
     
-    ci_df = (
-        data_df
-        .assign(
-            lower_odds=lambda x: np.exp(
-                np.log(x.odds_ratio) - 1.96*(
-                    # log(odds) - z_alpha/2*sqrt(1/a+1/b+1/c+1/d)
-                    np.sqrt(
-                        1/x.corpus_one_a + 1/x.corpus_two_b + 1/x.corpus_one_c + 1/x.corpus_two_d
-                    )
-                )
-            ),
-            upper_odds=lambda x: np.exp(
-                np.log(x.odds_ratio) + 1.96*(
-                    # log(odds)+ z_alpha/2*sqrt(1/a+1/b+1/c+1/d)
-                    np.sqrt(
-                        1/x.corpus_one_a + 1/x.corpus_two_b + 1/x.corpus_one_c + 1/x.corpus_two_d
-                    )
-                )
+    graph = (
+        p9.ggplot(count_plot_df.astype({"count":int}), p9.aes(x="lemma", y="count"))
+        + p9.geom_col(position=p9.position_dodge(width=0.5))
+        + p9.coord_flip()
+        + p9.facet_wrap("repository", scales='free_x')
+        + p9.scale_x_discrete(
+            limits=(
+                plot_df
+                .sort_values("odds_ratio", ascending=True)
+                .lemma
+                .tolist()
             )
         )
-    )
-    return ci_df
-
-def create_lemma_count_df(data_df, corpus_one_label, corpus_two_label):
-    """
-    Creates the dataframe that contains lemmas a the counts
-    Arguments:
-        data_df - the dataframe to convert
-        corpus_one_label - the label for the first corpus
-        corpus_two_label - the label for the second corpus
-    """
-    
-    count_plot_df = (
-        pd.DataFrame(
-            list(
-                zip(
-                    data_df.lemma.tolist(), 
-                    data_df.corpus_one_a.tolist(), 
-                    data_df.assign(label=corpus_one_label).label.tolist()
-
-                )
-            )
-            +
-            list(
-                zip(
-                    data_df.lemma.tolist(), 
-                    data_df.corpus_two_b.tolist(), 
-                    data_df.assign(label=corpus_two_label).label.tolist()
-
-                )
-            ),
-            columns=["lemma", "count", "repository"]
+        + p9.scale_y_continuous(labels=custom_format('{:,.0f}'))
+        + p9.labs(x=None)
+        + p9.theme_seaborn(context='paper')
+        + p9.theme(
+            # 1024, 768
+            figure_size=(13.653333333333334, 10.24),
+            axis_text_y=p9.element_text(family='DejaVu Sans', size=12),
+            panel_grid_minor=p9.element_blank(),
+            axis_title=p9.element_text(size=15),
+            axis_text_x=p9.element_text(size=11, weight="bold"),
+            strip_text=p9.element_text(size=13)
         )
     )
-    return count_plot_df
-    
-    
+    return graph
+
 def plot_pointplot(plot_df, y_axis_label="", use_log10=False):
     """
     Plots the pointplot
@@ -341,42 +456,6 @@ def plot_pointplot(plot_df, y_axis_label="", use_log10=False):
         + p9.labs(
             x=None,
             y=y_axis_label
-        )
-    )
-    return graph
-
-def plot_bargraph(count_plot_df, plot_df):
-    """
-    Plots the bargraph 
-    Arguments:
-        count_plot_df - The dataframe that contains lemma counts
-        plot_df - the dataframe that contains the odds ratio and lemmas
-    """
-    
-    graph = (
-        p9.ggplot(count_plot_df.astype({"count":int}), p9.aes(x="lemma", y="count"))
-        + p9.geom_col(position=p9.position_dodge(width=0.5))
-        + p9.coord_flip()
-        + p9.facet_wrap("repository", scales='free_x')
-        + p9.scale_x_discrete(
-            limits=(
-                plot_df
-                .sort_values("odds_ratio", ascending=True)
-                .lemma
-                .tolist()
-            )
-        )
-        + p9.scale_y_continuous(labels=custom_format('{:,.0f}'))
-        + p9.labs(x=None)
-        + p9.theme_seaborn(context='paper')
-        + p9.theme(
-            # 1024, 768
-            figure_size=(13.653333333333334, 10.24),
-            axis_text_y=p9.element_text(family='DejaVu Sans', size=12),
-            panel_grid_minor=p9.element_blank(),
-            axis_title=p9.element_text(size=15),
-            axis_text_x=p9.element_text(size=11, weight="bold"),
-            strip_text=p9.element_text(size=13)
         )
     )
     return graph

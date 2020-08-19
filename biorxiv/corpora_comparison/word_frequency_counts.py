@@ -9,21 +9,18 @@
 get_ipython().run_line_magic('load_ext', 'autoreload')
 get_ipython().run_line_magic('autoreload', '2')
 
-from collections import Counter, defaultdict
+from collections import Counter
 import csv
 from pathlib import Path
 import pickle
 import string
-import sys
 
-sys.path.append("../../modules/")
-
-import gensim
 import pandas as pd
 import spacy
-from tqdm import tqdm_notebook
+from tqdm import tqdm
 
-from document_helper import dump_article_text
+from annorxiver_modules.document_helper import dump_article_text
+from annorxiver_modules.corpora_comparison_helper import get_word_stats
 
 
 # In[2]:
@@ -31,26 +28,6 @@ from document_helper import dump_article_text
 
 lemma_model = spacy.load("en_core_web_sm")
 lemma_model.max_length = 9000000 
-
-
-# In[ ]:
-
-
-def fix_pronouns(x):
-    """
-    Spacy replaces pronouns with -pron- when
-    processing pronouns, which makes analysis difficult
-    as "me" would be the same as "I" or "we".
-    This lambda function is designed to fix that issue.
-    
-    Arguments: 
-        x - the token parsed by spacy
-    """
-    return (
-        x.lemma_.lower() 
-        if x.lemma_.lower() != '-pron-' 
-        else x.text.lower()
-    )
 
 
 # # Calculate Word Frequency of bioRxiv
@@ -63,46 +40,34 @@ biorxiv_map_df = (
     .groupby("doi")
     .agg({"document":"first", "doi":"last"})
 )
+print(biorxiv_map_df.shape)
 biorxiv_map_df.head()
 
 
 # In[4]:
 
 
-Path('output/biorxiv_word_counts').mkdir(exist_ok=True)
+Path("output/biorxiv_word_counts/").mkdir(parents=True, exist_ok=True)
 
 
 # In[5]:
 
 
-for document in tqdm_notebook(biorxiv_map_df.document.tolist()):
-    
-    document_text = dump_article_text(
-        file_path=f"../biorxiv_articles/{document}",
-        xpath_str="//abstract/p|//abstract/title|//body/sec//p|//body/sec//title",
-        remove_stop_words=False
-    )
+sentence_length = get_word_stats(
+    document_list=biorxiv_map_df.document.tolist(),
+    document_folder="output/biorxiv_word_counts/",
+    tag_path="//abstract/p|//abstract/title|//body/sec//p|//body/sec//title",
+    output_folder="output/biorxiv_word_counts/"
+)
 
-    doc = lemma_model(" ".join(document_text),  disable = ['ner', 'parser'])
-    tokens = [tok for tok in doc if tok.text.lower() not in string.punctuation]
-    
-    with open(f"output/biorxiv_word_counts/{Path(document).stem}.tsv", "w") as file:
-        writer = csv.DictWriter(file, fieldnames=["lemma", "count"], delimiter="\t")
-        writer.writeheader()
-        
-        lemma_freq = Counter(
-            list(
-                map(
-                    fix_pronouns, 
-                    tokens
-                )
-            )
-        )
-        
-        writer.writerows([
-            {"lemma":val[0], "count":val[1]}
-            for val in lemma_freq.items()
-        ])
+
+# In[6]:
+
+
+pickle.dump(
+    sentence_length, 
+    open("output/biorxiv_sentence_length.pkl", "wb")
+)
 
 
 # # Calculate Word Frequency of Pubmed Central
@@ -124,45 +89,34 @@ pmc_map_df.head()
 # In[4]:
 
 
-Path("output/pmc_word_counts").mkdir(exist_ok=True)
+Path("../../pmc/pmc_corpus/pmc_word_counts/").mkdir(parents=True, exist_ok=True)
 
 
-# In[5]:
+# In[ ]:
 
 
-for document in tqdm_notebook(pmc_map_df[["journal", "pmcid"]].values.tolist()):
-    
-    #Skip files that dont exist or files already parsed
-    if (
-        not Path(f"../../pmc/journals/{document[0]}/{document[1]}.nxml").exists()
-        or Path(f"output/pmc_word_counts/{document[1]}.tsv").exists()
-    ):
-        continue
-    
-    document_text = dump_article_text(
-        file_path=f"../../pmc/journals/{document[0]}/{document[1]}.nxml",
-        xpath_str="//abstract/sec/*|//body/sec/*",
-        remove_stop_words=False
+pmc_path_list = [
+    Path(f"{doc_path[0]}/{doc_path[1]}.nxml")
+    for doc_path in pmc_map_df[["journal", "pmcid"]].values.tolist()
+]
+
+sentence_length = get_word_stats(
+    document_list=pmc_path_list,
+    document_folder="../../pmc/journals/",
+    tag_path="//abstract/sec/*|//body/sec/*",
+    output_folder="../../pmc/pmc_corpus/pmc_word_counts/",
+    skip_condition=lambda folder, document: (
+        Path(f"{folder}/{str(document)}").exists() or 
+        Path(f"../../pmc/pmc_corpus/pmc_word_counts/{document.stem}.tsv").exists()
     )
-    
-    doc = lemma_model(" ".join(document_text),  disable = ['ner', 'parser'])
-    tokens = [tok for tok in doc if tok.text.lower() not in string.punctuation]
-    with open(f"output/pmc_word_counts/{document[1]}.tsv", "w") as file:
-        writer = csv.DictWriter(file, fieldnames=["lemma", "count"],delimiter="\t")
-        writer.writeheader()
+)
 
-        lemma_freq = Counter(
-            list(
-                map(
-                    fix_pronouns,
-                    tokens
-                )
-            )
-        )
-              
-        writer.writerows([
-            {"lemma":val[0], "count":val[1]}
-            for val in lemma_freq.items()
-        ])
-        
+
+# In[ ]:
+
+
+pickle.dump(
+    sentence_length, 
+    open("../../pmc/pmc_corpus/pmc_sentence_length.pkl", "wb")
+)
 
