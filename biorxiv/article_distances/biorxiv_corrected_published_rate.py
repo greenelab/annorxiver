@@ -350,69 +350,6 @@ print(f"Posted: {posted}")
 print(f"Overall proportion published: {published/posted:.4f}")
 
 
-# In[20]:
-
-
-if False:
-    # Calculate per month missing OA links
-    missing_oa_rate = (
-        (snapshot_w_links_df.published - snapshot_wo_links_df.published)/
-        (snapshot_wo_links_df.posted - snapshot_wo_links_df.published_closed)
-    )
-
-    # Calculate published closed rate
-    published_closed_rate = (
-        snapshot_wo_links_df.published_closed/snapshot_wo_links_df.posted
-    )
-
-
-# In[21]:
-
-
-if False:
-    publish_rate_df = (
-        publish_rate_df
-        .append(
-            publish_rate_df
-            .query("label=='2020 Snapshot+Missing Links'")
-            .assign(
-                published=lambda x: x.published + (missing_oa_rate.values * (
-                    snapshot_w_links_df
-                    .posted.values - 
-                    snapshot_w_links_df
-                    .published
-                    .values
-                    )
-                ),
-                label="2020 Estimate"
-            )
-            .assign(
-                rate=lambda x: x.published/x.posted
-            )
-        )
-    )
-    publish_rate_df.sample(10, random_state=100)
-
-
-# In[22]:
-
-
-if False:
-    est_published = (
-        publish_rate_df
-        .query("label=='2020 Estimate'")
-        .published
-        .sum()
-    )
-
-    est_posted = (
-        publish_rate_df
-        .query("label=='2020 Estimate'")
-        .posted
-        .sum()
-    )
-
-
 # # Plot Publication Rate
 
 # In[23]:
