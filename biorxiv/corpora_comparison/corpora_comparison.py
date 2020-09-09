@@ -620,15 +620,25 @@ preprint_count = aggregate_word_counts([
     if Path(f"output/biorxiv_word_counts/{Path(file)}.tsv").exists()
 ])
 
-preprint_count_df = pd.DataFrame.from_records([
-    {
-        "lemma":token[0],
-        "pos_tag":token[1],
-        "dep_tag":token[2],
-        "count":preprint_count[token]
-    }
-    for token in preprint_count
-])
+preprint_count_df = (
+    pd.DataFrame.from_records([
+        {
+            "lemma":token[0],
+            "pos_tag":token[1],
+            "dep_tag":token[2],
+            "count":preprint_count[token]
+        }
+        for token in preprint_count
+    ])
+    .query(f"lemma not in {stop_word_list}")
+    .groupby("lemma")
+    .agg({
+        "count":"sum"
+    })
+    .reset_index()
+    .sort_values("count", ascending=False)
+)
+
 preprint_count_df.head()
 
 
@@ -636,20 +646,30 @@ preprint_count_df.head()
 
 
 published_count = aggregate_word_counts([
-    Path(f"output/pmc_word_counts/{file}.tsv")
+    Path(f"../../pmc/pmc_corpus/pmc_word_counts/{file}.tsv")
     for file in mapped_doi_df.pmcid.values.tolist()
-    if Path(f"output/pmc_word_counts/{file}.tsv").exists()
+    if Path(f"../../pmc/pmc_corpus/pmc_word_counts/{file}.tsv").exists()
 ])
 
-published_count_df = pd.DataFrame.from_records([
-    {
-        "lemma":token[0],
-        "pos_tag":token[1],
-        "dep_tag":token[2],
-        "count":published_count[token]
-    }
-    for token in published_count
-])
+published_count_df = (
+    pd.DataFrame.from_records([
+        {
+            "lemma":token[0],
+            "pos_tag":token[1],
+            "dep_tag":token[2],
+            "count":published_count[token]
+        }
+        for token in published_count
+    ])
+     .query(f"lemma not in {stop_word_list}")
+    .groupby("lemma")
+    .agg({
+        "count":"sum"
+    })
+    .reset_index()
+    .sort_values("count", ascending=False)
+)
+
 published_count_df.head()
 
 
@@ -657,8 +677,8 @@ published_count_df.head()
 
 
 preprint_vs_published = get_term_statistics(
-    biorxiv_total_count_df, 
-    pmc_total_count_df, 
+    preprint_count_df, 
+    published_count_df, 
     100
 )
 

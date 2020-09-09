@@ -356,7 +356,7 @@ plot_df = (
     .append(
         full_plot_df
         .sort_values("odds_ratio", ascending=False)
-        .iloc[:-2]
+        .iloc[:-3]
         .tail(subset)
     )
 )
@@ -366,7 +366,7 @@ plot_df.head()
 # In[29]:
 
 
-g = plot_pointplot(plot_df, "Preprint vs Published Odds Ratio")
+g = plot_pointplot(plot_df, "Preprint vs Published Odds Ratio", limits=[0,1.5])
 g.save("output/svg_files/preprint_published_frequency_odds.svg", dpi=75)
 print(g)
 

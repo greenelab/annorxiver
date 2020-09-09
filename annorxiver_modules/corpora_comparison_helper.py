@@ -411,7 +411,7 @@ def plot_bargraph(count_plot_df, plot_df):
     )
     return graph
 
-def plot_pointplot(plot_df, y_axis_label="", use_log10=False):
+def plot_pointplot(plot_df, y_axis_label="", use_log10=False, limits=[0,3.2]):
     """
     Plots the pointplot
     Arguments:
@@ -439,7 +439,7 @@ def plot_pointplot(plot_df, y_axis_label="", use_log10=False):
         + (
             p9.scale_y_log10() 
             if use_log10 else 
-            p9.scale_y_continuous(limits=[0,3.2])
+            p9.scale_y_continuous(limits=limits)
         )
 
         + p9.geom_hline(p9.aes(yintercept=1), linetype = '--', color='grey')
