@@ -515,7 +515,7 @@ for idx, (row_idx, square_bin) in tqdm(enumerate(square_plot_df.iterrows())):
         "xmin":square_bin["xmin"], "xmax":square_bin["xmax"],
         "ymin":square_bin["ymin"], "ymax":square_bin["ymax"],
         "count":datapoints_df.shape[0], "bin_id":idx,
-        "pc":pca_sim_df.head(10).to_dict(orient="records"),
+        "pc":pca_sim_df.to_dict(orient="records"),
         "journal":dict(
             Counter(datapoints_df.journal.tolist())
             .items()

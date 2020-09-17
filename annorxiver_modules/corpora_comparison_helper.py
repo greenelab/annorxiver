@@ -11,12 +11,12 @@ import svgutils.transform as sg
 from tqdm import tqdm_notebook
 
 
-def aggregate_word_counts(doc_iterator):
+def aggregate_word_counts(doc_iterator, disable_progressbar=False):
     """
     This function aggregates the word count tsv files.
     Arguments:
         doc_iterator - a pathlib generator that returns file paths to be parsed
-        
+        disable_progressbar - show the progressbar?
     
     Example tsv file:
      
@@ -27,7 +27,7 @@ def aggregate_word_counts(doc_iterator):
     """
     global_word_counter = Counter()
     
-    for doc in tqdm_notebook(doc_iterator):
+    for doc in tqdm_notebook(doc_iterator, disable=disable_progressbar):
         with open(doc, "r") as tsvfile:
             reader = csv.DictReader(tsvfile, delimiter="\t")
             
@@ -142,7 +142,7 @@ def dump_to_dataframe(count_dict, file_name):
                 "count":count_dict[item]
             })
 
-def get_term_statistics(corpus_one, corpus_two, freq_num, psudeocount=1):
+def get_term_statistics(corpus_one, corpus_two, freq_num, psudeocount=1, disable_progressbar=False):
     """
     This function is designed to perform the folllowing calculations:
         - log likelihood of contingency table
@@ -152,6 +152,8 @@ def get_term_statistics(corpus_one, corpus_two, freq_num, psudeocount=1):
         corpus_one - a dataframe object with terms and counts 
         corpus_two - a datafram object with terms and counts
         freq_num - number of most common words to use from both corpora
+        psudeocount - the psudocount to avoid divide by zero
+        disable_progressbar - show the progress bar?
     """
     term_list = (
         set(
@@ -175,16 +177,16 @@ def get_term_statistics(corpus_one, corpus_two, freq_num, psudeocount=1):
     corpus_two_total = corpus_two['count'].sum()
     
     term_data = []
-    for term in tqdm_notebook(term_list):
+    for term in tqdm_notebook(term_list, disable=disable_progressbar):
 
         corpus_one_term_count = (
-            corpus_one.query(f"lemma=='{term}'")['count'].values[0]
+            corpus_one.query(f"lemma=={repr(term)}")['count'].values[0]
             if term in corpus_one.lemma.tolist()
             else 0
         )
         
         corpus_two_term_count = (
-            corpus_two.query(f"lemma=='{term}'")['count'].values[0]
+            corpus_two.query(f"lemma=={repr(term)}")['count'].values[0]
             if term in corpus_two.lemma.tolist()
             else 0
         )
