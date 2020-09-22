@@ -212,6 +212,8 @@ full_paper_dataset_subset.head()
 
 # ### Evaluate the Grid
 
+# This section involves tuning the hyperparameters of the SAUCIE network. This network sues a shallow autoencoder to project high dimensional data into a low dimensional space. This network takes in three lambda parameters along with a learning rate and number of steps. The plots in this section show the results of different parameters being tunes on a small subset of PMC papers (randomly sampled from four different journals). The best parameters for this model separates the four journals into their own distinct clusters.
+
 # In[11]:
 
 

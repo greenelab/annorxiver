@@ -13,6 +13,7 @@ from collections import Counter
 import csv
 import json
 from pathlib import Path
+import pickle
 import re
 
 import numpy as np
@@ -60,25 +61,37 @@ stop_word_list = list(spacy_nlp.Defaults.stop_words)
 # In[6]:
 
 
-global_word_counter = Counter()
-for name, group in tqdm_notebook(bin_group):
-    files = [
-        f"{word_count_folder.resolve()}/{doc}.tsv"
-        for doc in group.document.tolist()
-    ]
+word_counter_path = "output/app_plots/global_word_counter.pkl"
+if Path(word_counter_path).exists():
+    global_word_counter = pickle.load(
+        open(word_counter_path, "rb")
+    )
     
-    agg_word_count = aggregate_word_counts(files, disable_progressbar=True)
-    
-    filtered_agg_word_count = {
-       term[0]:agg_word_count[term] 
-        for term in agg_word_count 
-        if term[1] != 'SPACE' and term[0] not in stop_word_list
-    }
-    
-    global_word_counter.update(Counter(filtered_agg_word_count))
+else:
+    global_word_counter = Counter()
+    for name, group in tqdm_notebook(bin_group):
+        files = [
+            f"{word_count_folder.resolve()}/{doc}.tsv"
+            for doc in group.document.tolist()
+        ]
+
+        agg_word_count = aggregate_word_counts(files, disable_progressbar=True)
+
+        filtered_agg_word_count = {
+           term[0]:agg_word_count[term] 
+            for term in agg_word_count 
+            if term[1] != 'SPACE' and term[0] not in stop_word_list
+        }
+
+        global_word_counter.update(Counter(filtered_agg_word_count))
+
+    pickle.dump(
+        global_word_counter, 
+        open(word_counter_path, "wb")
+    )
 
 
-# In[8]:
+# In[7]:
 
 
 for bin_id, group in tqdm_notebook(bin_group):
@@ -92,7 +105,9 @@ for bin_id, group in tqdm_notebook(bin_group):
     filtered_agg_word_count = {
        term[0]:agg_word_count[term] 
         for term in agg_word_count 
-        if term[1] != 'SPACE' and "\\" not in repr(term[0]) and term[0] not in stop_word_list
+        if global_word_counter[term[0]] > 1000 and
+        term[0] not in stop_word_list and 
+        term[1] != 'SPACE'
     }
     
     bin_counter = Counter(filtered_agg_word_count)
@@ -136,10 +151,18 @@ for bin_id, group in tqdm_notebook(bin_group):
         disable_progressbar=True
     )
     
+    file_name = (
+        '000'+str(bin_id) if bin_id < 10 else 
+        '00'+str(bin_id) if bin_id < 100 else 
+        '0'+str(bin_id) if bin_id < 1000 else 
+        str(bin_id)
+    )
+    
     (
         word_odds_df
+        .sort_values("odds_ratio", ascending=False)
         .to_csv(
-            f"output/word_odds/word_odds_bin_{bin_id}.tsv", 
+            f"output/word_odds/word_odds_bin_{file_name}.tsv", 
             sep="\t", index=False
         )
     )
@@ -147,7 +170,7 @@ for bin_id, group in tqdm_notebook(bin_group):
 
 # # Insert Bin Word Associations in JSON File
 
-# In[2]:
+# In[8]:
 
 
 square_bin_plot_df = pd.read_json(
@@ -160,20 +183,28 @@ square_bin_plot_df = pd.read_json(
 square_bin_plot_df.head()
 
 
-# In[3]:
+# In[9]:
 
 
 lemma_bin_records = []
 for bin_id in tqdm_notebook(square_bin_plot_df.bin_id.tolist()):
+    
+    file_name = (
+        '000'+str(bin_id) if bin_id < 10 else 
+        '00'+str(bin_id) if bin_id < 100 else 
+        '0'+str(bin_id) if bin_id < 1000 else 
+        str(bin_id)
+    )
+    
     bin_assoc_df = pd.read_csv(
-        f"output/word_odds/word_odds_bin_{bin_id}.tsv",
+        f"output/word_odds/word_odds_bin_{file_name}.tsv",
         sep="\t"
     )
     
     high_odds_words = (
         bin_assoc_df
         .sort_values("odds_ratio", ascending=False)
-        .head(15)
+        .head(20)
         [["lemma", "odds_ratio"]]
     )
       
@@ -186,7 +217,7 @@ for bin_id in tqdm_notebook(square_bin_plot_df.bin_id.tolist()):
     ])
 
 
-# In[8]:
+# In[10]:
 
 
 (
