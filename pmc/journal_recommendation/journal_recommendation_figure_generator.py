@@ -41,11 +41,11 @@ get_ipython().run_line_magic('load_ext', 'rpy2.ipython')
 
 
 results = [
-    {"value":.00517, "model":"random_baseline", "distance":"N/A", "dataset":"train"},
-    {"value":.39982, "model":"paper_paper", "distance":"euclidean", "dataset":"train"},
-    {"value":.37340, "model":"centroid", "distance":"euclidean", "dataset":"train"},
-    {"value":.39824, "model":"paper_paper", "distance":"manhattan", "dataset":"train"},
-    {"value":.39824, "model":"centroid", "distance":"manhattan", "dataset":"train"},
+    {"value":.00517, "model":"random_baseline", "distance":"N/A", "dataset":"train (cross validation)"},
+    {"value":.39982, "model":"paper_paper", "distance":"euclidean", "dataset":"train (cross validation)"},
+    {"value":.37340, "model":"centroid", "distance":"euclidean", "dataset":"train (cross validation)"},
+    {"value":.39824, "model":"paper_paper", "distance":"manhattan", "dataset":"train (cross validation)"},
+    {"value":.39824, "model":"centroid", "distance":"manhattan", "dataset":"train (cross validation)"},
     {"value":.00445, "model":"random_baseline", "distance":"N/A", "dataset":"test"},
     {"value":.20638, "model":"paper_paper", "distance":"euclidean", "dataset":"test"},
     {"value":.21636, "model":"centroid", "distance":"euclidean", "dataset":"test"},
@@ -61,7 +61,7 @@ result_df = pd.DataFrame.from_records(results)
 
 result_df['dataset'] = pd.Categorical(
     result_df.dataset.tolist(), 
-    categories=['train', 'test']
+    categories=['train (cross validation)', 'test']
 )
 
 result_df.head()
