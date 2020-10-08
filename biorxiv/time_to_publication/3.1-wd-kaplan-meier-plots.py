@@ -15,17 +15,14 @@ import matplotlib.pyplot as plt
 
 
 def show_sample(df):
-    print(f'len = {len(df)}')
+    print(f"len = {len(df)}")
     display(df[:2])
 
 
 # In[3]:
 
 
-preprints_df = pd.read_csv(
-    "/home/thielk/gitlab/annorxiver/biorxiv/exploratory_data_analysis/output/biorxiv_article_metadata.tsv",
-    sep="\t",
-)
+preprints_df = pd.read_csv("output/biorxiv_article_metadata.tsv", sep="\t",)
 
 
 # In[4]:
@@ -48,7 +45,7 @@ xml_df = (
 # In[6]:
 
 
-print(f'preprints_df len: {len(preprints_df)}')
+print(f"preprints_df len: {len(preprints_df)}")
 show_sample(xml_df)
 
 
@@ -56,21 +53,20 @@ show_sample(xml_df)
 
 
 header_list = [
-     'document', # file_path
-     'title',
-     'version',
-     'category',
-     'author_type',
-     'heading',
-     'doi',
-     'publisher',  # actually, the publisher of biorxiv Cold Spring Harbor Laboratory	
-     'rcvd_day',
-     'rcvd_month',
-     'rcvd_year']
+    "document",  # file_path
+    "title",
+    "version",
+    "category",
+    "author_type",
+    "heading",
+    "doi",
+    "publisher",  # actually, the publisher of biorxiv Cold Spring Harbor Laboratory
+    "rcvd_day",
+    "rcvd_month",
+    "rcvd_year",
+]
 xmlmeta_df_0 = pd.read_csv(
-    "/home/will/notebooks/rxiv/biorxiv-basic-meta.tsv",
-    names=header_list,
-    sep="\t",
+    "output/biorxiv-basic-meta.tsv", names=header_list, sep="\t",
 )
 
 
@@ -80,68 +76,56 @@ xmlmeta_df_0 = pd.read_csv(
 # In[8]:
 
 
-xref_member_closed_df = pd.read_csv('/home/will/notebooks/rxiv/crossref-members-closed.csv')
-xref_member_open_df = pd.read_csv('/home/will/notebooks/rxiv/crossref-members-open.csv')
+xref_member_closed_df = pd.read_csv("output/crossref-members-closed.csv")
+xref_member_open_df = pd.read_csv("output/crossref-members-open.csv")
 xref_member_df = pd.concat([xref_member_closed_df, xref_member_open_df])
-xref_member_df['doi_prefix'] = xref_member_df['Sponsored member & prefix'].str.extract(r'(10.[0-9]+)$')
-xref_member_df[['mem_name', 'mem_id']] = xref_member_df['Member Name & ID'].str.extract(r'(.*) \(ID ([0-9]+)\)$')
+xref_member_df["doi_prefix"] = xref_member_df["Sponsored member & prefix"].str.extract(
+    r"(10.[0-9]+)$"
+)
+xref_member_df[["mem_name", "mem_id"]] = xref_member_df["Member Name & ID"].str.extract(
+    r"(.*) \(ID ([0-9]+)\)$"
+)
 show_sample(xref_member_df)
 
 
 # In[9]:
 
 
-xref_pref_table = xref_member_df[['doi_prefix', 'mem_name']]
+xref_pref_table = xref_member_df[["doi_prefix", "mem_name"]]
 xref_pref_table[:5]
 
 
 # In[10]:
 
 
-xref_pref_table.to_csv("xref_pref_table.tsv", sep="\t", index=False)
+xref_pref_table.to_csv("output/xref_pref_table.tsv", sep="\t", index=False)
 
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
-
-
-# ### Get extraction from XML that is done in Databricks
-# Databricks notebook: https://elsevier.cloud.databricks.com/#notebook/2490918/command/2490924
 
 # In[11]:
 
 
 header_list = [
-     'document', # file_path
-     'title',
-     'version',
-     'category',
-     'author_type',
-     'heading',
-     'doi',
-     'publisher',  # actually, the publisher of biorxiv Cold Spring Harbor Laboratory	
-     'rcvd_day',
-     'rcvd_month',
-     'rcvd_year']
+    "document",  # file_path
+    "title",
+    "version",
+    "category",
+    "author_type",
+    "heading",
+    "doi",
+    "publisher",  # actually, the publisher of biorxiv Cold Spring Harbor Laboratory
+    "rcvd_day",
+    "rcvd_month",
+    "rcvd_year",
+]
 xmlmeta_df_0 = pd.read_csv(
-    "/home/will/notebooks/rxiv/biorxiv-basic-meta.tsv",
-    names=header_list,
-    sep="\t",
+    "output/biorxiv-basic-meta.tsv", names=header_list, sep="\t",
 )
 
 
 # In[12]:
 
 
-xmlmeta_df_0.groupby('publisher').count()
+xmlmeta_df_0.groupby("publisher").count()
 
 
 # In[13]:
@@ -153,16 +137,26 @@ xmlmeta_df_0[:2]
 # In[14]:
 
 
-xmlmeta_df_0['date_received'] = xmlmeta_df_0['rcvd_year'] + '-' + xmlmeta_df_0['rcvd_month'] + '-' + xmlmeta_df_0['rcvd_day']
-xmlmeta_df_0["date_received"] = pd.to_datetime(xmlmeta_df_0["date_received"], errors='coerce')
-xmlmeta_df = xmlmeta_df_0.dropna(subset=["date_received"]).drop(['rcvd_day', 'rcvd_month', 'rcvd_year'], axis=1)
+xmlmeta_df_0["date_received"] = (
+    xmlmeta_df_0["rcvd_year"]
+    + "-"
+    + xmlmeta_df_0["rcvd_month"]
+    + "-"
+    + xmlmeta_df_0["rcvd_day"]
+)
+xmlmeta_df_0["date_received"] = pd.to_datetime(
+    xmlmeta_df_0["date_received"], errors="coerce"
+)
+xmlmeta_df = xmlmeta_df_0.dropna(subset=["date_received"]).drop(
+    ["rcvd_day", "rcvd_month", "rcvd_year"], axis=1
+)
 show_sample(xmlmeta_df_0)
 
 
 # In[15]:
 
 
-xmlmeta_df = xmlmeta_df.groupby('doi').first()
+xmlmeta_df = xmlmeta_df.groupby("doi").first()
 show_sample(xmlmeta_df)
 
 
@@ -171,9 +165,7 @@ show_sample(xmlmeta_df)
 # In[16]:
 
 
-api_df = pd.read_csv(
-    "/home/thielk/gitlab/ctha-biorxiv-analysis/notebooks/biorxiv_published_api_data.tsv", sep="\t"
-)
+api_df = pd.read_csv("output/biorxiv_published_api_data.tsv", sep="\t")
 
 
 # In[17]:
@@ -185,7 +177,7 @@ api_df[api_df["published_date"].str.contains(":")]
 # In[18]:
 
 
-api_df['doi_prefix'] = api_df['published_doi'].str.split('/').str[0]
+api_df["doi_prefix"] = api_df["published_doi"].str.split("/").str[0]
 
 
 # In[19]:
@@ -197,19 +189,13 @@ api_df[:5]
 # In[20]:
 
 
-doi_prefixes_df = api_df['doi_prefix'].drop_duplicates()
+doi_prefixes_df = api_df["doi_prefix"].drop_duplicates()
 
 
 # In[21]:
 
 
 len(doi_prefixes_df)
-
-
-# In[ ]:
-
-
-
 
 
 # In[22]:
@@ -239,7 +225,7 @@ api_df.set_index("biorxiv_doi")
 
 merged_df = pd.merge(
     xml_df,
-    #xmlmeta_df,
+    # xmlmeta_df,
     api_df.set_index("biorxiv_doi"),
     left_index=True,
     right_index=True,
@@ -277,7 +263,7 @@ len(merged_df)
 # lets ignore papers we don't have xmls for
 merged_df = pd.merge(
     xml_df,
-    #xmlmeta_df,
+    # xmlmeta_df,
     api_df.set_index("biorxiv_doi"),
     left_index=True,
     right_index=True,
@@ -294,11 +280,7 @@ len(merged_df)
 # In[32]:
 
 
-merged_df = pd.merge(
-    merged_df,
-    xref_pref_table,
-    on='doi_prefix'
-)
+merged_df = pd.merge(merged_df, xref_pref_table, on="doi_prefix")
 
 
 # In[33]:
@@ -353,7 +335,9 @@ merged_df["observation_duration"].astype("timedelta64[s]")
 # In[40]:
 
 
-ax = sns.distplot(merged_df["observation_duration"].astype("timedelta64[D]")) # timedelta in days
+ax = sns.distplot(
+    merged_df["observation_duration"].astype("timedelta64[D]")
+)  # timedelta in days
 
 
 # In[41]:
@@ -405,7 +389,7 @@ for category, cat_group in merged_df.groupby("category"):
 
 # Shrink current axis by 20%
 box = ax.get_position()
-#ax.set_position([box.x0, box.y0, box.width * 0.8, box.height])
+# ax.set_position([box.x0, box.y0, box.width * 0.8, box.height])
 
 # Put a legend to the right of the current axis
 _ = ax.legend(loc="center left", bbox_to_anchor=(1, 0.5), title="Biorxiv category")
@@ -418,7 +402,7 @@ _ = ax.set_ylim(0, 1)
 # In[46]:
 
 
-def run_plot_by_group(df, group_name='category', min_group_size=0, selected=None):
+def run_plot_by_group(df, group_name="category", min_group_size=0, selected=None):
     f = plt.figure(figsize=(10, 8))
     ax = None
     for category, cat_group in df.groupby(group_name):
@@ -437,7 +421,9 @@ def run_plot_by_group(df, group_name='category', min_group_size=0, selected=None
     ax.set_position([box.x0, box.y0, box.width * 0.8, box.height])
 
     # Put a legend to the right of the current axis
-    _ = ax.legend(loc="center left", bbox_to_anchor=(1, 0.5), title=f"Biorxiv {group_name}")
+    _ = ax.legend(
+        loc="center left", bbox_to_anchor=(1, 0.5), title=f"Biorxiv {group_name}"
+    )
 
     _ = ax.set_ylabel("proportion of unpublished biorxiv papers")
     _ = ax.set_xlabel("timeline (years)")
@@ -447,32 +433,36 @@ def run_plot_by_group(df, group_name='category', min_group_size=0, selected=None
 # In[47]:
 
 
-run_plot_by_group(merged_df, 'category', min_group_size=0,
-                  selected=['biochemistry', 'cell biology', 'clinical trials', 'zoology'])
+run_plot_by_group(
+    merged_df,
+    "category",
+    min_group_size=0,
+    selected=["biochemistry", "cell biology", "clinical trials", "zoology"],
+)
 
 
 # In[48]:
 
 
-run_plot_by_group(merged_df, 'category', min_group_size=5000)
+run_plot_by_group(merged_df, "category", min_group_size=5000)
 
 
 # In[49]:
 
 
-run_plot_by_group(merged_df, 'mem_name', min_group_size=500)
+run_plot_by_group(merged_df, "mem_name", min_group_size=500)
 
 
 # In[50]:
 
 
-get_ipython().run_cell_magic('time', '', 'f = plt.figure(figsize=(10, 8))\n\nax = None\nfor category, cat_group in merged_df.groupby("mem_name"):\n    if len(cat_group) > 100:\n        kmf.fit(\n            cat_group["observation_duration"].dt.total_seconds() / 60 / 60 / 24 / 365,\n            event_observed=cat_group["published"],\n        )\n        ax = kmf.plot(label=category, ax=ax, ci_show=False, logx=True)\n\n# Shrink current axis by 20%\n#box = ax.get_position()\n#ax.set_position([box.x0, box.y0, box.width * 0.8, box.height])\n\n# Put a legend to the right of the current axis\n_ = ax.legend(loc="center left", bbox_to_anchor=(1, 0.5), title="Publisher")\n\n_ = ax.set_ylabel("proportion of unpublished biorxiv papers")\n_ = ax.set_xlabel("timeline (years)")\n_ = ax.set_ylim(0, 1)')
+get_ipython().run_cell_magic('time', '', 'f = plt.figure(figsize=(10, 8))\n\nax = None\nfor category, cat_group in merged_df.groupby("mem_name"):\n    if len(cat_group) > 100:\n        kmf.fit(\n            cat_group["observation_duration"].dt.total_seconds() / 60 / 60 / 24 / 365,\n            event_observed=cat_group["published"],\n        )\n        ax = kmf.plot(label=category, ax=ax, ci_show=False, logx=True)\n\n# Shrink current axis by 20%\n# box = ax.get_position()\n# ax.set_position([box.x0, box.y0, box.width * 0.8, box.height])\n\n# Put a legend to the right of the current axis\n_ = ax.legend(loc="center left", bbox_to_anchor=(1, 0.5), title="Publisher")\n\n_ = ax.set_ylabel("proportion of unpublished biorxiv papers")\n_ = ax.set_xlabel("timeline (years)")\n_ = ax.set_ylim(0, 1)')
 
 
 # In[51]:
 
 
-#merged_df["doi_prefix"] = merged_df["published_doi"].str.split("/").str[0]
+# merged_df["doi_prefix"] = merged_df["published_doi"].str.split("/").str[0]
 
 
 # In[52]:
@@ -484,10 +474,17 @@ get_ipython().run_cell_magic('time', '', 'f = plt.figure(figsize=(10, 8))\n\nax 
 # In[53]:
 
 
-get_ipython().run_cell_magic('time', '', 'doi_prefix_df = merged_df.groupby("doi_prefix").apply(\n    lambda cat_group: pd.Series(\n        {\n            "count": len(cat_group),\n            "80th_percentile": kmf.fit(\n                cat_group["observation_duration"].dt.total_seconds()\n                / 60\n                / 60\n                / 24,\n                event_observed=cat_group["published"],\n            ).percentile(0.8),\n        }\n    )\n)')
+import warnings
+warnings.filterwarnings("ignore")
 
 
 # In[54]:
+
+
+get_ipython().run_cell_magic('time', '', 'doi_prefix_df = merged_df.groupby("doi_prefix").apply(\n    lambda cat_group: pd.Series(\n        {\n            "count": len(cat_group),\n            "80th_percentile": kmf.fit(\n                cat_group["observation_duration"].dt.total_seconds() / 60 / 60 / 24,\n                event_observed=cat_group["published"],\n            ).percentile(0.8),\n        }\n    )\n)')
+
+
+# In[55]:
 
 
 doi_prefix_df[doi_prefix_df["count"] > 50].sort_values("80th_percentile").head()
@@ -497,13 +494,13 @@ doi_prefix_df[doi_prefix_df["count"] > 50].sort_values("80th_percentile").head()
 # 
 # MDPI AG <== 10.3390 - wikipedia notes questionable quality of peer-review
 
-# In[55]:
-
-
-get_ipython().run_cell_magic('time', '', 'doi_prefix_df = merged_df.groupby("mem_name").apply(\n    lambda cat_group: pd.Series(\n        {\n            "count": len(cat_group),\n            "80th_percentile": kmf.fit(\n                cat_group["observation_duration"].dt.total_seconds()\n                / 60\n                / 60\n                / 24,\n                event_observed=cat_group["published"]\n            ).percentile(0.8),\n        }\n    )\n)')
-
-
 # In[56]:
+
+
+get_ipython().run_cell_magic('time', '', 'doi_prefix_df = merged_df.groupby("mem_name").apply(\n    lambda cat_group: pd.Series(\n        {\n            "count": len(cat_group),\n            "80th_percentile": kmf.fit(\n                cat_group["observation_duration"].dt.total_seconds() / 60 / 60 / 24,\n                event_observed=cat_group["published"],\n            ).percentile(0.8),\n        }\n    )\n)')
+
+
+# In[57]:
 
 
 doi_prefix_df[doi_prefix_df["count"] > 50].sort_values("80th_percentile").head(10)

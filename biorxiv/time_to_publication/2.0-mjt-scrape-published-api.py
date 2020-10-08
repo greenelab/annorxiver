@@ -39,7 +39,7 @@ for i in tqdm(range(0, total, page_size), total=total/page_size):
 # In[6]:
 
 
-pd.DataFrame(collection).to_csv("biorxiv_published_api_data.tsv", sep="\t", index=False)
+pd.DataFrame(collection).to_csv("output/biorxiv_published_api_data.tsv", sep="\t", index=False)
 
 
 # In[ ]:

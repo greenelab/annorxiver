@@ -13,10 +13,7 @@ import matplotlib.pyplot as plt
 # In[2]:
 
 
-preprints_df = pd.read_csv(
-    "/home/thielk/gitlab/annorxiver/biorxiv/exploratory_data_analysis/output/biorxiv_article_metadata.tsv",
-    sep="\t",
-)
+preprints_df = pd.read_csv("output/biorxiv_article_metadata.tsv", sep="\t",)
 
 
 # In[3]:
@@ -39,9 +36,7 @@ xml_df = (
 # In[5]:
 
 
-api_df = pd.read_csv(
-    "/home/thielk/gitlab/ctha-biorxiv-analysis/notebooks/biorxiv_published_api_data.tsv", sep="\t"
-)
+api_df = pd.read_csv("output/biorxiv_published_api_data.tsv", sep="\t")
 
 
 # In[6]:
@@ -160,7 +155,9 @@ merged_df = merged_df[merged_df["observation_duration"] > pd.Timedelta(0)]
 # In[21]:
 
 
-ax = sns.distplot(merged_df["observation_duration"].dt.total_seconds() / 60 / 60 / 24 / 365)
+ax = sns.distplot(
+    merged_df["observation_duration"].dt.total_seconds() / 60 / 60 / 24 / 365
+)
 
 
 # In[22]:
@@ -222,7 +219,7 @@ get_ipython().run_cell_magic('time', '', 'f = plt.figure(figsize=(10, 8))\n\nax 
 # In[27]:
 
 
-get_ipython().run_cell_magic('time', '', 'doi_prefix_df = merged_df.groupby("doi_prefix").apply(\n    lambda cat_group: pd.Series(\n        {\n            "count": len(cat_group),\n            "80th_percentile": kmf.fit(\n                cat_group["observation_duration"].dt.total_seconds()\n                / 60\n                / 60\n                / 24,\n                event_observed=cat_group["published"],\n            ).percentile(0.8),\n        }\n    )\n)')
+get_ipython().run_cell_magic('time', '', 'doi_prefix_df = merged_df.groupby("doi_prefix").apply(\n    lambda cat_group: pd.Series(\n        {\n            "count": len(cat_group),\n            "80th_percentile": kmf.fit(\n                cat_group["observation_duration"].dt.total_seconds() / 60 / 60 / 24,\n                event_observed=cat_group["published"],\n            ).percentile(0.8),\n        }\n    )\n)')
 
 
 # In[28]:
