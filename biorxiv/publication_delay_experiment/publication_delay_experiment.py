@@ -310,8 +310,8 @@ g = (
         label=f"Y={results_2.slope:.2f}*X+{results_2.intercept:.2f}"
     )
 )
-g.save("output/article_distance_vs_publication_time.svg", dpi=500)
-g.save("output/article_distance_vs_publication_time.png", dpi=500)
+g.save("output/version_count_vs_publication_time.svg", dpi=500)
+g.save("output/version_count_vs_publication_time.png", dpi=500)
 print(g)
 
 
