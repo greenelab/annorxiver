@@ -221,7 +221,7 @@ g = (
     + p9.labs(
         x="preprint category",
         y="Days Until 50% of Preprints are Published",
-        title="Preprint Category Halflife"
+        title="Preprint Category Half-Life"
     )
 )
 g.save("output/preprint_category_halflife.svg", dpi=500)

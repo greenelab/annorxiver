@@ -48,6 +48,7 @@ if not already_downloaded:
 else:
     published_dates = pd.read_csv("output/biorxiv_published_dates.tsv", sep="\t")
 
+print(published_dates.shape)
 published_dates.head()
 
 
@@ -59,19 +60,19 @@ biorxiv_journal_df = (
         "../journal_tracker/output/mapped_published_doi.tsv", 
         sep="\t"
     )
-    .groupby("doi")
+    .groupby("preprint_doi")
     .agg({
         "document":"first",
         "category":"first",
-        "journal":"first",
-        "doi":"count",
+        "preprint_doi":"count",
         "published_doi":"first",  
         "pmcid":"first", 
         "pmcoa":"first",
     })
-    .rename(index=str, columns={"doi":"version_count"})
+    .rename(index=str, columns={"preprint_doi":"version_count"})
     .reset_index()
 )
+print(biorxiv_journal_df.shape)
 biorxiv_journal_df.head()
 
 
@@ -86,6 +87,7 @@ biorxiv_embed_df = (
         sep="\t"
     )   
 )
+print(biorxiv_embed_df.shape)
 biorxiv_embed_df.head()
 
 
@@ -102,6 +104,7 @@ pmc_articles_df = (
     )
     .query("article_type=='research-article'")
 )
+print(pmc_articles_df.shape)
 pmc_articles_df.head()
 
 
@@ -120,9 +123,24 @@ pmc_embed_df = (
 pmc_embed_df.head()
 
 
+# In[8]:
+
+
+biorxiv_journal_df = (
+    biorxiv_journal_df
+    .merge(
+        pmc_articles_df[["journal", "pmcid"]],
+        on="pmcid",
+        how="left"
+    )
+)
+print(biorxiv_journal_df.shape)
+biorxiv_journal_df.head()
+
+
 # # Gather Golden bioRxiv Set
 
-# In[8]:
+# In[9]:
 
 
 matched_preprint_published_pairs = (
@@ -132,25 +150,31 @@ matched_preprint_published_pairs = (
     .merge(
         published_dates
         [["biorxiv_doi", "preprint_date", "published_date"]]
-        .rename(index=str, columns={"biorxiv_doi":"doi"}),
-        on="doi"
+        .rename(index=str, columns={"biorxiv_doi":"preprint_doi"}),
+        on="preprint_doi"
     )
     .assign(
-        preprint_date = lambda x: pd.to_datetime(x.preprint_date.tolist()),
+        preprint_date = lambda x: pd.to_datetime(
+            x.preprint_date
+            .tolist()
+        ),
         published_date = lambda x: pd.to_datetime(
-            x.published_date.apply(lambda y: y[0:y.index(":")] if ":" in y else y)
+            x
+            .published_date
+            .apply(lambda y: y[0:y.index(":")] if ":" in y else y)
         )
     )
     .assign(
         time_to_published = lambda x: x.published_date - x.preprint_date
     )
 )
+print(matched_preprint_published_pairs.shape)
 matched_preprint_published_pairs.head()
 
 
 # # Calculate the Document Distances
 
-# In[9]:
+# In[10]:
 
 
 biorxiv_documents = (
@@ -162,7 +186,7 @@ biorxiv_documents = (
 biorxiv_documents.head()
 
 
-# In[10]:
+# In[11]:
 
 
 pmc_documents = (
@@ -174,13 +198,17 @@ pmc_documents = (
 pmc_documents.head()
 
 
-# In[11]:
+# In[12]:
 
 
 published_date_distances = (
     matched_preprint_published_pairs
     .assign(
-        doc_distances = np.diag(cdist(biorxiv_documents.values, pmc_documents.values, 'euclidean'))
+        doc_distances = np.diag(cdist(
+            biorxiv_documents.values, 
+            pmc_documents.values, 
+            'euclidean'
+        ))
     )
     .query("doc_distances.notnull()")
 )
@@ -190,7 +218,7 @@ published_date_distances.head()
 
 # # Construct Scatter Plot of Date vs Version Count
 
-# In[12]:
+# In[13]:
 
 
 # Get smoothed linear regression line
@@ -215,7 +243,7 @@ results = linregress(x, y)
 print(results)
 
 
-# In[13]:
+# In[14]:
 
 
 # Get smoothed linear regression line
@@ -241,7 +269,7 @@ results_2 = linregress(x, y)
 print(results_2)
 
 
-# In[14]:
+# In[15]:
 
 
 g = (
@@ -260,11 +288,10 @@ g = (
         label=f"Y={results_2.slope:.2f}*X+{results_2.intercept:.2f}"
     )
 )
-g.save("output/article_distance_vs_publication_time_dots.png", dpi=500)
 print(g)
 
 
-# In[15]:
+# In[16]:
 
 
 g = (
@@ -290,7 +317,7 @@ print(g)
 
 # # Construct Scatter Plot of Date vs Document Distances
 
-# In[16]:
+# In[17]:
 
 
 # Get smoothed linear regression line
@@ -315,7 +342,7 @@ results = linregress(x, y)
 print(results)
 
 
-# In[17]:
+# In[18]:
 
 
 # Get smoothed linear regression line
@@ -341,7 +368,7 @@ results_2 = linregress(x, y)
 print(results_2)
 
 
-# In[18]:
+# In[19]:
 
 
 g = (
@@ -360,11 +387,10 @@ g = (
         label=f"Y={results_2.slope:.2f}*X+{results_2.intercept:.2f}"
     )
 )
-g.save("output/article_distance_vs_publication_time_dots.png", dpi=500)
 print(g)
 
 
-# In[19]:
+# In[20]:
 
 
 g = (
@@ -392,7 +418,7 @@ print(g)
 
 # The goal here is to understand what a unit of distance represents for two document embeddings. It is already established that low distances can indicate similar documents, but question remains how does a unit of distances relate to time taken to get published?
 
-# In[20]:
+# In[21]:
 
 
 def random_combination(iterable, r, size=100, seed=100):
@@ -434,14 +460,14 @@ def article_distances(iterable, embed_df, combination_size=2, sample_size=100, s
     )
 
 
-# In[33]:
+# In[22]:
 
 
 # Randomly sample two papers from the same journal 1000 times - plos one
 plos_one_distances = (
     article_distances(
         biorxiv_journal_df
-        .query("journal=='Genetics'")
+        .query("journal=='PLoS_Genet'")
         .document
         .tolist(),
         biorxiv_embed_df,
@@ -456,7 +482,7 @@ print(
 )
 
 
-# In[29]:
+# In[23]:
 
 
 # Randomly sample two papers from the same field category 1000 times - bioinformatics
@@ -479,7 +505,7 @@ print(
 )
 
 
-# In[30]:
+# In[24]:
 
 
 # Randomly sample two papers from the entire bioRxiv corpus 1000 times
