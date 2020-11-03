@@ -3,6 +3,8 @@
 
 # # Restructure Hazard Function Calculations
 
+# This notebook builds off of Marvin's work where I change the KaplanMeier Estimators to reflect days rather than years. Given that the lines are a bit difficult to read, I decided to report the values in the form of halflife estimates.
+
 # In[1]:
 
 
@@ -96,6 +98,8 @@ preprints_w_published_dates.head()
 
 # # Calculate Overall Survival Function
 
+# This section loads up the KaplanMeier Estimator for preprints. It measures the lifetime of unpublished preprints. Overtime preprints start to become published which is what decreases the population size.
+
 # In[5]:
 
 
@@ -141,6 +145,8 @@ print(g)
 
 
 # # Calculate Category Survival Function
+
+# This section measures how long it takes for certain categories to get preprints published.
 
 # In[10]:
 
@@ -228,3 +234,7 @@ g.save("output/preprint_category_halflife.svg", dpi=500)
 g.save("output/preprint_category_halflife.png", dpi=500)
 print(g)
 
+
+# Take home Results:
+#     1. The average amount of time for half of all preprints to be published is 348 days (~1 year)
+#     2. Biophysics and biochemistry are two categories that take the least time to have half their preprints published

@@ -3,6 +3,8 @@
 
 # # Measure the Difference between Preprint-Published similarity and Published Articles
 
+# This notebook measures the time delay that results from the peer review process. Two plots are generated: one that depict the average publication time delay as changes are demanded from the peer review process and the other that depicts the added time delay as preprints have to undergo multiple versions to be published.
+
 # In[1]:
 
 
@@ -174,6 +176,8 @@ matched_preprint_published_pairs.head()
 
 # # Calculate the Document Distances
 
+# This block calculates the euclidean distance between preprint's first version and their final published version.
+
 # In[10]:
 
 
@@ -218,30 +222,7 @@ published_date_distances.head()
 
 # # Construct Scatter Plot of Date vs Version Count
 
-# In[13]:
-
-
-# Get smoothed linear regression line
-x = (
-    published_date_distances
-    .time_to_published
-    .apply(lambda x: x/timedelta(days=1))
-    .tolist()
-)
-
-y = (
-    published_date_distances
-    .version_count
-    .values
-    .tolist()
-)
-
-xseq = (
-    np.linspace(np.min(x), np.max(x), 80)
-)
-results = linregress(x, y)
-print(results)
-
+# Preprints are delayed on an average of 51 days for each new version posted onto bioRxiv. This section regresses preprint's version counts against the time it takes to have a preprint published. A scatter and square bin plot are generated below.
 
 # In[14]:
 
@@ -316,6 +297,8 @@ print(g)
 
 
 # # Construct Scatter Plot of Date vs Document Distances
+
+# Preprints are delayed on an average of 17 days as changes are demanded from the peer-review process. This section regresses a preprint's document distance against the time it takes to have a preprint published. A scatter and square bin plot are generated below.
 
 # In[17]:
 
@@ -416,7 +399,7 @@ print(g)
 
 # # Contextualize Document Distances
 
-# The goal here is to understand what a unit of distance represents for two document embeddings. It is already established that low distances can indicate similar documents, but question remains how does a unit of distances relate to time taken to get published?
+# The goal here is to understand what a unit of distance represents for two document embeddings. It is already established that low distances can indicate similar documents, but question remains how does a unit of distances relate to time taken to get published? To answer this question I randomly sampled two preprints from the following groups: same journal, same preprint category and conglomeration of all bioRxiv preprints. Sampled preprints have their distance measured and I report the average distance of each group.
 
 # In[21]:
 
@@ -526,3 +509,8 @@ print(
     f"Std: {np.std(biorxiv_distances):.3f}"
 )
 
+
+# Take home results:
+#     1. Preprints are delayed 51 days for each new version that needs to be created
+#     2. Preprints are delayed 17 days due to peer review process demands.
+#     3. A distance unit reflects about an 18% ((6.210-5.068)/6.210) change of a preprints textual content
