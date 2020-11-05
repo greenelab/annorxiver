@@ -9,8 +9,9 @@
 
 
 import json
+import re
 
-from habanero import Crossref
+import numpy as np
 import pandas as pd
 from ratelimit import limits, sleep_and_retry
 import requests
@@ -21,7 +22,10 @@ from urllib.error import HTTPError
 # In[2]:
 
 
-preprints_df = pd.read_csv("../exploratory_data_analysis/output/biorxiv_article_metadata.tsv", sep="\t")
+preprints_df = pd.read_csv(
+    "../exploratory_data_analysis/output/biorxiv_article_metadata.tsv", 
+    sep="\t"
+)
 preprints_df.head()
 
 
@@ -39,29 +43,16 @@ print(len(dois))
 # In[4]:
 
 
-credentials = json.load(open("credentials.json", "r"))
-
-if "@" not in credentials['email']:
-    raise Exception("Please input a valid email address.")
-    
-if credentials['tool_name'] == 'insert tool name here':
-    raise Exception("Please input a name for the tool you are using.")
-    
-cf = Crossref(mailto=credentials['email'])
-
-
-# In[5]:
-
-
-TEN_MINUTES = 600
+FIVE_MINUTES = 300
 
 @sleep_and_retry
-@limits(calls=10, period=TEN_MINUTES)
-def call_crossref(doi_ids):
+@limits(calls=100, period=FIVE_MINUTES)
+def call_biorxiv(doi_ids):
+    url = "https://api.biorxiv.org/details/biorxiv/"
     responses = []
     for doi in doi_ids:
         try:
-            response = cf.works(ids=doi)
+            response = requests.get(url+doi).json()
             responses.append(response)
         except:
             responses.append({
@@ -74,19 +65,19 @@ def call_crossref(doi_ids):
     return responses
 
 
-# In[6]:
+# In[5]:
 
 
-TEN_MINUTES = 600
+FIVE_MINUTES = 300
 
 @sleep_and_retry
-@limits(calls=50, period=TEN_MINUTES)
-def call_pmc(doi_ids):
+@limits(calls=300, period=FIVE_MINUTES)
+def call_pmc(doi_ids, tool_name, email):
     query = (
         "https://www.ncbi.nlm.nih.gov/pmc/utils/idconv/v1.0/?"
         f"ids={','.join(doi_ids)}"
-        f"&tool={credentials['tool_name']}"
-        f"&email={credentials['email']}"
+        f"&tool={tool_name}"
+        f"&email={email}"
         "&format=json"
     )
     
@@ -95,112 +86,92 @@ def call_pmc(doi_ids):
 
 # # Map preprint DOIs to Published DOIs
 
-# In[8]:
+# In[6]:
 
 
 batch_limit = 100
 doi_mapper_records = []
 
 for batch in tqdm.tqdm(range(0, len(dois), batch_limit)):
-    response = call_crossref(dois[batch:batch+batch_limit])
+    response = call_biorxiv(dois[batch:batch+batch_limit])
     doi_mapper_records += [
         {
-         "preprint_doi":result['message']['DOI'],
-         "published_doi":(
-                 result['message']['relation']['is-preprint-of'][0]['id'] 
-                 if "is-preprint-of" in result['message']['relation'] 
-                 else ""
-             )
+            "preprint_doi": collection['doi'],
+            "posted_date": collection['date'],
+            "published_doi": collection['published'],
+            "version": collection['version']
         }
         for result in response
+        for collection in result['collection']
     ]
+
+
+# In[7]:
+
+
+(
+    pd.DataFrame
+    .from_records(doi_mapper_records)
+    .to_csv("output/mapped_published_doi_part1.tsv", sep="\t", index=False)
+)
+
+
+# # Map Journal Titles to DOI
+
+# In[6]:
+
+
+published_doi_df = pd.read_csv(
+    "output/mapped_published_doi_part1.tsv", 
+    sep="\t"
+)
+print(published_doi_df.shape)
+published_doi_df.head()
 
 
 # In[9]:
 
 
-published_doi_df = (
-    pd.DataFrame.from_records(doi_mapper_records)
-    .append(mapped_preprints_df)
+mapped_preprints_df = (
+    preprints_df
+    .assign(
+        version=lambda x: x.document.apply(lambda doc: int(doc.split(".")[0][-1])),
+    )
+    .rename(index=str, columns={"doi":"preprint_doi"})
+    .merge(
+        published_doi_df.assign(
+            published_doi=lambda x: x.published_doi.apply(
+                lambda url: re.sub(r"http(s)?://doi.org/", '', url) 
+                if type(url) == str else url
+            )
+        ), 
+        on=["preprint_doi", "version"]
+    )
 )
-published_doi_df.to_csv("output/mapped_published_doi.tsv", sep="\t", index=False)
-
-
-# # Map Journal Titles to DOI
-
-# In[8]:
-
-
-published_doi_df = pd.read_csv("output/mapped_published_doi.tsv", sep="\t")
+print(mapped_preprints_df.shape)
+mapped_preprints_df.head()
 
 
 # In[11]:
 
 
-journal_dois = (
-    published_doi_df
-    .published_doi
-    .unique()
-    .tolist()
+mapped_preprints_df.to_csv(
+    "output/mapped_published_doi_part2.tsv", 
+    sep="\t", index=False
 )
-
-
-# In[14]:
-
-
-batch_limit = 100
-journal_mapper_records = []
-
-for batch in tqdm.tqdm(range(0, len(journal_dois), batch_limit)):
-    response = call_crossref(journal_dois[batch:batch+batch_limit])
-    journal_mapper_records += [
-        {
-            "published_doi": result['message']['DOI'],
-            "journal": (
-                result['message']['container-title'][0] 
-                if 'container-title' in result['message'] and len(result['message']['container-title']) > 0
-                else "fill_me_in"
-            ),
-        }
-        for result in response
-    ]
-
-
-# In[15]:
-
-
-journal_mapper_df = pd.DataFrame.from_records(journal_mapper_records)
-journal_mapper_df.head()
-
-
-# In[12]:
-
-
-final_df = (
-    preprints_df
-    .merge(published_doi_df, left_on="doi", right_on="preprint_doi")
-    .merge(journal_mapper_df, on="published_doi", how="left")
-    .drop("preprint_doi", axis=1)
-)
-final_df.head()
-
-
-# In[13]:
-
-
-final_df.to_csv("output/mapped_published_doi.tsv", sep="\t", index=False)
 
 
 # # Map Published Articles to PMC
 
-# In[7]:
+# In[6]:
 
 
-preprint_df = pd.read_csv("output/mapped_published_doi.tsv", sep="\t").drop("pmcid", axis=1)
+preprint_df = pd.read_csv("output/mapped_published_doi_part2.tsv", sep="\t")
+print(preprint_df.shape)
 preprint_df.head()
 
 
-# In[8]:
+# In[7]:
 
 
 pmc_df = pd.read_csv(
@@ -210,24 +181,25 @@ pmc_df = pd.read_csv(
 pmc_df.head()
 
 
-# In[9]:
+# In[8]:
 
 
 final_df = (
     preprint_df
     .assign(published_doi=preprint_df.published_doi.str.lower())
     .merge(
-        pmc_df[["doi", "pmcid"]].assign(doi=pmc_df.doi.str.lower()).dropna(), 
-        how="left", left_on="published_doi", 
-        right_on="doi"
+        pmc_df[["doi", "pmcid"]]
+        .assign(doi=pmc_df.doi.str.lower())
+        .dropna()
+        .rename(index=str, columns={"doi":"published_doi"}), 
+        how="left", on="published_doi"
     )
-    .drop("doi_y", axis=1)
-    .rename(index=str, columns={"doi_x":"doi"})
 )
+print(final_df.shape)
 final_df.head()
 
 
-# In[10]:
+# In[9]:
 
 
 # Fill in missing links
@@ -240,39 +212,48 @@ missing_ids = (
 print(len(missing_ids))
 
 
-# In[12]:
+# In[10]:
 
 
 chunksize=100
 data = []
 for chunk in tqdm.tqdm(range(0, len(missing_ids), chunksize)):
     query_ids = missing_ids[chunk:chunk+chunksize]
-    response = call_pmc(query_ids).json()
+    response = call_pmc(query_ids, 'model_name', 'email@server.com').json()
     
     for potential_match in response['records']:
         if "pmcid" not in potential_match:
             continue
-            
-        final_df.loc[
-            final_df["published_doi"] == potential_match['doi'], 
-            "pmcid"
-        ] = potential_match["pmcid"]
+        
+        data.append({
+            "pmcid": potential_match["pmcid"], 
+            "published_doi": potential_match['doi']
+        })
 
 
-# In[13]:
+# In[11]:
 
 
-final_df.head()
+missing_pmcids = pd.DataFrame.from_records(data)
+missing_pmcids.head()
 
 
-# In[17]:
+# In[28]:
 
 
 (
     final_df
+    .merge(
+        missing_pmcids.assign(published_doi=lambda x:x.published_doi.str.lower()),
+        on="published_doi", how="left"
+    )
     .assign(
+        final_pmcid=lambda x: x.pmcid_x.fillna('') + x.pmcid_y.fillna(''),
         pmcoa=final_df.pmcid.isin(pmc_df.pmcid.values.tolist())
     )
+    .drop(["pmcid_x", "pmcid_y"], axis=1)
+    .rename(index=str, columns={"final_pmcid":"pmcid"})
+    .replace('', np.nan)
     .to_csv(
         "output/mapped_published_doi.tsv",
         sep="\t", index=False
