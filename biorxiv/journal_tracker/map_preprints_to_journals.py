@@ -22,7 +22,10 @@ from urllib.error import HTTPError
 # In[2]:
 
 
-preprints_df = pd.read_csv("../exploratory_data_analysis/output/biorxiv_article_metadata.tsv", sep="\t")
+preprints_df = pd.read_csv(
+    "../exploratory_data_analysis/output/biorxiv_article_metadata.tsv", 
+    sep="\t"
+)
 preprints_df.head()
 
 
@@ -152,7 +155,10 @@ mapped_preprints_df.head()
 # In[11]:
 
 
-mapped_preprints_df.to_csv("output/mapped_published_doi_part2.tsv", sep="\t", index=False)
+mapped_preprints_df.to_csv(
+    "output/mapped_published_doi_part2.tsv", 
+    sep="\t", index=False
+)
 
 
 # # Map Published Articles to PMC
@@ -213,13 +219,16 @@ chunksize=100
 data = []
 for chunk in tqdm.tqdm(range(0, len(missing_ids), chunksize)):
     query_ids = missing_ids[chunk:chunk+chunksize]
-    response = call_pmc(query_ids, 'annorxivr', 'dnicholson329@gmail.com').json()
+    response = call_pmc(query_ids, 'model_name', 'email@server.com').json()
     
     for potential_match in response['records']:
         if "pmcid" not in potential_match:
             continue
         
-        data.append({"pmcid": potential_match["pmcid"], "published_doi": potential_match['doi']})
+        data.append({
+            "pmcid": potential_match["pmcid"], 
+            "published_doi": potential_match['doi']
+        })
 
 
 # In[11]:

@@ -91,6 +91,7 @@ preprints_w_published_dates = (
     preprints_w_published_dates[
         preprints_w_published_dates.time_to_published > pd.Timedelta(0)
     ]
+    .dropna()
 )
 print(preprints_w_published_dates.shape)
 preprints_w_published_dates.head()
@@ -136,10 +137,14 @@ overall_preprint_survival.head()
 
 
 g = (
-    p9.ggplot(overall_preprint_survival, p9.aes(x="timeline", y="KM_estimate", color="label"))
-    + p9.geom_point()
+    p9.ggplot(
+        overall_preprint_survival
+        .assign(timeline=lambda x: pd.to_timedelta(x.timeline, 'D')), 
+        p9.aes(x="timeline", y="KM_estimate", color="label")
+    )
+    + p9.scale_x_timedelta(labels=timedelta_format('d'))
+    + p9.geom_line()
     + p9.ylim(0,1)
-    + p9.xlim(0, 2550)
 )
 print(g)
 
@@ -180,17 +185,32 @@ for cat, grouped_df in preprints_w_published_dates.groupby("category"):
 
 g = (
     p9.ggplot(
-        entire_preprint_df, 
+        entire_preprint_df
+        .assign(timeline=lambda x: pd.to_timedelta(x.timeline, 'D'))
+        .query("category != 'none'"), 
         p9.aes(x="timeline", y="KM_estimate", color='category')
     )
-    + p9.geom_line()
+    + p9.geom_line(linetype='dashed', size=0.7)
     + p9.ylim(0,1)
-    + p9.xlim(0,2550)
+    + p9.scale_x_timedelta(labels=timedelta_format('d'))
     + p9.labs(
         x="timeline (days)",
-        y="proportion of unpublished biorxiv paper"
+        y="proportion of unpublished biorxiv paper",
+        title="Preprint Survival Curves"
+    )
+    + p9.theme_seaborn(
+        context='paper', 
+        style='white', 
+        font_scale=1.2
+    )
+    + p9.theme(
+        axis_ticks_minor_x=p9.element_blank(),
+        #legend_position=(0.5, -0.2), 
+        #legend_direction='horizontal'
     )
 )
+g.save("output/preprint_category_survival_curves.svg", dpi=500)
+g.save("output/preprint_category_survival_curves.png", dpi=500)
 print(g)
 
 
@@ -210,24 +230,35 @@ category_half_life
 
 g = (
     p9.ggplot(
-        category_half_life.query("category!='none'"),
+        category_half_life
+        .query("category!='none'")
+        .assign(half_life_time=lambda x: pd.to_timedelta(x.half_life_time, 'D')),
         p9.aes(x="category", y="half_life_time")
     )
-    + p9.geom_col()
+    + p9.geom_col(fill="#41b6c4")
     + p9.scale_x_discrete(
         limits=(
             category_half_life
             .query("category!='none'")
-            .sort_values("half_life_time", ascending=False)
             .category
             .tolist()
-        )
+            [::-1]
+        ),
     )
+    + p9.scale_y_timedelta(labels=timedelta_format('d'))
     + p9.coord_flip()
     + p9.labs(
-        x="preprint category",
-        y="Days Until 50% of Preprints are Published",
+        x="Preprint Categories",
+        y="Time Until 50% of Preprints are Published",
         title="Preprint Category Half-Life"
+    )
+    + p9.theme_seaborn(
+        context='paper', 
+        style='white', 
+        font_scale=1.2
+    )
+    + p9.theme(
+        axis_ticks_minor_x=p9.element_blank(),
     )
 )
 g.save("output/preprint_category_halflife.svg", dpi=500)
