@@ -340,7 +340,7 @@ g = (
 print(g)
 
 
-# In[23]:
+# In[17]:
 
 
 g = (
@@ -355,7 +355,7 @@ g = (
     )
     + p9.geom_line(
         stat="smooth",method='lm', linetype='dashed', 
-        se=False, alpha=0.6, size=0.7
+        se=False, alpha=1, size=0.7
     )
     + p9.scale_y_timedelta(labels=timedelta_format('d'))
     + p9.annotate(
