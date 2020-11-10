@@ -3,7 +3,7 @@ import csv
 from collections import Counter
 
 from lxml import etree
-from mizani.formatters import custom_format
+from mizani.formatters import custom_format, log_format
 import numpy as np
 import pandas as pd
 import plotnine as p9
@@ -387,7 +387,7 @@ def plot_bargraph(count_plot_df, plot_df):
     
     graph = (
         p9.ggplot(count_plot_df.astype({"count":int}), p9.aes(x="lemma", y="count"))
-        + p9.geom_col(position=p9.position_dodge(width=0.5))
+        + p9.geom_col(position=p9.position_dodge(width=0.5), fill="#253494")
         + p9.coord_flip()
         + p9.facet_wrap("repository", scales='free_x')
         + p9.scale_x_discrete(
@@ -398,17 +398,21 @@ def plot_bargraph(count_plot_df, plot_df):
                 .tolist()
             )
         )
-        + p9.scale_y_continuous(labels=custom_format('{:,.0f}'))
+        + p9.scale_y_continuous(labels=custom_format('{:,.0g}'))
         + p9.labs(x=None)
-        + p9.theme_seaborn(context='paper')
+        + p9.theme_seaborn(
+            context='paper',
+            style="ticks",
+            font="Arial",
+            font_scale=0.95
+        )
         + p9.theme(
-            # 1024, 768
-            figure_size=(13.653333333333334, 10.24),
-            axis_text_y=p9.element_text(family='DejaVu Sans', size=12),
-            panel_grid_minor=p9.element_blank(),
-            axis_title=p9.element_text(size=15),
-            axis_text_x=p9.element_text(size=11, weight="bold"),
-            strip_text=p9.element_text(size=13)
+            # 640 x 480
+            figure_size=(6.66, 5),
+            strip_background=p9.element_rect(fill="white"),
+            strip_text=p9.element_text(size=12),
+            axis_title=p9.element_text(size=12),
+            axis_text_x=p9.element_text(size=10),
         )
     )
     return graph
@@ -428,7 +432,9 @@ def plot_pointplot(plot_df, y_axis_label="", use_log10=False, limits=[0,3.2]):
                 ymin="lower_odds", 
                 ymax="upper_odds"
             ), 
-            position=p9.position_dodge(width=5)
+            position=p9.position_dodge(width=1),
+            size=0.3,
+            color="#253494"
         )
         + p9.scale_x_discrete(
             limits=(
@@ -443,17 +449,21 @@ def plot_pointplot(plot_df, y_axis_label="", use_log10=False, limits=[0,3.2]):
             if use_log10 else 
             p9.scale_y_continuous(limits=limits)
         )
-
+        
         + p9.geom_hline(p9.aes(yintercept=1), linetype = '--', color='grey')
         + p9.coord_flip()
-        + p9.theme_seaborn(context='paper')
+        + p9.theme_seaborn(
+            context='paper', 
+            style="ticks", 
+            font_scale=1, 
+            font='Arial'
+        )
         + p9.theme(
-            # 1024, 768
-            figure_size=(13.653333333333334, 10.24),
-            axis_text_y=p9.element_text(family='DejaVu Sans', size=12),
+            # 640 x 480
+            figure_size=(6.66, 5),
             panel_grid_minor=p9.element_blank(),
-            axis_title=p9.element_text(size=15),
-            axis_text_x=p9.element_text(size=11, weight="bold")
+            axis_title=p9.element_text(size=12),
+            axis_text_x=p9.element_text(size=10)
         )
         + p9.labs(
             x=None,
@@ -471,21 +481,21 @@ def plot_point_bar_figure(figure_one_path, figure_two_path):
         figure_two_path - The barplot figure
     """
     
-    fig = sg.SVGFigure("2080", "768")
+    fig = sg.SVGFigure("1280", "960")
     fig.append([etree.Element("rect", {"width":"100%", "height":"100%", "fill":"white"})])
 
     fig1 = sg.fromfile(figure_one_path)
     plot1 = fig1.getroot()
-    plot1.moveto(0, 25, scale=1.2)
+    plot1.moveto(22, 25, scale=1.35)
 
     fig2 = sg.fromfile(figure_two_path)
     plot2 = fig2.getroot()
-    plot2.moveto(1024, 0, scale=1.2)
+    plot2.moveto(662, 0, scale=1.35)
 
     fig.append([plot1,plot2])
 
-    text_A = sg.TextElement(10, 30, "A", size=22, weight="bold")
-    text_B = sg.TextElement(1044, 30, "B", size=22, weight="bold")
+    text_A = sg.TextElement(10, 30, "A", size=18, weight="bold")
+    text_B = sg.TextElement(640, 30, "B", size=18, weight="bold")
 
     fig.append([text_A, text_B])
     

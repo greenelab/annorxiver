@@ -26,15 +26,6 @@ def display_clouds(pc_cloud_1, pc_cloud_2):
         )
     )
     
-def save_plot(image_path, output_path):
-    img = mpimg.imread(image_path)
-    fig = plt.figure(figsize=(8,6), dpi=300)
-    plt.imshow(img)
-    plt.axis("off")
-    fig.savefig(output_path, format='svg')
-    #Turn off the images
-    plt.close()
-    
 
 def plot_scatter_clouds(
     scatter_plot_path, word_cloud_x_path, 
@@ -43,44 +34,37 @@ def plot_scatter_clouds(
     
     # Save the matplotlfigures
     scatter_plot = Path(scatter_plot_path)
-    scatter_plot_output = f"output/pca_plots/svg_files/{scatter_plot.stem}.svg"
-   
     word_cloud_x = Path(word_cloud_x_path)
-    word_cloud_x_output = f"output/pca_plots/svg_files/{word_cloud_x.stem}.svg"
-    
     word_cloud_y = Path(word_cloud_y_path)
-    word_cloud_y_output = f"output/pca_plots/svg_files/{word_cloud_y.stem}.svg"
-    
-    save_plot(str(scatter_plot), scatter_plot_output)
-    save_plot(str(word_cloud_x), word_cloud_x_output)
-    save_plot(str(word_cloud_y), word_cloud_y_output)
     
     #create new SVG figure
     fig = sg.SVGFigure("1280", "768")
     fig.append([etree.Element("rect", {"width":"100%", "height":"100%", "fill":"white"})])
 
     # load matpotlib-generated figures
-    fig1 = sg.fromfile(word_cloud_y_output)
-    fig2 = sg.fromfile(scatter_plot_output)
-    fig3 = sg.fromfile(word_cloud_x_output)
+    fig1 = sg.fromfile(word_cloud_y)
+    fig2 = sg.fromfile(scatter_plot)
+    fig3 = sg.fromfile(word_cloud_x)
 
     # get the plot objects
     plot1 = fig1.getroot()
-    plot1.moveto(-40, -20, scale=0.98)
+    plot1.scale_xy(x=0.45, y=0.45)
+    plot1.moveto(30, 30)
 
     plot2 = fig2.getroot()
-    plot2.moveto(420, -110, scale=1.4)
+    plot2.moveto(650, 0, scale=1)
     
     plot3 = fig3.getroot()
-    plot3.moveto(460, 370, scale=0.98)
+    plot3.scale_xy(x=0.45, y=0.45)
+    plot3.moveto(650, 384)
 
     # append plots and labels to figure
     fig.append([plot2,plot1, plot3])
 
     
-    text_A = sg.TextElement(10, 30, "A", size=20, weight="bold")
-    text_B = sg.TextElement(510, 30, "B", size=20, weight="bold")
-    text_C = sg.TextElement(510, 390, "C", size=20, weight="bold")
+    text_A = sg.TextElement(10, 30, "A", size=22, weight="bold")
+    text_B = sg.TextElement(620, 30, "B", size=22, weight="bold")
+    text_C = sg.TextElement(620, 390, "C", size=22, weight="bold")
     
     fig.append([text_A, text_B, text_C])
 
@@ -99,13 +83,13 @@ def plot_scatter_clouds(
     
     
     word_cloud_title_1 = sg.TextElement(
-        200, 370, 
+        225, 400, 
         f"pca{second_pc}", size=22, 
         weight="bold"
     )
     
     word_cloud_title_2 = sg.TextElement(
-        713, 760, 
+        850, 760, 
         f"pca{first_pc}", size=22, 
         weight="bold"
     )
@@ -116,7 +100,7 @@ def plot_scatter_clouds(
     svg2png(
         bytestring=fig.to_str(), 
         write_to=final_figure_path,
-        dpi=500
+        dpi=250
     )
     
     return Image(final_figure_path)
@@ -128,7 +112,7 @@ def generate_scatter_plots(
     nsample=200, random_state=100,
     selected_categories=['bioinformatics', 'neuroscience'],
     color_palette=['#a6cee3','#1f78b4'],
-    save_file_path="output/pca_plots/scatterplot_files/pca01_v_pca02.png"
+    save_file_path="output/pca_plots/scatterplot_files/pca01_v_pca02.svg"
 ):
     g = (
         p9.ggplot(
@@ -150,11 +134,17 @@ def generate_scatter_plots(
             title="PCA of BioRxiv (Word Dim: 300)",
             color="Article Category"
         )
+        + p9.theme_seaborn(
+            context="paper",
+            style="ticks",
+            font="Arial",
+            font_scale=1.3
+        )
         + p9.theme(
-            figure_size=(4.59,3.44),
+            figure_size=(6.66, 5),
             dpi=300
         )
     )
     
-    g.save(save_file_path)
+    g.save(save_file_path, dpi=250)
     print(g)
