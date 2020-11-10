@@ -14,6 +14,8 @@ import re
 
 from gensim.models import Word2Vec
 import itertools
+import matplotlib
+matplotlib.use('SVG') #set the backend to SVG
 import matplotlib.pyplot as plt
 import pandas as pd
 import plotnine as p9
@@ -74,7 +76,7 @@ n_components = 50
 random_state = 100
 
 
-# In[5]:
+# In[4]:
 
 
 biorxiv_articles_df = pd.read_csv(
@@ -86,7 +88,7 @@ biorxiv_articles_df = pd.read_csv(
 )
 
 
-# In[6]:
+# In[5]:
 
 
 reducer = PCA(
@@ -105,7 +107,7 @@ pca_df = (
 )
 
 
-# In[8]:
+# In[6]:
 
 
 (
@@ -124,7 +126,7 @@ pca_df = (
 
 # Once PCA has finished, there are now 50 different principal components. The association between every word and principal component is calculated via [cosine similarity](https://en.wikipedia.org/wiki/Cosine_similarity) (cosine of the angle between two vectors).
 
-# In[6]:
+# In[7]:
 
 
 word_vector_df = pd.read_csv(
@@ -133,7 +135,7 @@ word_vector_df = pd.read_csv(
 )
 
 
-# In[7]:
+# In[8]:
 
 
 # 1 - cosine distance = cosine similarity
@@ -148,7 +150,7 @@ word_pca_similarity = (
 word_pca_similarity.shape
 
 
-# In[8]:
+# In[9]:
 
 
 word_pca_sim_df = (
@@ -157,17 +159,17 @@ word_pca_sim_df = (
 )
 
 # for files greater than a 1GB
-if n_components > 40:
-    word_pca_sim_df.to_csv(
-        f"output/word_pca_similarity/word_pca_cos_sim_{n_components}_pcs.tsv.xz", 
-        sep="\t", index=False, compression="xz"
-    )
+#if n_components > 40:
+#    word_pca_sim_df.to_csv(
+#        f"output/word_pca_similarity/word_pca_cos_sim_{n_components}_pcs.tsv.xz", 
+#        sep="\t", index=False, compression="xz"
+#    )
 
-else:
-    word_pca_sim_df.to_csv(
-        f"output/word_pca_similarity/word_pca_cos_sim_{n_components}_pcs.tsv", 
-        sep="\t", index=False
-    )
+#else:
+#    word_pca_sim_df.to_csv(
+#        f"output/word_pca_similarity/word_pca_cos_sim_{n_components}_pcs.tsv", 
+#        sep="\t", index=False
+#    )
 
 word_pca_sim_df.head()
 
@@ -176,7 +178,7 @@ word_pca_sim_df.head()
 
 # Given word to principal component association, next step is to generate word clouds for each principal component. The word clouds have orange representing words that are most similar to the principal component and blue as words most dissimilar to the principal component.
 
-# In[9]:
+# In[10]:
 
 
 class PolarityColorFunc():
@@ -207,7 +209,7 @@ class PolarityColorFunc():
         return self.get_color_mapper(word)
 
 
-# In[10]:
+# In[11]:
 
 
 pca_dimensions = [f"pca{dim}_cossim" for dim in range(1, n_components+1, 1)]
@@ -249,8 +251,11 @@ for pc, component in tqdm_notebook(enumerate(pca_dimensions, start=1)):
             for record in word_class_map[word_class]
         })
         .recolor(color_func=polarity_color_map)
-        .to_file(f"output/word_pca_similarity/figures/pca_{pc}_cossim_word_cloud.png")
+        .to_svg(embed_font=True)
     )
+    
+    with open(f"output/word_pca_similarity/svg_files/pca_{pc}_cossim_word_cloud.svg","w") as f:
+        f.write(polarity_cloud)
 
 
 # # Document Centroid Cosine Similarity
