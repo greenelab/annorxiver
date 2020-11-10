@@ -11,13 +11,12 @@
 get_ipython().run_line_magic('load_ext', 'autoreload')
 get_ipython().run_line_magic('autoreload', '2')
 import sys
-sys.path.append("../../modules/")
 
 import pandas as pd
 from scipy.spatial.distance import cdist
 from sklearn.decomposition import PCA
 
-from pca_plot_helper import *
+from annorxiver_modules.pca_plot_helper import *
 
 
 # In[2]:
@@ -141,8 +140,8 @@ global_color_palette = [
 
 
 display_clouds(
-    'output/word_pca_similarity/figures/pca_01_cossim_word_cloud.png',
-    'output/word_pca_similarity/figures/pca_02_cossim_word_cloud.png'
+    'output/word_pca_similarity/svg_files/pca_01_cossim_word_cloud.svg',
+    'output/word_pca_similarity/svg_files/pca_02_cossim_word_cloud.svg'
 )
 
 
@@ -167,7 +166,7 @@ generate_scatter_plots(
     nsample=200, random_state=100,
     selected_categories=selected_categories,
     color_palette=global_color_palette,
-    save_file_path="output/pca_plots/scatterplot_files/pca01_v_pca02.png"
+    save_file_path="output/pca_plots/svg_files/scatterplot_files/pca01_v_pca02.svg"
 )
 
 
@@ -175,9 +174,9 @@ generate_scatter_plots(
 
 
 plot_scatter_clouds(
-    scatter_plot_path = "output/pca_plots/scatterplot_files/pca01_v_pca02.png", 
-    word_cloud_x_path = "output/word_pca_similarity/figures/pca_01_cossim_word_cloud.png",
-    word_cloud_y_path = "output/word_pca_similarity/figures/pca_02_cossim_word_cloud.png",
+    scatter_plot_path = "output/pca_plots/svg_files/scatterplot_files/pca01_v_pca02.svg", 
+    word_cloud_x_path = "output/word_pca_similarity/svg_files/pca_01_cossim_word_cloud.svg",
+    word_cloud_y_path = "output/word_pca_similarity/svg_files/pca_02_cossim_word_cloud.svg",
     final_figure_path = "output/pca_plots/figures/pca01_v_pca02_figure.png"
 )
 
@@ -190,8 +189,8 @@ plot_scatter_clouds(
 
 
 display_clouds(
-    'output/word_pca_similarity/figures/pca_01_cossim_word_cloud.png',
-    'output/word_pca_similarity/figures/pca_03_cossim_word_cloud.png'
+    'output/word_pca_similarity/svg_files/pca_01_cossim_word_cloud.svg',
+    'output/word_pca_similarity/svg_files/pca_03_cossim_word_cloud.svg'
 )
 
 
@@ -216,7 +215,7 @@ generate_scatter_plots(
     nsample=200, random_state=100,
     selected_categories=selected_categories,
     color_palette=global_color_palette,
-    save_file_path="output/pca_plots/scatterplot_files/pca01_v_pca03.png"
+    save_file_path="output/pca_plots/svg_files/scatterplot_files/pca01_v_pca03.svg"
 )
 
 
@@ -224,9 +223,9 @@ generate_scatter_plots(
 
 
 plot_scatter_clouds(
-    scatter_plot_path = "output/pca_plots/scatterplot_files/pca01_v_pca03.png", 
-    word_cloud_x_path = "output/word_pca_similarity/figures/pca_01_cossim_word_cloud.png",
-    word_cloud_y_path = "output/word_pca_similarity/figures/pca_03_cossim_word_cloud.png",
+    scatter_plot_path = "output/pca_plots/svg_files/scatterplot_files/pca01_v_pca03.svg", 
+    word_cloud_x_path = "output/word_pca_similarity/svg_files/pca_01_cossim_word_cloud.svg",
+    word_cloud_y_path = "output/word_pca_similarity/svg_files/pca_03_cossim_word_cloud.svg",
     final_figure_path = "output/pca_plots/figures/pca01_v_pca03_figure.png"
 )
 
@@ -239,8 +238,8 @@ plot_scatter_clouds(
 
 
 display_clouds(
-    'output/word_pca_similarity/figures/pca_02_cossim_word_cloud.png',
-    'output/word_pca_similarity/figures/pca_03_cossim_word_cloud.png'
+    'output/word_pca_similarity/svg_files/pca_02_cossim_word_cloud.svg',
+    'output/word_pca_similarity/svg_files/pca_03_cossim_word_cloud.svg'
 )
 
 
@@ -265,7 +264,7 @@ generate_scatter_plots(
     nsample=200, random_state=100,
     selected_categories=selected_categories,
     color_palette=global_color_palette,
-    save_file_path="output/pca_plots/scatterplot_files/pca02_v_pca03.png"
+    save_file_path="output/pca_plots/svg_files/scatterplot_files/pca02_v_pca03.svg"
 )
 
 
@@ -273,9 +272,9 @@ generate_scatter_plots(
 
 
 plot_scatter_clouds(
-    scatter_plot_path = "output/pca_plots/scatterplot_files/pca02_v_pca03.png", 
-    word_cloud_x_path = "output/word_pca_similarity/figures/pca_02_cossim_word_cloud.png",
-    word_cloud_y_path = "output/word_pca_similarity/figures/pca_03_cossim_word_cloud.png",
+    scatter_plot_path = "output/pca_plots/svg_files/scatterplot_files/pca02_v_pca03.svg", 
+    word_cloud_x_path = "output/word_pca_similarity/svg_files/pca_02_cossim_word_cloud.svg",
+    word_cloud_y_path = "output/word_pca_similarity/svg_files/pca_03_cossim_word_cloud.svg",
     final_figure_path = "output/pca_plots/figures/pca02_v_pca03_figure.png"
 )
 
@@ -288,8 +287,8 @@ plot_scatter_clouds(
 
 
 display_clouds(
-    'output/word_pca_similarity/figures/pca_03_cossim_word_cloud.png',
-    'output/word_pca_similarity/figures/pca_05_cossim_word_cloud.png'
+    'output/word_pca_similarity/svg_files/pca_03_cossim_word_cloud.svg',
+    'output/word_pca_similarity/svg_files/pca_05_cossim_word_cloud.svg'
 )
 
 
@@ -314,7 +313,7 @@ generate_scatter_plots(
     nsample=200, random_state=100,
     selected_categories=selected_categories,
     color_palette=global_color_palette,
-    save_file_path="output/pca_plots/scatterplot_files/pca03_v_pca05.png"
+    save_file_path="output/pca_plots/svg_files/scatterplot_files/pca03_v_pca05.svg"
 )
 
 
@@ -322,9 +321,9 @@ generate_scatter_plots(
 
 
 plot_scatter_clouds(
-    scatter_plot_path = "output/pca_plots/scatterplot_files/pca03_v_pca05.png", 
-    word_cloud_x_path = "output/word_pca_similarity/figures/pca_03_cossim_word_cloud.png",
-    word_cloud_y_path = "output/word_pca_similarity/figures/pca_05_cossim_word_cloud.png",
+    scatter_plot_path = "output/pca_plots/svg_files/scatterplot_files/pca03_v_pca05.svg", 
+    word_cloud_x_path = "output/word_pca_similarity/svg_files/pca_03_cossim_word_cloud.svg",
+    word_cloud_y_path = "output/word_pca_similarity/svg_files/pca_05_cossim_word_cloud.svg",
     final_figure_path = "output/pca_plots/figures/pca03_v_pca05_figure.png"
 )
 
@@ -361,8 +360,8 @@ plot_scatter_clouds(
 
 
 display_clouds(
-    'output/word_pca_similarity/figures/pca_01_cossim_word_cloud.png',
-    'output/word_pca_similarity/figures/pca_04_cossim_word_cloud.png'
+    'output/word_pca_similarity/svg_files/pca_01_cossim_word_cloud.svg',
+    'output/word_pca_similarity/svg_files/pca_04_cossim_word_cloud.svg'
 )
 
 
@@ -387,7 +386,7 @@ generate_scatter_plots(
     nsample=200, random_state=100,
     selected_categories=selected_categories,
     color_palette=global_color_palette,
-    save_file_path="output/pca_plots/scatterplot_files/pca01_v_pca04.png"
+    save_file_path="output/pca_plots/svg_files/scatterplot_files/pca01_v_pca04.svg"
 )
 
 
@@ -395,9 +394,9 @@ generate_scatter_plots(
 
 
 plot_scatter_clouds(
-    scatter_plot_path = "output/pca_plots/scatterplot_files/pca01_v_pca04.png", 
-    word_cloud_x_path = "output/word_pca_similarity/figures/pca_01_cossim_word_cloud.png",
-    word_cloud_y_path = "output/word_pca_similarity/figures/pca_04_cossim_word_cloud.png",
+    scatter_plot_path = "output/pca_plots/svg_files/scatterplot_files/pca01_v_pca04.svg", 
+    word_cloud_x_path = "output/word_pca_similarity/svg_files/pca_01_cossim_word_cloud.svg",
+    word_cloud_y_path = "output/word_pca_similarity/svg_files/pca_04_cossim_word_cloud.svg",
     final_figure_path = "output/pca_plots/figures/pca01_v_pca04_figure.png"
 )
 
@@ -440,8 +439,8 @@ plot_scatter_clouds(
 
 
 display_clouds(
-    'output/word_pca_similarity/figures/pca_01_cossim_word_cloud.png',
-    'output/word_pca_similarity/figures/pca_06_cossim_word_cloud.png'
+    'output/word_pca_similarity/svg_files/pca_01_cossim_word_cloud.svg',
+    'output/word_pca_similarity/svg_files/pca_06_cossim_word_cloud.svg'
 )
 
 
@@ -466,7 +465,7 @@ generate_scatter_plots(
     nsample=200, random_state=100,
     selected_categories=selected_categories,
     color_palette=global_color_palette,
-    save_file_path="output/pca_plots/scatterplot_files/pca01_v_pca06.png"
+    save_file_path="output/pca_plots/svg_files/scatterplot_files/pca01_v_pca06.svg"
 )
 
 
@@ -474,9 +473,9 @@ generate_scatter_plots(
 
 
 plot_scatter_clouds(
-    scatter_plot_path = "output/pca_plots/scatterplot_files/pca01_v_pca06.png", 
-    word_cloud_x_path = "output/word_pca_similarity/figures/pca_01_cossim_word_cloud.png",
-    word_cloud_y_path = "output/word_pca_similarity/figures/pca_06_cossim_word_cloud.png",
+    scatter_plot_path = "output/pca_plots/svg_files/scatterplot_files/pca01_v_pca06.svg", 
+    word_cloud_x_path = "output/word_pca_similarity/svg_files/pca_01_cossim_word_cloud.svg",
+    word_cloud_y_path = "output/word_pca_similarity/svg_files/pca_06_cossim_word_cloud.svg",
     final_figure_path = "output/pca_plots/figures/pca01_v_pca06_figure.png"
 )
 
@@ -527,8 +526,8 @@ plot_scatter_clouds(
 
 
 display_clouds(
-    'output/word_pca_similarity/figures/pca_02_cossim_word_cloud.png',
-    'output/word_pca_similarity/figures/pca_15_cossim_word_cloud.png'
+    'output/word_pca_similarity/svg_files/pca_02_cossim_word_cloud.svg',
+    'output/word_pca_similarity/svg_files/pca_15_cossim_word_cloud.svg'
 )
 
 
@@ -554,7 +553,7 @@ generate_scatter_plots(
     nsample=200, random_state=100,
     selected_categories=selected_categories,
     color_palette=global_color_palette,
-    save_file_path="output/pca_plots/scatterplot_files/pca02_v_pca15.png"
+    save_file_path="output/pca_plots/svg_files/scatterplot_files/pca02_v_pca15.svg"
 )
 
 
@@ -562,9 +561,9 @@ generate_scatter_plots(
 
 
 plot_scatter_clouds(
-    scatter_plot_path = "output/pca_plots/scatterplot_files/pca02_v_pca15.png", 
-    word_cloud_x_path = "output/word_pca_similarity/figures/pca_02_cossim_word_cloud.png",
-    word_cloud_y_path = "output/word_pca_similarity/figures/pca_15_cossim_word_cloud.png",
+    scatter_plot_path = "output/pca_plots/svg_files/scatterplot_files/pca02_v_pca15.svg", 
+    word_cloud_x_path = "output/word_pca_similarity/svg_files/pca_02_cossim_word_cloud.svg",
+    word_cloud_y_path = "output/word_pca_similarity/svg_files/pca_15_cossim_word_cloud.svg",
     final_figure_path = "output/pca_plots/figures/pca02_v_pca15_figure.png"
 )
 
@@ -601,8 +600,8 @@ plot_scatter_clouds(
 
 
 display_clouds(
-    'output/word_pca_similarity/figures/pca_02_cossim_word_cloud.png',
-    'output/word_pca_similarity/figures/pca_08_cossim_word_cloud.png'
+    'output/word_pca_similarity/svg_files/pca_02_cossim_word_cloud.svg',
+    'output/word_pca_similarity/svg_files/pca_08_cossim_word_cloud.svg'
 )
 
 
@@ -627,7 +626,7 @@ generate_scatter_plots(
     nsample=200, random_state=100,
     selected_categories=selected_categories,
     color_palette=global_color_palette,
-    save_file_path="output/pca_plots/scatterplot_files/pca02_v_pca08.png"
+    save_file_path="output/pca_plots/svg_files/scatterplot_files/pca02_v_pca08.svg"
 )
 
 
@@ -635,9 +634,9 @@ generate_scatter_plots(
 
 
 plot_scatter_clouds(
-    scatter_plot_path = "output/pca_plots/scatterplot_files/pca02_v_pca08.png", 
-    word_cloud_x_path = "output/word_pca_similarity/figures/pca_02_cossim_word_cloud.png",
-    word_cloud_y_path = "output/word_pca_similarity/figures/pca_08_cossim_word_cloud.png",
+    scatter_plot_path = "output/pca_plots/svg_files/scatterplot_files/pca02_v_pca08.svg", 
+    word_cloud_x_path = "output/word_pca_similarity/svg_files/pca_02_cossim_word_cloud.svg",
+    word_cloud_y_path = "output/word_pca_similarity/svg_files/pca_08_cossim_word_cloud.svg",
     final_figure_path = "output/pca_plots/figures/pca02_v_pca08_figure.png"
 )
 
@@ -676,8 +675,8 @@ plot_scatter_clouds(
 
 
 display_clouds(
-    'output/word_pca_similarity/figures/pca_02_cossim_word_cloud.png',
-    'output/word_pca_similarity/figures/pca_13_cossim_word_cloud.png'
+    'output/word_pca_similarity/svg_files/pca_02_cossim_word_cloud.svg',
+    'output/word_pca_similarity/svg_files/pca_13_cossim_word_cloud.svg'
 )
 
 
@@ -702,7 +701,7 @@ generate_scatter_plots(
     nsample=200, random_state=100,
     selected_categories=selected_categories,
     color_palette=global_color_palette,
-    save_file_path="output/pca_plots/scatterplot_files/pca02_v_pca13.png"
+    save_file_path="output/pca_plots/svg_files/scatterplot_files/pca02_v_pca13.svg"
 )
 
 
@@ -710,9 +709,9 @@ generate_scatter_plots(
 
 
 plot_scatter_clouds(
-    scatter_plot_path = "output/pca_plots/scatterplot_files/pca02_v_pca13.png", 
-    word_cloud_x_path = "output/word_pca_similarity/figures/pca_02_cossim_word_cloud.png",
-    word_cloud_y_path = "output/word_pca_similarity/figures/pca_13_cossim_word_cloud.png",
+    scatter_plot_path = "output/pca_plots/svg_files/scatterplot_files/pca02_v_pca13.svg", 
+    word_cloud_x_path = "output/word_pca_similarity/svg_files/pca_02_cossim_word_cloud.svg",
+    word_cloud_y_path = "output/word_pca_similarity/svg_files/pca_13_cossim_word_cloud.svg",
     final_figure_path = "output/pca_plots/figures/pca02_v_pca13_figure.png"
 )
 
@@ -747,8 +746,8 @@ plot_scatter_clouds(
 
 
 display_clouds(
-    'output/word_pca_similarity/figures/pca_04_cossim_word_cloud.png',
-    'output/word_pca_similarity/figures/pca_20_cossim_word_cloud.png'
+    'output/word_pca_similarity/svg_files/pca_04_cossim_word_cloud.svg',
+    'output/word_pca_similarity/svg_files/pca_20_cossim_word_cloud.svg'
 )
 
 
@@ -773,7 +772,7 @@ generate_scatter_plots(
     nsample=200, random_state=100,
     selected_categories=selected_categories,
     color_palette=global_color_palette,
-    save_file_path="output/pca_plots/scatterplot_files/pca04_v_pca20.png"
+    save_file_path="output/pca_plots/svg_files/scatterplot_files/pca04_v_pca20.svg"
 )
 
 
@@ -781,9 +780,9 @@ generate_scatter_plots(
 
 
 plot_scatter_clouds(
-    scatter_plot_path = "output/pca_plots/scatterplot_files/pca04_v_pca20.png", 
-    word_cloud_x_path = "output/word_pca_similarity/figures/pca_04_cossim_word_cloud.png",
-    word_cloud_y_path = "output/word_pca_similarity/figures/pca_20_cossim_word_cloud.png",
+    scatter_plot_path = "output/pca_plots/svg_files/scatterplot_files/pca04_v_pca20.svg", 
+    word_cloud_x_path = "output/word_pca_similarity/svg_files/pca_04_cossim_word_cloud.svg",
+    word_cloud_y_path = "output/word_pca_similarity/svg_files/pca_20_cossim_word_cloud.svg",
     final_figure_path = "output/pca_plots/figures/pca04_v_pca20_figure.png"
 )
 

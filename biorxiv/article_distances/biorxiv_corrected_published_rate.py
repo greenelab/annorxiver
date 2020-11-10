@@ -40,15 +40,15 @@ abdill_df.head(10)
 biorxiv_journal_df = (
     pd.read_csv(
         Path("../journal_tracker")/
-        Path("output/mapped_published_doi.tsv"), 
+        Path("output/mapped_published_doi_before_update.tsv"), 
         sep="\t"
     )
-    .groupby("doi")
+    .rename(index=str, columns={"doi":"preprint_doi"})
+    .groupby("preprint_doi")
     .agg({
         "document":"first",
         "category":"first",
-        "journal":"first",
-        "doi":"last",
+        "preprint_doi":"last",
         "published_doi":"first",  
         "pmcid":"first", 
         "pmcoa":"first"
@@ -77,8 +77,8 @@ annotated_links_df =(
         sep="\t"
     )
     .assign(published=True)
-    .rename(index=str, columns={"biorxiv_doi":"doi"})
-    [["document", "doi", "published", "distance_bin"]]
+    .rename(index=str, columns={"biorxiv_doi":"preprint_doi"})
+    [["document", "preprint_doi", "published", "distance_bin"]]
 )
 print(annotated_links_df.shape)
 annotated_links_df.head()
@@ -88,14 +88,14 @@ annotated_links_df.head()
 
 
 missing_link_mapper = {
-    row['doi']:[
+    row['preprint_doi']:[
         row['published'],
         True
     ]
     for row in (
         annotated_links_df
         .query("distance_bin in ['[0, 25%ile)', '[25%ile, 50%ile)']")
-        [["doi", "published"]]
+        [["preprint_doi", "published"]]
         .to_dict(orient="records")
     )
 }
@@ -107,16 +107,16 @@ print(f"Novel links filled: {new_link_count}")
 
 
 remaining_links = {
-    row['doi']:[
+    row['preprint_doi']:[
         row['published'],
         row['pmcoa']
     ]
     for row in (
         biorxiv_journal_df
-        [["doi", "published", "pmcoa"]]
+        [["preprint_doi", "published", "pmcoa"]]
         .to_dict(orient="records")
     ) 
-    if row['doi'] not in missing_link_mapper
+    if row['preprint_doi'] not in missing_link_mapper
 }
 print(len(remaining_links))
 
@@ -135,7 +135,7 @@ updated_biorxiv_journal_df = (
     pd.DataFrame
     .from_records([
         {
-            "doi":row[0], 
+            "preprint_doi":row[0], 
             "published":row[1][0], 
             "pmcoa":row[1][1]
         } 
@@ -144,7 +144,7 @@ updated_biorxiv_journal_df = (
     .merge(
         biorxiv_journal_df
          .drop(["published", "pmcoa"], axis=1), 
-        on="doi"
+        on="preprint_doi"
     )
 )
 print(updated_biorxiv_journal_df.shape)
@@ -352,7 +352,7 @@ print(f"Overall proportion published: {published/posted:.4f}")
 
 # # Plot Publication Rate
 
-# In[23]:
+# In[20]:
 
 
 color_mapper = {
@@ -362,7 +362,7 @@ color_mapper = {
 }
 
 
-# In[24]:
+# In[21]:
 
 
 g = (
@@ -382,24 +382,6 @@ g = (
     + p9.geom_line()
     + p9.scale_linetype_manual(
         ['solid', 'solid', 'solid']
-    )
-    + p9.theme_seaborn(
-        style='ticks', 
-        context='paper',
-        font_scale=1.3
-    )
-    + p9.theme(
-        figure_size=(10,4.5),
-        axis_text_x=p9.element_blank(),
-        axis_title_x=p9.element_text(
-            weight='bold',
-            margin={"t":15}
-        ),
-        axis_title_y=p9.element_text(weight='bold'),
-    )
-    + p9.labs(
-        y="Proportion Published",
-        x="Month"
     )
     + p9.scale_color_manual(
         [
@@ -450,8 +432,25 @@ g = (
         "text", x=8.5, y=0.48, 
         label=f"overall: {published/posted:.4f}", size = 8
     )
+    
+    + p9.theme_seaborn(
+        style='ticks', 
+        context='paper',
+        font_scale=1.5
+    )
+    + p9.theme(
+        figure_size=(10,4.5),
+        axis_text_x=p9.element_blank(),
+        axis_title_x=p9.element_text(
+            margin={"t":15}
+        )
+    )
+    + p9.labs(
+        y="Proportion Published",
+        x="Month"
+    )
 )
-g.save("output/figures/publication_rate.svg", dpi=500)
-g.save("output/figures/publication_rate.png", dpi=500)
+g.save("output/figures/publication_rate.svg", dpi=250)
+g.save("output/figures/publication_rate.png", dpi=250)
 print(g)
 

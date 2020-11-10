@@ -250,7 +250,7 @@ print(g)
 
 # # Plot Documents Projected on PCs Grouped by Category
 
-# In[13]:
+# In[7]:
 
 
 projected_documents = reducer.transform(
@@ -259,7 +259,7 @@ projected_documents = reducer.transform(
 projected_documents.shape
 
 
-# In[14]:
+# In[8]:
 
 
 projected_documents_df = (
@@ -275,19 +275,19 @@ projected_documents_df = (
 projected_documents_df
 
 
-# In[15]:
+# In[9]:
 
 
 g = (
     p9.ggplot(projected_documents_df)
     + p9.aes(x="factor(category)", y="PC_1")
-    + p9.geom_boxplot()
-    + p9.coord_flip()
-    + p9.theme(
-        figure_size=(11, 11),
-        text=p9.element_text(size=12),
-        panel_grid_major_y=p9.element_blank()
+    + p9.geom_boxplot(
+        fill="#a6cee3",
+        outlier_size=1,
+        outlier_alpha=0.65,
+        fatten=1.5,
     )
+    + p9.coord_flip()
     + p9.scale_x_discrete(
         limits=(
             projected_documents_df
@@ -304,25 +304,32 @@ g = (
         x = "Article Category",
         y = "PC1"
     )
+    + p9.theme(figure_size=(6.66, 5))
+    + p9.theme_seaborn(
+        context="paper",
+        style="ticks",
+        font="Arial",
+        font_scale=1
+    )
 )
-g.save("output/pca_plots/figures/category_box_plot_pc1.png", dpi=500)
-g.save("output/pca_plots/figures/category_box_plot_pc1.svg", dpi=500)
+g.save("output/pca_plots/figures/category_box_plot_pc1.png", dpi=250)
+g.save("output/pca_plots/svg_files/category_box_plot/category_box_plot_pc1.svg", dpi=250)
 print(g)
 
 
-# In[16]:
+# In[10]:
 
 
 g = (
     p9.ggplot(projected_documents_df)
     + p9.aes(x="factor(category)", y="PC_2")
-    + p9.geom_boxplot()
-    + p9.coord_flip()
-    + p9.theme(
-        figure_size=(11, 11),
-        text=p9.element_text(size=12),
-        panel_grid_major_y=p9.element_blank()
+    + p9.geom_boxplot(
+        fill="#a6cee3",
+        outlier_size=1,
+        outlier_alpha=0.65,
+        fatten=1.5,
     )
+    + p9.coord_flip()
     + p9.scale_x_discrete(
         limits=(
             projected_documents_df
@@ -339,9 +346,16 @@ g = (
         x = "Article Category",
         y = "PC2"
     )
+    + p9.theme(figure_size=(6.66, 5))
+    + p9.theme_seaborn(
+        context="paper",
+        style="ticks",
+        font="Arial",
+        font_scale=1
+    )
 )
-g.save("output/pca_plots/figures/category_box_plot_pc2.png", dpi=500)
-g.save("output/pca_plots/figures/category_box_plot_pc2.svg", dpi=500)
+g.save("output/pca_plots/figures/category_box_plot_pc2.png", dpi=250)
+g.save("output/pca_plots/svg_files/category_box_plot/category_box_plot_pc2.svg", dpi=250)
 print(g)
 
 
