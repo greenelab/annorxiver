@@ -235,7 +235,7 @@ g = (
         .assign(half_life_time=lambda x: pd.to_timedelta(x.half_life_time, 'D')),
         p9.aes(x="category", y="half_life_time")
     )
-    + p9.geom_col(fill="#41b6c4")
+    + p9.geom_col(fill="#1f78b4")
     + p9.scale_x_discrete(
         limits=(
             category_half_life
@@ -261,8 +261,8 @@ g = (
         axis_ticks_minor_x=p9.element_blank(),
     )
 )
-g.save("output/preprint_category_halflife.svg", dpi=500)
-g.save("output/preprint_category_halflife.png", dpi=500)
+g.save("output/preprint_category_halflife.svg", dpi=250)
+g.save("output/preprint_category_halflife.png", dpi=250)
 print(g)
 
 

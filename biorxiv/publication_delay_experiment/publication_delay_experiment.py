@@ -263,7 +263,7 @@ g = (
         published_date_distances, 
         p9.aes(x="factor(version_count)", y="time_to_published")
     )
-    + p9.geom_boxplot(fill="#ffffcc")
+    + p9.geom_boxplot(fill="#a6cee3")
     + p9.geom_line(
         mapping=p9.aes(x="version_count", y="time_to_published"),
         stat="smooth", method='lm', linetype='dashed', 
@@ -277,6 +277,12 @@ g = (
     + p9.labs(
         x="# of Preprint Versions",
         y="Time Elapsed Until Preprint is Published"
+    )
+    + p9.theme_seaborn(
+        context="paper",
+        style="ticks",
+        font="Arial",
+        font_scale=1.3
     )
 )
 g.save("output/version_count_vs_publication_time.svg", dpi=500)
@@ -336,6 +342,12 @@ g = (
         x="Eucledian Distance of Preprints First and Final Versions",
         y="Time Elapsed Until Preprint is Published"
     )
+    + p9.theme_seaborn(
+        context="paper",
+        style="ticks",
+        font="Arial",
+        font_scale=1.3
+    )
 )
 print(g)
 
@@ -359,17 +371,17 @@ g = (
     )
     + p9.scale_y_timedelta(labels=timedelta_format('d'))
     + p9.annotate(
-        'text', x=15, y=timedelta(days=1470), 
+        'text', x=15, y=timedelta(days=1490), 
         label=f"Y={results_2.slope:.2f}*X+{results_2.intercept:.2f}"
     )
     + p9.labs(
         x="Eucledian Distance of Preprint-Published Versions",
-        y="Time Elapsed Until Published",
+        y="Time Elapsed Until Preprint is Published",
         legend="log(count)"
     )
 )
-g.save("output/article_distance_vs_publication_time.svg", dpi=500)
-g.save("output/article_distance_vs_publication_time.png", dpi=500)
+g.save("output/article_distance_vs_publication_time.svg", dpi=250)
+g.save("output/article_distance_vs_publication_time.png", dpi=250)
 print(g)
 
 
