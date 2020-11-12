@@ -22,6 +22,16 @@ from annorxiver_modules.pca_plot_helper import *
 # In[2]:
 
 
+# Set up porting from python to R
+# and R to python :mindblown:
+
+import rpy2.rinterface
+get_ipython().run_line_magic('load_ext', 'rpy2.ipython')
+
+
+# In[3]:
+
+
 journal_map_df = pd.read_csv("../exploratory_data_analysis/output/biorxiv_article_metadata.tsv", sep="\t")
 journal_map_df.head()
 
@@ -30,14 +40,14 @@ journal_map_df.head()
 
 # Run PCA over the documents. Generates 50 principal components, but can generate more or less.
 
-# In[3]:
+# In[4]:
 
 
 n_components = 50
 random_state = 100
 
 
-# In[4]:
+# In[5]:
 
 
 biorxiv_articles_df = pd.read_csv(
@@ -46,7 +56,7 @@ biorxiv_articles_df = pd.read_csv(
 )
 
 
-# In[5]:
+# In[6]:
 
 
 reducer = PCA(
@@ -82,19 +92,19 @@ pca_df = (
 pca_df.head()
 
 
-# In[6]:
+# In[7]:
 
 
 reducer.explained_variance_
 
 
-# In[7]:
+# In[8]:
 
 
 reducer.explained_variance_ratio_
 
 
-# In[8]:
+# In[9]:
 
 
 (
@@ -124,7 +134,7 @@ reducer.explained_variance_ratio_
 # | PCA4 | Microbiology vs Cell Biology |
 # | PCA5 | RNA-seq vs Evolutional Biology | 
 
-# In[9]:
+# In[10]:
 
 
 global_color_palette = [
@@ -136,7 +146,7 @@ global_color_palette = [
 
 # ### PCA1 vs PCA2
 
-# In[10]:
+# In[11]:
 
 
 display_clouds(
@@ -147,7 +157,7 @@ display_clouds(
 
 # These word clouds depict the following concepts: quantitative biology vs molecular biology (left) and genomics vs neuroscience (right). The cells below provide evidence for the previous claim
 
-# In[11]:
+# In[12]:
 
 
 selected_categories = [
@@ -157,17 +167,23 @@ selected_categories = [
 ]
 
 
-# In[12]:
+# In[13]:
 
 
-generate_scatter_plots(
-    pca_df,
-    x="pca1", y="pca2",
-    nsample=200, random_state=100,
-    selected_categories=selected_categories,
-    color_palette=global_color_palette,
-    save_file_path="output/pca_plots/svg_files/scatterplot_files/pca01_v_pca02.svg"
+pca_sample_df = (
+    pca_df
+    .query(f"category in {selected_categories}")
+    .groupby("category")
+    .apply(lambda x: x.sample(200, random_state=100) if len(x) > 200 else x)
+    .reset_index(drop=True)
 )
+pca_sample_df.head()
+
+
+# In[39]:
+
+
+get_ipython().run_cell_magic('R', '-i pca_sample_df', '# have to switch to R as it has a better "layout manager"\n# https://github.com/has2k1/plotnine/issues/46\nlibrary(ggplot2)\n\ncolor_mapper <- c(\n    \'biochemistry\' = \'#a6cee3\', \n    \'bioinformatics\'= \'#1f78b4\',\n    \'cell biology\'=\'#b2df8a\',\n    \'neuroscience\'=\'#33a02c\',\n    \'scientific communication\'=\'#fb9a99\'\n)\n\noptions(repr.plot.width = 6.66, repr.plot.height = 5)\ng <- (\n        ggplot(pca_sample_df)\n        + aes(x=pca1, y=pca2, color=factor(category))\n        + geom_point()\n        + scale_y_continuous(position="right")\n        + scale_color_manual(values=color_mapper)\n        + labs(\n            color="Article Category",\n            title="PCA of BioRxiv (Word Dim: 300)"\n        )\n        + theme_bw()\n        + theme(\n            legend.position="left",\n            text=element_text(family = "Arial", size=12.48),\n            rect=element_rect(color="black"),\n            panel.grid.major = element_blank(),\n          panel.grid.minor = element_blank(),\n        )\n)\nggsave(\n    file="output/pca_plots/svg_files/scatterplot_files/pca01_v_pca02_reversed.svg",\n    width=6.66,\n    height=5,\n    units="in",\n    dpi=300\n)\nprint(g)')
 
 
 # In[13]:
