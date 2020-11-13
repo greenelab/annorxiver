@@ -140,7 +140,7 @@ panel_five.moveto(620, 1000, scale=1)
 # In[8]:
 
 
-panel_one_label = sg.TextElement(80, 20, "A", size=22, weight="bold")
+panel_one_label = sg.TextElement(10, 20, "A", size=22, weight="bold")
 panel_two_label = sg.TextElement(10, 600, "B", size=22, weight="bold")
 panel_three_label = sg.TextElement(610, 600, "C", size=22, weight="bold")
 panel_four_label = sg.TextElement(30, 1010, "D", size=22, weight="bold")
@@ -312,7 +312,7 @@ panel_one_image_label = sg.TextElement(210, 800, "PCA 1", size=22, weight="bold"
 panel_two_label = sg.TextElement(600, 20, "B", size=22, weight="bold")
 panel_two_image_label = sg.TextElement(820, 385, "PCA 2", size=22, weight="bold")
 panel_three_label = sg.TextElement(10, 420, "C", size=22, weight="bold")
-panel_four_label = sg.TextElement(620, 420, "D", size=22, weight="bold")
+panel_four_label = sg.TextElement(600, 420, "D", size=22, weight="bold")
 panel_five_label = sg.TextElement(10, 850, "E", size=22, weight="bold")
 
 
