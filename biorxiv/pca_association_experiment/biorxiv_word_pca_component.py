@@ -251,11 +251,8 @@ for pc, component in tqdm_notebook(enumerate(pca_dimensions, start=1)):
             for record in word_class_map[word_class]
         })
         .recolor(color_func=polarity_color_map)
-        .to_svg(embed_font=True)
+        .to_file(f"output/word_pca_similarity/figure_pieces/pca_{pc}_cossim_word_cloud.png")
     )
-    
-    with open(f"output/word_pca_similarity/svg_files/pca_{pc}_cossim_word_cloud.svg","w") as f:
-        f.write(polarity_cloud)
 
 
 # # Document Centroid Cosine Similarity

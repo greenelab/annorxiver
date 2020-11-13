@@ -76,10 +76,18 @@ g = (
     + p9.coord_flip()
     + p9.facet_wrap("dataset")
     + p9.scale_fill_manual(["#808080", "#1f78b4"])
-    + p9.theme_seaborn(context='paper')
+    + p9.theme_seaborn(
+        context='paper',
+        style="ticks",
+        font="Arial",
+        font_scale=1.3
+    )
+    + p9.theme(
+        figure_size=(6.66, 5)
+    )
     + p9.labs(
         y="Accuracy",
-        fill="Distance"
+        fill="Distance Metric"
     )
 )
 

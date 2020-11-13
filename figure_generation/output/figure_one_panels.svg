@@ -2,7 +2,7 @@
 <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" width="1600" viewBox="0 0 1600 1400" height="1400">
   <g>
     <rect width="100%" height="100%" fill="white"/>
-    <g transform="translate(100, 30) scale(1)  scale(1.500000 1.500000)"><defs>
+    <g transform="translate(30, 30) scale(1)  scale(1.500000 1.500000)"><defs>
   <style type="text/css">
 *{stroke-linecap:butt;stroke-linejoin:round;}
   </style>
@@ -546,7 +546,7 @@
   </clipPath>
  </defs>
 </g>
-    <g transform="translate(30, 600) scale(1)  scale(1.200000 1.200000)"><defs>
+    <g transform="translate(40, 600) scale(1)  scale(1.200000 1.200000)"><defs>
   <style type="text/css">
 *{stroke-linecap:butt;stroke-linejoin:round;}
   </style>
