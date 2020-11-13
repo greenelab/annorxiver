@@ -240,6 +240,7 @@ g = (
         limits=(
             category_half_life
             .query("category!='none'")
+            .sort_values("half_life_time")
             .category
             .tolist()
             [::-1]

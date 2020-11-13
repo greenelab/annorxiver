@@ -180,10 +180,10 @@ pca_sample_df = (
 pca_sample_df.head()
 
 
-# In[39]:
+# In[20]:
 
 
-get_ipython().run_cell_magic('R', '-i pca_sample_df', '# have to switch to R as it has a better "layout manager"\n# https://github.com/has2k1/plotnine/issues/46\nlibrary(ggplot2)\n\ncolor_mapper <- c(\n    \'biochemistry\' = \'#a6cee3\', \n    \'bioinformatics\'= \'#1f78b4\',\n    \'cell biology\'=\'#b2df8a\',\n    \'neuroscience\'=\'#33a02c\',\n    \'scientific communication\'=\'#fb9a99\'\n)\n\noptions(repr.plot.width = 6.66, repr.plot.height = 5)\ng <- (\n        ggplot(pca_sample_df)\n        + aes(x=pca1, y=pca2, color=factor(category))\n        + geom_point()\n        + scale_y_continuous(position="right")\n        + scale_color_manual(values=color_mapper)\n        + labs(\n            color="Article Category",\n            title="PCA of BioRxiv (Word Dim: 300)"\n        )\n        + theme_bw()\n        + theme(\n            legend.position="left",\n            text=element_text(family = "Arial", size=12.48),\n            rect=element_rect(color="black"),\n            panel.grid.major = element_blank(),\n          panel.grid.minor = element_blank(),\n        )\n)\nggsave(\n    file="output/pca_plots/svg_files/scatterplot_files/pca01_v_pca02_reversed.svg",\n    width=6.66,\n    height=5,\n    units="in",\n    dpi=300\n)\nprint(g)')
+get_ipython().run_cell_magic('R', '-i pca_sample_df', '# have to switch to R as it has a better "layout manager"\n# https://github.com/has2k1/plotnine/issues/46\nlibrary(ggplot2)\n\ncolor_mapper <- c(\n    \'biochemistry\' = \'#a6cee3\', \n    \'bioinformatics\'= \'#1f78b4\',\n    \'cell biology\'=\'#b2df8a\',\n    \'neuroscience\'=\'#33a02c\',\n    \'scientific communication\'=\'#fb9a99\'\n)\n\ng <- (\n        ggplot(pca_sample_df)\n        + aes(x=pca1, y=pca2, color=factor(category))\n        + theme_bw()\n        + theme(\n            legend.position="left",\n            text=element_text(family = "Arial", size=14),\n            rect=element_rect(color="black"),\n            panel.grid.major = element_blank(),\n            panel.grid.minor = element_blank()\n        )\n        + geom_point()\n        + scale_y_continuous(position="right")\n        + scale_color_manual(values=color_mapper)\n        + labs(\n            color="Article Category",\n            title="PCA of BioRxiv (Word Dim: 300)"\n        )\n)\n\nCairo::CairoSVG(\n    file="output/pca_plots/svg_files/scatterplot_files/pca01_v_pca02_reversed.svg",\n    height=5,\n    width=8,\n)\n\nprint(g)')
 
 
 # In[13]:

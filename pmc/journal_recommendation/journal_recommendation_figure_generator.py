@@ -420,7 +420,7 @@ data_df.describe()
 # In[25]:
 
 
-get_ipython().run_cell_magic('R', '-i data_df -o square_plot_df', '\nlibrary(ggplot2)\n\nbin_num <- 50\ng <- (\n    ggplot(data_df, aes(x=dim1, y=dim2))\n    + geom_bin2d(bins=bin_num, binwidth=0.85)\n)\nsquare_plot_df <- ggplot_build(g)$data[[1]]\nprint(g)')
+get_ipython().run_cell_magic('R', '-i data_df -o square_plot_df', '\nlibrary(ggplot2)\n\nbin_num <- 50\ng <- (\n    ggplot(data_df, aes(x=dim1, y=dim2))\n    + geom_bin2d(bins=bin_num, binwidth=0.85)\n    + theme(legend.position="left")\n)\nsquare_plot_df <- ggplot_build(g)$data[[1]]\nprint(g)')
 
 
 # In[26]:
