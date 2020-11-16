@@ -22,7 +22,7 @@ from sklearn.linear_model import LogisticRegressionCV
 
 
 potential_links_df = pd.read_csv(
-    "output/potential_biorxiv_pmc_links.tsv", 
+    "output/annotated_links/potential_biorxiv_pmc_links.tsv", 
     sep="\t"
 )
 potential_links_df.head()
@@ -32,7 +32,7 @@ potential_links_df.head()
 
 
 annotated_df = pd.read_csv(
-    "output/final_biorxiv_pmc_links_curation.tsv", 
+    "output/annotated_links/final_biorxiv_pmc_links_curation.tsv", 
     sep="\t"
 )
 annotated_df.head()
@@ -87,12 +87,22 @@ binned_stats_df
 
 g = (
     p9.ggplot(binned_stats_df, p9.aes(x="distance_bin", y="frac_correct"))
-    + p9.geom_col()
-    + p9.theme_seaborn()
+    + p9.geom_col(fill="#a6cee3")
     + p9.coord_flip()
+    + p9.labs(
+        x="Fraction Correct",
+        y="Euclidean Distance Bins"
+    )
+    + p9.theme_seaborn(
+        context="paper",
+        style="ticks",
+        font="Arial",
+        font_scale=1.5
+    )
+    
 )
-g.save("output/distance_bin_accuracy.svg")
-g.save("output/distance_bin_accuracy.png", dpi=500)
+g.save("output/figures/distance_bin_accuracy.svg")
+g.save("output/figures/distance_bin_accuracy.png", dpi=250)
 print(g)
 
 

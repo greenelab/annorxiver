@@ -11,16 +11,25 @@
 get_ipython().run_line_magic('load_ext', 'autoreload')
 get_ipython().run_line_magic('autoreload', '2')
 import sys
-sys.path.append("../../modules/")
 
 import pandas as pd
 from scipy.spatial.distance import cdist
 from sklearn.decomposition import PCA
 
-from pca_plot_helper import *
+from annorxiver_modules.pca_plot_helper import *
 
 
 # In[2]:
+
+
+# Set up porting from python to R
+# and R to python :mindblown:
+
+import rpy2.rinterface
+get_ipython().run_line_magic('load_ext', 'rpy2.ipython')
+
+
+# In[3]:
 
 
 journal_map_df = pd.read_csv("../exploratory_data_analysis/output/biorxiv_article_metadata.tsv", sep="\t")
@@ -31,14 +40,14 @@ journal_map_df.head()
 
 # Run PCA over the documents. Generates 50 principal components, but can generate more or less.
 
-# In[3]:
+# In[4]:
 
 
 n_components = 50
 random_state = 100
 
 
-# In[4]:
+# In[ ]:
 
 
 biorxiv_articles_df = pd.read_csv(
@@ -47,7 +56,7 @@ biorxiv_articles_df = pd.read_csv(
 )
 
 
-# In[5]:
+# In[ ]:
 
 
 reducer = PCA(
@@ -83,19 +92,19 @@ pca_df = (
 pca_df.head()
 
 
-# In[6]:
+# In[ ]:
 
 
 reducer.explained_variance_
 
 
-# In[7]:
+# In[ ]:
 
 
 reducer.explained_variance_ratio_
 
 
-# In[8]:
+# In[ ]:
 
 
 (
@@ -125,7 +134,7 @@ reducer.explained_variance_ratio_
 # | PCA4 | Microbiology vs Cell Biology |
 # | PCA5 | RNA-seq vs Evolutional Biology | 
 
-# In[9]:
+# In[ ]:
 
 
 global_color_palette = [
@@ -137,18 +146,18 @@ global_color_palette = [
 
 # ### PCA1 vs PCA2
 
-# In[10]:
+# In[ ]:
 
 
 display_clouds(
-    'output/word_pca_similarity/figures/pca_01_cossim_word_cloud.png',
-    'output/word_pca_similarity/figures/pca_02_cossim_word_cloud.png'
+    'output/word_pca_similarity/figure_pieces/pca_01_cossim_word_cloud.png',
+    'output/word_pca_similarity/figure_pieces/pca_02_cossim_word_cloud.png'
 )
 
 
 # These word clouds depict the following concepts: quantitative biology vs molecular biology (left) and genomics vs neuroscience (right). The cells below provide evidence for the previous claim
 
-# In[11]:
+# In[ ]:
 
 
 selected_categories = [
@@ -158,7 +167,26 @@ selected_categories = [
 ]
 
 
-# In[12]:
+# In[ ]:
+
+
+pca_sample_df = (
+    pca_df
+    .query(f"category in {selected_categories}")
+    .groupby("category")
+    .apply(lambda x: x.sample(200, random_state=100) if len(x) > 200 else x)
+    .reset_index(drop=True)
+)
+pca_sample_df.head()
+
+
+# In[ ]:
+
+
+get_ipython().run_cell_magic('R', '-i pca_sample_df', '# have to switch to R as it has a better "layout manager"\n# https://github.com/has2k1/plotnine/issues/46\nlibrary(ggplot2)\n\ncolor_mapper <- c(\n    \'biochemistry\' = \'#a6cee3\', \n    \'bioinformatics\'= \'#1f78b4\',\n    \'cell biology\'=\'#b2df8a\',\n    \'neuroscience\'=\'#33a02c\',\n    \'scientific communication\'=\'#fb9a99\'\n)\n\ng <- (\n        ggplot(pca_sample_df)\n        + aes(x=pca1, y=pca2, color=factor(category))\n        + theme_bw()\n        + theme(\n            legend.position="left",\n            text=element_text(family = "Arial", size=16),\n            rect=element_rect(color="black"),\n            panel.grid.major = element_blank(),\n            panel.grid.minor = element_blank()\n        )\n        + geom_point()\n        + scale_y_continuous(position="right")\n        + scale_color_manual(values=color_mapper)\n        + labs(\n            x="PC1",\n            y="PC2",\n            color="Article Category",\n            title="PCA of BioRxiv (Word Dim: 300)"\n        )\n)\n\nCairo::CairoSVG(\n    file="output/pca_plots/svg_files/scatterplot_files/pca01_v_pca02_reversed.svg",\n    height=5,\n    width=10,\n)\n\nprint(g)')
+
+
+# In[ ]:
 
 
 generate_scatter_plots(
@@ -167,17 +195,17 @@ generate_scatter_plots(
     nsample=200, random_state=100,
     selected_categories=selected_categories,
     color_palette=global_color_palette,
-    save_file_path="output/pca_plots/scatterplot_files/pca01_v_pca02.png"
+    save_file_path="output/pca_plots/svg_files/scatterplot_files/pca01_v_pca02.svg"
 )
 
 
-# In[13]:
+# In[ ]:
 
 
 plot_scatter_clouds(
-    scatter_plot_path = "output/pca_plots/scatterplot_files/pca01_v_pca02.png", 
-    word_cloud_x_path = "output/word_pca_similarity/figures/pca_01_cossim_word_cloud.png",
-    word_cloud_y_path = "output/word_pca_similarity/figures/pca_02_cossim_word_cloud.png",
+    scatter_plot_path = "output/pca_plots/svg_files/scatterplot_files/pca01_v_pca02.svg", 
+    word_cloud_x_path = "output/word_pca_similarity/figure_pieces/pca_01_cossim_word_cloud.png",
+    word_cloud_y_path = "output/word_pca_similarity/figure_pieces/pca_02_cossim_word_cloud.png",
     final_figure_path = "output/pca_plots/figures/pca01_v_pca02_figure.png"
 )
 
@@ -186,18 +214,18 @@ plot_scatter_clouds(
 
 # ### PCA1 vs PCA 3
 
-# In[14]:
+# In[17]:
 
 
 display_clouds(
-    'output/word_pca_similarity/figures/pca_01_cossim_word_cloud.png',
-    'output/word_pca_similarity/figures/pca_03_cossim_word_cloud.png'
+    'output/word_pca_similarity/figure_pieces/pca_01_cossim_word_cloud.png',
+    'output/word_pca_similarity/figure_pieces/pca_03_cossim_word_cloud.png'
 )
 
 
 # These word clouds depict the following concepts: quantitative biology vs molecular biology (left) and disease vs sequencing (right)
 
-# In[15]:
+# In[18]:
 
 
 selected_categories = [
@@ -207,7 +235,7 @@ selected_categories = [
 ]
 
 
-# In[16]:
+# In[19]:
 
 
 generate_scatter_plots(
@@ -216,17 +244,17 @@ generate_scatter_plots(
     nsample=200, random_state=100,
     selected_categories=selected_categories,
     color_palette=global_color_palette,
-    save_file_path="output/pca_plots/scatterplot_files/pca01_v_pca03.png"
+    save_file_path="output/pca_plots/svg_files/scatterplot_files/pca01_v_pca03.svg"
 )
 
 
-# In[17]:
+# In[20]:
 
 
 plot_scatter_clouds(
-    scatter_plot_path = "output/pca_plots/scatterplot_files/pca01_v_pca03.png", 
-    word_cloud_x_path = "output/word_pca_similarity/figures/pca_01_cossim_word_cloud.png",
-    word_cloud_y_path = "output/word_pca_similarity/figures/pca_03_cossim_word_cloud.png",
+    scatter_plot_path = "output/pca_plots/svg_files/scatterplot_files/pca01_v_pca03.svg", 
+    word_cloud_x_path = "output/word_pca_similarity/figure_pieces/pca_01_cossim_word_cloud.png",
+    word_cloud_y_path = "output/word_pca_similarity/figure_pieces/pca_03_cossim_word_cloud.png",
     final_figure_path = "output/pca_plots/figures/pca01_v_pca03_figure.png"
 )
 
@@ -235,18 +263,18 @@ plot_scatter_clouds(
 
 # ### PCA2 vs PCA3
 
-# In[18]:
+# In[21]:
 
 
 display_clouds(
-    'output/word_pca_similarity/figures/pca_02_cossim_word_cloud.png',
-    'output/word_pca_similarity/figures/pca_03_cossim_word_cloud.png'
+    'output/word_pca_similarity/figure_pieces/pca_02_cossim_word_cloud.png',
+    'output/word_pca_similarity/figure_pieces/pca_03_cossim_word_cloud.png'
 )
 
 
 # These word clouds depict the following concepts: neuroscience to genomics (left) and disease vs sequencing (right)
 
-# In[19]:
+# In[22]:
 
 
 selected_categories = [
@@ -256,7 +284,7 @@ selected_categories = [
 ]
 
 
-# In[20]:
+# In[23]:
 
 
 generate_scatter_plots(
@@ -265,17 +293,17 @@ generate_scatter_plots(
     nsample=200, random_state=100,
     selected_categories=selected_categories,
     color_palette=global_color_palette,
-    save_file_path="output/pca_plots/scatterplot_files/pca02_v_pca03.png"
+    save_file_path="output/pca_plots/svg_files/scatterplot_files/pca02_v_pca03.svg"
 )
 
 
-# In[21]:
+# In[24]:
 
 
 plot_scatter_clouds(
-    scatter_plot_path = "output/pca_plots/scatterplot_files/pca02_v_pca03.png", 
-    word_cloud_x_path = "output/word_pca_similarity/figures/pca_02_cossim_word_cloud.png",
-    word_cloud_y_path = "output/word_pca_similarity/figures/pca_03_cossim_word_cloud.png",
+    scatter_plot_path = "output/pca_plots/svg_files/scatterplot_files/pca02_v_pca03.svg", 
+    word_cloud_x_path = "output/word_pca_similarity/figure_pieces/pca_02_cossim_word_cloud.png",
+    word_cloud_y_path = "output/word_pca_similarity/figure_pieces/pca_03_cossim_word_cloud.png",
     final_figure_path = "output/pca_plots/figures/pca02_v_pca03_figure.png"
 )
 
@@ -284,18 +312,18 @@ plot_scatter_clouds(
 
 # ### PCA3 vs PCA5 
 
-# In[22]:
+# In[25]:
 
 
 display_clouds(
-    'output/word_pca_similarity/figures/pca_03_cossim_word_cloud.png',
-    'output/word_pca_similarity/figures/pca_05_cossim_word_cloud.png'
+    'output/word_pca_similarity/figure_pieces/pca_03_cossim_word_cloud.png',
+    'output/word_pca_similarity/figure_pieces/pca_05_cossim_word_cloud.png'
 )
 
 
 # These word clouds depict the following concepts: sequencing vs disease (left) and RNA-seq vs evolutionary biology (right)
 
-# In[23]:
+# In[26]:
 
 
 selected_categories = [
@@ -305,7 +333,7 @@ selected_categories = [
 ]
 
 
-# In[24]:
+# In[27]:
 
 
 generate_scatter_plots(
@@ -314,22 +342,22 @@ generate_scatter_plots(
     nsample=200, random_state=100,
     selected_categories=selected_categories,
     color_palette=global_color_palette,
-    save_file_path="output/pca_plots/scatterplot_files/pca03_v_pca05.png"
+    save_file_path="output/pca_plots/svg_files/scatterplot_files/pca03_v_pca05.svg"
 )
 
 
-# In[25]:
+# In[28]:
 
 
 plot_scatter_clouds(
-    scatter_plot_path = "output/pca_plots/scatterplot_files/pca03_v_pca05.png", 
-    word_cloud_x_path = "output/word_pca_similarity/figures/pca_03_cossim_word_cloud.png",
-    word_cloud_y_path = "output/word_pca_similarity/figures/pca_05_cossim_word_cloud.png",
+    scatter_plot_path = "output/pca_plots/svg_files/scatterplot_files/pca03_v_pca05.svg", 
+    word_cloud_x_path = "output/word_pca_similarity/figure_pieces/pca_03_cossim_word_cloud.png",
+    word_cloud_y_path = "output/word_pca_similarity/figure_pieces/pca_05_cossim_word_cloud.png",
     final_figure_path = "output/pca_plots/figures/pca03_v_pca05_figure.png"
 )
 
 
-# In[26]:
+# In[29]:
 
 
 (
@@ -341,7 +369,7 @@ plot_scatter_clouds(
 )
 
 
-# In[27]:
+# In[30]:
 
 
 (
@@ -357,18 +385,18 @@ plot_scatter_clouds(
 
 # ### PCA1 vs PCA4
 
-# In[28]:
+# In[31]:
 
 
 display_clouds(
-    'output/word_pca_similarity/figures/pca_01_cossim_word_cloud.png',
-    'output/word_pca_similarity/figures/pca_04_cossim_word_cloud.png'
+    'output/word_pca_similarity/figure_pieces/pca_01_cossim_word_cloud.png',
+    'output/word_pca_similarity/figure_pieces/pca_04_cossim_word_cloud.png'
 )
 
 
 # These word cloud produces the following concepts: qunatitative biology vs molecular biology (left) and microbiology vs cell biology (right).
 
-# In[29]:
+# In[32]:
 
 
 selected_categories = [
@@ -378,7 +406,7 @@ selected_categories = [
 ]
 
 
-# In[30]:
+# In[33]:
 
 
 generate_scatter_plots(
@@ -387,22 +415,22 @@ generate_scatter_plots(
     nsample=200, random_state=100,
     selected_categories=selected_categories,
     color_palette=global_color_palette,
-    save_file_path="output/pca_plots/scatterplot_files/pca01_v_pca04.png"
+    save_file_path="output/pca_plots/svg_files/scatterplot_files/pca01_v_pca04.svg"
 )
 
 
-# In[31]:
+# In[34]:
 
 
 plot_scatter_clouds(
-    scatter_plot_path = "output/pca_plots/scatterplot_files/pca01_v_pca04.png", 
-    word_cloud_x_path = "output/word_pca_similarity/figures/pca_01_cossim_word_cloud.png",
-    word_cloud_y_path = "output/word_pca_similarity/figures/pca_04_cossim_word_cloud.png",
+    scatter_plot_path = "output/pca_plots/svg_files/scatterplot_files/pca01_v_pca04.svg", 
+    word_cloud_x_path = "output/word_pca_similarity/figure_pieces/pca_01_cossim_word_cloud.png",
+    word_cloud_y_path = "output/word_pca_similarity/figure_pieces/pca_04_cossim_word_cloud.png",
     final_figure_path = "output/pca_plots/figures/pca01_v_pca04_figure.png"
 )
 
 
-# In[32]:
+# In[35]:
 
 
 (
@@ -415,7 +443,7 @@ plot_scatter_clouds(
 )
 
 
-# In[33]:
+# In[36]:
 
 
 (
@@ -436,18 +464,18 @@ plot_scatter_clouds(
 
 # ## PCA1 vs PCA6
 
-# In[34]:
+# In[37]:
 
 
 display_clouds(
-    'output/word_pca_similarity/figures/pca_01_cossim_word_cloud.png',
-    'output/word_pca_similarity/figures/pca_06_cossim_word_cloud.png'
+    'output/word_pca_similarity/figure_pieces/pca_01_cossim_word_cloud.png',
+    'output/word_pca_similarity/figure_pieces/pca_06_cossim_word_cloud.png'
 )
 
 
 # The right word cloud appears to represent mathematics vs scientific communication or at least popular buzz words scientist used to promote their research. The next few cells will look more into it.
 
-# In[35]:
+# In[38]:
 
 
 selected_categories = [
@@ -457,7 +485,7 @@ selected_categories = [
 ]
 
 
-# In[36]:
+# In[39]:
 
 
 generate_scatter_plots(
@@ -466,22 +494,22 @@ generate_scatter_plots(
     nsample=200, random_state=100,
     selected_categories=selected_categories,
     color_palette=global_color_palette,
-    save_file_path="output/pca_plots/scatterplot_files/pca01_v_pca06.png"
+    save_file_path="output/pca_plots/svg_files/scatterplot_files/pca01_v_pca06.svg"
 )
 
 
-# In[37]:
+# In[40]:
 
 
 plot_scatter_clouds(
-    scatter_plot_path = "output/pca_plots/scatterplot_files/pca01_v_pca06.png", 
-    word_cloud_x_path = "output/word_pca_similarity/figures/pca_01_cossim_word_cloud.png",
-    word_cloud_y_path = "output/word_pca_similarity/figures/pca_06_cossim_word_cloud.png",
+    scatter_plot_path = "output/pca_plots/svg_files/scatterplot_files/pca01_v_pca06.svg", 
+    word_cloud_x_path = "output/word_pca_similarity/figure_pieces/pca_01_cossim_word_cloud.png",
+    word_cloud_y_path = "output/word_pca_similarity/figure_pieces/pca_06_cossim_word_cloud.png",
     final_figure_path = "output/pca_plots/figures/pca01_v_pca06_figure.png"
 )
 
 
-# In[38]:
+# In[41]:
 
 
 (
@@ -494,7 +522,7 @@ plot_scatter_clouds(
 )
 
 
-# In[39]:
+# In[42]:
 
 
 (
@@ -509,7 +537,7 @@ plot_scatter_clouds(
 
 # Looking at the top categories for the top and bottom right quadrants it seems that the papers follow the patterns captures by the word clouds above; however the positive axis still remains difficult to judge without taking a look at the individual papers.
 
-# In[40]:
+# In[43]:
 
 
 (
@@ -523,18 +551,18 @@ plot_scatter_clouds(
 
 # ## PCA2 vs PCA15
 
-# In[41]:
+# In[44]:
 
 
 display_clouds(
-    'output/word_pca_similarity/figures/pca_02_cossim_word_cloud.png',
-    'output/word_pca_similarity/figures/pca_15_cossim_word_cloud.png'
+    'output/word_pca_similarity/figure_pieces/pca_02_cossim_word_cloud.png',
+    'output/word_pca_similarity/figure_pieces/pca_15_cossim_word_cloud.png'
 )
 
 
 # The word cloud on the right seems to contain the following concepts: facial recognition and behavior vs neuron biochemistry.
 
-# In[42]:
+# In[45]:
 
 
 selected_categories = [
@@ -545,7 +573,7 @@ selected_categories = [
 ]
 
 
-# In[43]:
+# In[46]:
 
 
 generate_scatter_plots(
@@ -554,24 +582,24 @@ generate_scatter_plots(
     nsample=200, random_state=100,
     selected_categories=selected_categories,
     color_palette=global_color_palette,
-    save_file_path="output/pca_plots/scatterplot_files/pca02_v_pca15.png"
+    save_file_path="output/pca_plots/svg_files/scatterplot_files/pca02_v_pca15.svg"
 )
 
 
-# In[44]:
+# In[47]:
 
 
 plot_scatter_clouds(
-    scatter_plot_path = "output/pca_plots/scatterplot_files/pca02_v_pca15.png", 
-    word_cloud_x_path = "output/word_pca_similarity/figures/pca_02_cossim_word_cloud.png",
-    word_cloud_y_path = "output/word_pca_similarity/figures/pca_15_cossim_word_cloud.png",
+    scatter_plot_path = "output/pca_plots/svg_files/scatterplot_files/pca02_v_pca15.svg", 
+    word_cloud_x_path = "output/word_pca_similarity/figure_pieces/pca_02_cossim_word_cloud.png",
+    word_cloud_y_path = "output/word_pca_similarity/figure_pieces/pca_15_cossim_word_cloud.png",
     final_figure_path = "output/pca_plots/figures/pca02_v_pca15_figure.png"
 )
 
 
 # This graph depicts diversity within the neuroscience field as some papers are about facial recognition (negative) and other papers are about biochemistry (positive).
 
-# In[45]:
+# In[48]:
 
 
 (
@@ -582,7 +610,7 @@ plot_scatter_clouds(
 )
 
 
-# In[46]:
+# In[49]:
 
 
 (
@@ -597,18 +625,18 @@ plot_scatter_clouds(
 
 # ## PCA2 vs PCA8
 
-# In[47]:
+# In[50]:
 
 
 display_clouds(
-    'output/word_pca_similarity/figures/pca_02_cossim_word_cloud.png',
-    'output/word_pca_similarity/figures/pca_08_cossim_word_cloud.png'
+    'output/word_pca_similarity/figure_pieces/pca_02_cossim_word_cloud.png',
+    'output/word_pca_similarity/figure_pieces/pca_08_cossim_word_cloud.png'
 )
 
 
 # The wordcloud on the right seems to represent the following concept:  biochemistry vs developmental biology. Main evidence for this appears in the plot below.
 
-# In[48]:
+# In[51]:
 
 
 selected_categories = [
@@ -618,7 +646,7 @@ selected_categories = [
 ]
 
 
-# In[49]:
+# In[52]:
 
 
 generate_scatter_plots(
@@ -627,22 +655,22 @@ generate_scatter_plots(
     nsample=200, random_state=100,
     selected_categories=selected_categories,
     color_palette=global_color_palette,
-    save_file_path="output/pca_plots/scatterplot_files/pca02_v_pca08.png"
+    save_file_path="output/pca_plots/svg_files/scatterplot_files/pca02_v_pca08.svg"
 )
 
 
-# In[50]:
+# In[53]:
 
 
 plot_scatter_clouds(
-    scatter_plot_path = "output/pca_plots/scatterplot_files/pca02_v_pca08.png", 
-    word_cloud_x_path = "output/word_pca_similarity/figures/pca_02_cossim_word_cloud.png",
-    word_cloud_y_path = "output/word_pca_similarity/figures/pca_08_cossim_word_cloud.png",
+    scatter_plot_path = "output/pca_plots/svg_files/scatterplot_files/pca02_v_pca08.svg", 
+    word_cloud_x_path = "output/word_pca_similarity/figure_pieces/pca_02_cossim_word_cloud.png",
+    word_cloud_y_path = "output/word_pca_similarity/figure_pieces/pca_08_cossim_word_cloud.png",
     final_figure_path = "output/pca_plots/figures/pca02_v_pca08_figure.png"
 )
 
 
-# In[51]:
+# In[54]:
 
 
 (
@@ -655,7 +683,7 @@ plot_scatter_clouds(
 )
 
 
-# In[52]:
+# In[55]:
 
 
 (
@@ -672,18 +700,18 @@ plot_scatter_clouds(
 
 # ## PCA2 VS PCA13
 
-# In[53]:
+# In[56]:
 
 
 display_clouds(
-    'output/word_pca_similarity/figures/pca_02_cossim_word_cloud.png',
-    'output/word_pca_similarity/figures/pca_13_cossim_word_cloud.png'
+    'output/word_pca_similarity/figure_pieces/pca_02_cossim_word_cloud.png',
+    'output/word_pca_similarity/figure_pieces/pca_13_cossim_word_cloud.png'
 )
 
 
 # Based on a quick google search the wordcloud on the right represents: viruses (immunology) vs model organisms.
 
-# In[54]:
+# In[57]:
 
 
 selected_categories = [
@@ -693,7 +721,7 @@ selected_categories = [
 ]
 
 
-# In[55]:
+# In[58]:
 
 
 generate_scatter_plots(
@@ -702,22 +730,22 @@ generate_scatter_plots(
     nsample=200, random_state=100,
     selected_categories=selected_categories,
     color_palette=global_color_palette,
-    save_file_path="output/pca_plots/scatterplot_files/pca02_v_pca13.png"
+    save_file_path="output/pca_plots/svg_files/scatterplot_files/pca02_v_pca13.svg"
 )
 
 
-# In[56]:
+# In[59]:
 
 
 plot_scatter_clouds(
-    scatter_plot_path = "output/pca_plots/scatterplot_files/pca02_v_pca13.png", 
-    word_cloud_x_path = "output/word_pca_similarity/figures/pca_02_cossim_word_cloud.png",
-    word_cloud_y_path = "output/word_pca_similarity/figures/pca_13_cossim_word_cloud.png",
+    scatter_plot_path = "output/pca_plots/svg_files/scatterplot_files/pca02_v_pca13.svg", 
+    word_cloud_x_path = "output/word_pca_similarity/figure_pieces/pca_02_cossim_word_cloud.png",
+    word_cloud_y_path = "output/word_pca_similarity/figure_pieces/pca_13_cossim_word_cloud.png",
     final_figure_path = "output/pca_plots/figures/pca02_v_pca13_figure.png"
 )
 
 
-# In[57]:
+# In[60]:
 
 
 (
@@ -728,7 +756,7 @@ plot_scatter_clouds(
 )
 
 
-# In[58]:
+# In[61]:
 
 
 (
@@ -743,18 +771,18 @@ plot_scatter_clouds(
 
 # ## PCA04 vs PCA20
 
-# In[59]:
+# In[62]:
 
 
 display_clouds(
-    'output/word_pca_similarity/figures/pca_04_cossim_word_cloud.png',
-    'output/word_pca_similarity/figures/pca_20_cossim_word_cloud.png'
+    'output/word_pca_similarity/figure_pieces/pca_04_cossim_word_cloud.png',
+    'output/word_pca_similarity/figure_pieces/pca_20_cossim_word_cloud.png'
 )
 
 
 # PCA20 represents the following concepts: immunology and cancer biology.
 
-# In[60]:
+# In[63]:
 
 
 selected_categories = [
@@ -764,7 +792,7 @@ selected_categories = [
 ]
 
 
-# In[61]:
+# In[64]:
 
 
 generate_scatter_plots(
@@ -773,22 +801,22 @@ generate_scatter_plots(
     nsample=200, random_state=100,
     selected_categories=selected_categories,
     color_palette=global_color_palette,
-    save_file_path="output/pca_plots/scatterplot_files/pca04_v_pca20.png"
+    save_file_path="output/pca_plots/svg_files/scatterplot_files/pca04_v_pca20.svg"
 )
 
 
-# In[62]:
+# In[65]:
 
 
 plot_scatter_clouds(
-    scatter_plot_path = "output/pca_plots/scatterplot_files/pca04_v_pca20.png", 
-    word_cloud_x_path = "output/word_pca_similarity/figures/pca_04_cossim_word_cloud.png",
-    word_cloud_y_path = "output/word_pca_similarity/figures/pca_20_cossim_word_cloud.png",
+    scatter_plot_path = "output/pca_plots/svg_files/scatterplot_files/pca04_v_pca20.svg", 
+    word_cloud_x_path = "output/word_pca_similarity/figure_pieces/pca_04_cossim_word_cloud.png",
+    word_cloud_y_path = "output/word_pca_similarity/figure_pieces/pca_20_cossim_word_cloud.png",
     final_figure_path = "output/pca_plots/figures/pca04_v_pca20_figure.png"
 )
 
 
-# In[63]:
+# In[66]:
 
 
 (
@@ -801,7 +829,7 @@ plot_scatter_clouds(
 )
 
 
-# In[64]:
+# In[67]:
 
 
 (

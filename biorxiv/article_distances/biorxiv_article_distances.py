@@ -28,12 +28,11 @@ biorxiv_journal_df = (
         "../journal_tracker/output/mapped_published_doi.tsv", 
         sep="\t"
     )
-    .groupby("doi")
+    .groupby("preprint_doi")
     .agg({
         "document":"last",
         "category":"first",
-        "journal":"first",
-        "doi":"last",
+        "preprint_doi":"last",
         "published_doi":"first",  
         "pmcid":"first", 
         "pmcoa":"first"
@@ -252,10 +251,10 @@ final_df.head()
 
 
 final_df = (
-    biorxiv_journal_df[["document", "doi"]]
+    biorxiv_journal_df[["document", "preprint_doi"]]
     .merge(final_df)
 )
-final_df.to_csv("output/article_distances.tsv", sep="\t", index=False)
+final_df.to_csv("output/annotated_links/article_distances.tsv", sep="\t", index=False)
 final_df.head()
 
 
@@ -265,13 +264,27 @@ final_df.head()
 
 
 g = (
-    p9.ggplot(final_df)
+    p9.ggplot(
+        final_df.replace({
+            "pre_vs_published":"preprint-published", 
+            "pre_vs_random":"preprint-random"
+        })
+    )
     + p9.aes(x="label",y="distance")
-    + p9.geom_violin()
-    + p9.theme_seaborn()
+    + p9.geom_violin(fill="#a6cee3")
+    + p9.labs(
+        x="Document Pair Groups",
+        y="Euclidean Distance"
+    )
+    + p9.theme_seaborn(
+        context="paper",
+        style="ticks",
+        font="Arial",
+        font_scale=1.35
+    )
 )
-g.save("output/biorxiv_article_distance.svg", dpi=500)
-g.save("output/biorxiv_article_distance.png", dpi=500)
+g.save("output/figures/biorxiv_article_distance.svg", dpi=250)
+g.save("output/figures/biorxiv_article_distance.png", dpi=250)
 print(g)
 
 

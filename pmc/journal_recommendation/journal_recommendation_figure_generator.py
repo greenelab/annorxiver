@@ -76,10 +76,18 @@ g = (
     + p9.coord_flip()
     + p9.facet_wrap("dataset")
     + p9.scale_fill_manual(["#808080", "#1f78b4"])
-    + p9.theme_seaborn(context='paper')
+    + p9.theme_seaborn(
+        context='paper',
+        style="ticks",
+        font="Arial",
+        font_scale=1.3
+    )
+    + p9.theme(
+        figure_size=(6.66, 5)
+    )
     + p9.labs(
         y="Accuracy",
-        fill="Distance"
+        fill="Distance Metric"
     )
 )
 
@@ -420,7 +428,7 @@ data_df.describe()
 # In[25]:
 
 
-get_ipython().run_cell_magic('R', '-i data_df -o square_plot_df', '\nlibrary(ggplot2)\n\nbin_num <- 50\ng <- (\n    ggplot(data_df, aes(x=dim1, y=dim2))\n    + geom_bin2d(bins=bin_num, binwidth=0.85)\n)\nsquare_plot_df <- ggplot_build(g)$data[[1]]\nprint(g)')
+get_ipython().run_cell_magic('R', '-i data_df -o square_plot_df', '\nlibrary(ggplot2)\n\nbin_num <- 50\ng <- (\n    ggplot(data_df, aes(x=dim1, y=dim2))\n    + geom_bin2d(bins=bin_num, binwidth=0.85)\n    + theme(legend.position="left")\n)\nsquare_plot_df <- ggplot_build(g)$data[[1]]\nprint(g)')
 
 
 # In[26]:

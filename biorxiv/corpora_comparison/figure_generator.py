@@ -55,13 +55,26 @@ g = (
     )
     + p9.aes(x="factor(num_terms)", y="KL_divergence", fill="comparison")
     + p9.geom_col(stat='identity', position='dodge')
-    + p9.scale_fill_manual(["#b2df8a", "#1f78b4", "#a6cee3"])
+    + p9.scale_fill_brewer(
+        type='qual', 
+        palette='Paired',
+        direction=-1
+    )
     + p9.labs(
         x = "Number of terms evaluated",
         y = "KL Divergence"
     )
-    + p9.theme_seaborn(context='paper')
+    + p9.theme_seaborn(
+        context='paper',
+        style="ticks",
+        font_scale=1.2,
+    )
+    + p9.theme(
+        figure_size=(6.66, 5),
+        text=p9.element_text(family="Arial")
+    )
 )
+g.save("output/svg_files/corpora_kl_divergence.svg", dpi=500)
 g.save("output/figures/corpora_kl_divergence.png", dpi=500)
 print(g)
 
@@ -144,7 +157,7 @@ fig = plot_point_bar_figure(
 svg2png(
     bytestring=fig.to_str(), 
     write_to=fig_output_path,
-    dpi=500
+    dpi=75
 )
 
 Image(fig_output_path)
@@ -230,7 +243,7 @@ fig = plot_point_bar_figure(
 svg2png(
     bytestring=fig.to_str(), 
     write_to=fig_output_path,
-    dpi=500
+    dpi=75
 )
 
 Image(fig_output_path)
@@ -317,7 +330,7 @@ fig = plot_point_bar_figure(
 svg2png(
     bytestring=fig.to_str(), 
     write_to=fig_output_path,
-    dpi=500
+    dpi=75
 )
 
 Image(fig_output_path)
@@ -402,7 +415,7 @@ fig = plot_point_bar_figure(
 svg2png(
     bytestring=fig.to_str(), 
     write_to=fig_output_path,
-    dpi=500
+    dpi=75
 )
 
 Image(fig_output_path)
