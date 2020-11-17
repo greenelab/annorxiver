@@ -416,30 +416,8 @@ ax = plt.hexbin(
     gridsize=50,
     cmap="YlGnBu",
     norm=mpl.colors.LogNorm(),
+    mincnt=1
     #     edgecolors=None
-)
-ax = plt.gca()
-ax.plot(x_line, y_line, "--k")
-ax.annotate(
-    f"Y={results_2.slope:.2f}*X+{results_2.intercept:.2f}", (8, 1490),
-)
-_ = ax.set_xlabel("Euclidian Distance of Preprint-Published Versions")
-_ = ax.set_ylabel("Time Elapsed Until Preprint is Published (Days)")
-cbar = plt.colorbar()
-_ = cbar.ax.set_ylabel("count", rotation=270)
-
-
-# In[18]:
-
-
-plt.figure(figsize=(6, 5))
-ax = plt.hexbin(
-    published_date_distances["doc_distances"],
-    published_date_distances["days_to_published"],
-    gridsize=50,
-    cmap="YlGnBu",
-    norm=mpl.colors.LogNorm(),
-    edgecolors=None,
 )
 ax = plt.gca()
 ax.plot(x_line, y_line, "--k")
@@ -455,31 +433,25 @@ _ = cbar.ax.set_ylabel("count", rotation=270)
 # In[19]:
 
 
-hexplot = sns.jointplot(
-    x="doc_distances",
-    y="days_to_published",
-    data=published_date_distances,
-    kind="hex",
-    joint_kws={"cmap": "YlGnBu"},
+plt.figure(figsize=(6, 5))
+ax = plt.hexbin(
+    published_date_distances["doc_distances"],
+    published_date_distances["days_to_published"],
+    gridsize=50,
+    cmap="YlGnBu",
     norm=mpl.colors.LogNorm(),
-    height=8,
+    mincnt=1,
+    edgecolors=None,
 )
-
-hexplot.set_axis_labels(
-    xlabel="Euclidian Distance of Preprint-Published Versions",
-    ylabel="Time Elapsed Until Preprint is Published (Days)",
-)
-
-hexplot.ax_joint.plot(x_line, y_line, "--k")
-hexplot.ax_joint.annotate(
+ax = plt.gca()
+ax.plot(x_line, y_line, "--k")
+ax.annotate(
     f"Y={results_2.slope:.2f}*X+{results_2.intercept:.2f}", (8, 1490),
 )
-# shrink fig so cbar is visible
-plt.subplots_adjust(left=0.2, right=0.8, top=0.8, bottom=0.2)
-# make new ax object for the cbar
-cbar_ax = hexplot.fig.add_axes([0.85, 0.25, 0.05, 0.4])  # x, y, width, height
-plt.colorbar(cax=cbar_ax)
-_ = cbar_ax.set_ylabel("count", rotation=270)
+_ = ax.set_xlabel("Euclidian Distance of Preprint-Published Versions")
+_ = ax.set_ylabel("Time Elapsed Until Preprint is Published (Days)")
+cbar = plt.colorbar()
+_ = cbar.ax.set_ylabel("count", rotation=270)
 
 
 # In[20]:
@@ -490,7 +462,7 @@ hexplot = sns.jointplot(
     y="days_to_published",
     data=published_date_distances,
     kind="hex",
-    joint_kws={"cmap": "YlGnBu", "edgecolors": None},
+    joint_kws={"cmap": "YlGnBu", "mincnt":1},
     norm=mpl.colors.LogNorm(),
     height=8,
 )
@@ -510,4 +482,40 @@ plt.subplots_adjust(left=0.2, right=0.8, top=0.8, bottom=0.2)
 cbar_ax = hexplot.fig.add_axes([0.85, 0.25, 0.05, 0.4])  # x, y, width, height
 plt.colorbar(cax=cbar_ax)
 _ = cbar_ax.set_ylabel("count", rotation=270)
+
+
+# In[21]:
+
+
+hexplot = sns.jointplot(
+    x="doc_distances",
+    y="days_to_published",
+    data=published_date_distances,
+    kind="hex",
+    joint_kws={"cmap": "YlGnBu", "mincnt":1, "edgecolors": None},
+    norm=mpl.colors.LogNorm(),
+    height=8,
+)
+
+hexplot.set_axis_labels(
+    xlabel="Euclidian Distance of Preprint-Published Versions",
+    ylabel="Time Elapsed Until Preprint is Published (Days)",
+)
+
+hexplot.ax_joint.plot(x_line, y_line, "--k")
+hexplot.ax_joint.annotate(
+    f"Y={results_2.slope:.2f}*X+{results_2.intercept:.2f}", (8, 1490),
+)
+# shrink fig so cbar is visible
+plt.subplots_adjust(left=0.2, right=0.8, top=0.8, bottom=0.2)
+# make new ax object for the cbar
+cbar_ax = hexplot.fig.add_axes([0.85, 0.25, 0.05, 0.4])  # x, y, width, height
+plt.colorbar(cax=cbar_ax)
+_ = cbar_ax.set_ylabel("count", rotation=270)
+
+
+# In[ ]:
+
+
+
 
