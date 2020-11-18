@@ -23,7 +23,7 @@ from sklearn.linear_model import LogisticRegressionCV
 import tqdm
 
 from mizani.breaks import date_breaks
-from mizani.formatters import timedelta_format
+from mizani.formatters import timedelta_format, log_format
 
 
 # # Gather Preprint-Published Pairs
@@ -221,6 +221,12 @@ published_date_distances = (
     .dropna()
     .query("doc_distances.notnull()")
 )
+
+published_date_distances.to_csv(
+    "output/preprint_published_distances.tsv", 
+    sep="\t", index=False
+)
+
 print(published_date_distances.shape)
 published_date_distances.head()
 
@@ -352,7 +358,7 @@ g = (
 print(g)
 
 
-# In[17]:
+# In[18]:
 
 
 g = (
@@ -363,7 +369,8 @@ g = (
     + p9.geom_bin2d(bins=100)
     + p9.scale_fill_distiller(
         trans="log", direction=-1, type='seq', 
-        palette='YlGnBu', name = "log(count)" 
+        palette='YlGnBu', name = "log(count)",
+        labels = log_format(base=10)
     )
     + p9.geom_line(
         stat="smooth",method='lm', linetype='dashed', 
