@@ -1,22 +1,22 @@
 # Annorxiver
 
 ## Citation
-- [Manuscript in progress](greenelab.github.io/annorxiver_manuscript)
+- [Manuscript in progress](https:/greenelab.github.io/annorxiver_manuscript)
 - doi and full citation coming soon!!
 
 ## About
-This repository contains code for the annorxvier project.
-This project focuses on analyzing the linguistic style and content of bioRxiv preprints and understanding how these features change when preprints undergo the publication process.
+This repository contains code for the annorxiver project.
+This project analyzes the linguistic style and content of bioRxiv preprints and aims to understand how these features change when preprints undergo the publication process.
 We are currently working on a manuscript for the work in this repository.
 Feel free to check it out! (link above).
-We also created a [web app](greenelab.github.io/preprint-similarity-search) allows anyone to input a bioRxiv or medRxiv preprint and receive a set of the most linguistically similar journals and articles to serve as potential publication venues for their work.
+We also created a [web app](greenelab.github.io/preprint-similarity-search) that takes a bioRxiv or medRxiv preprint doi as input and returns a set of the most linguistically similar journals and articles to serve as potential publication venues for their work.
 
 ## Directory Structure
 | Folder/file | Description |
 | --- | --- | 
-| [annorxiver_modules](annorxiver_modules) | This folder contains universal functions that other notebooks in this repository will use |
+| [annorxiver_modules](annorxiver_modules) | This folder contains supporting functions that other notebooks in this repository will use |
 | [biorxiv](biorxiv) | This folder contains all experiments that are related to biorxiv preprints. | 
-| [credentials](credentials) | Some of the code in this repository needs credentials to run. Any users that need to run those notebooks use check this folder first. |
+| [credentials](credentials) | Some of the code in this repository need credentials to run. Any user that needs to run those notebooks should check this folder first. |
 | [figure_generation](figure_generation) | This folder contains code to generate figures for the manuscript in progress. |
 | [nytac/corpora_stats](nytac/corpora_stats) | This folder contains results when parsing the New York Times annotated corpus (NYTAC) from the Linguistic Data Consortium (LDC). |
 | [pmc](pmc) |  This folder contains all experiments that are related to articles in Pubmed Central Open Access corpus (PMC). | 
@@ -26,7 +26,7 @@ We also created a [web app](greenelab.github.io/preprint-similarity-search) allo
 
 ## Set up Environment
 
-Annorxiver uses [conda](http://conda.pydata.org/docs/intro.html) as a python package manager. Before moving on to the instructions below, please make sure to have it installed. [Download conda here!!](https://www.continuum.io/downloads)
+Annorxiver uses [conda](http://conda.pydata.org/docs/intro.html) as a python package manager. Before moving on to the instructions below, please make sure to have it installed. [Download conda here!!](https://docs.conda.io/en/latest/miniconda.html)
   
 Once everything has been installed, type following command in the terminal: 
 
