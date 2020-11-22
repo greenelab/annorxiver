@@ -20,8 +20,8 @@ We also created a [web app](greenelab.github.io/preprint-similarity-search) that
 | [figure_generation](figure_generation) | This folder contains code to generate figures for the manuscript in progress. |
 | [nytac/corpora_stats](nytac/corpora_stats) | This folder contains results when parsing the New York Times annotated corpus (NYTAC) from the Linguistic Data Consortium (LDC). |
 | [pmc](pmc) |  This folder contains all experiments that are related to articles in Pubmed Central Open Access corpus (PMC). | 
-| environment.yml | This file contains the necessary packages this repository uses.  |
-| setup.py | This file sets up the annorxiver modules to be used as a regular python package. |
+| [environment.yml](environment.yml) | This file contains the necessary packages this repository uses.  |
+| [setup.py](setup.py) | This file sets up the annorxiver modules to be used as a regular python package. |
 
 
 ## Set up Environment
