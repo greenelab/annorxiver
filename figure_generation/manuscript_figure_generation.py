@@ -487,7 +487,7 @@ time_to_publication_path = Path(
 
 
 panel_one = (
-    sg.fromfile(publication_delay_path/"article_distance_vs_publication_time.svg")
+    sg.fromfile(publication_delay_path/"article_distance_vs_publication_time_hex.svg")
 )
 
 panel_one_size = (
@@ -495,7 +495,7 @@ panel_one_size = (
     np.round(float(panel_one.root.attrib['height'][:-2])*1.33, 0)
 )
 
-scale_x = 1
+scale_x = 1.2
 scale_y = 1
 
 print(f"original: {panel_one_size}")
@@ -503,14 +503,14 @@ print(f"scaled:{(panel_one_size[0]*scale_x, panel_one_size[1]*scale_y)}")
 
 panel_one = panel_one.getroot()
 panel_one.scale_xy(x=scale_x, y=scale_y)
-panel_one.moveto(20,20)
+panel_one.moveto(30,20)
 
 
 # In[29]:
 
 
 panel_two = (
-    sg.fromfile(publication_delay_path/"version_count_vs_publication_time.svg")
+    sg.fromfile(publication_delay_path/"version_count_vs_publication_time_violin.svg")
 )
 
 panel_two_size = (

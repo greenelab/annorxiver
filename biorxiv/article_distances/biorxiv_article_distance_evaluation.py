@@ -78,6 +78,14 @@ binned_stats_df = (
     .to_frame()
     .rename(index=str, columns={"final_same_paper":"frac_correct"})
     .reset_index()
+    .replace({
+        "distance_bin":{
+            "[0, 25%ile)": '0-25th',
+            '[25%ile, 50%ile)':'25th-50th',
+            '[50%ile, 75%ile)':'50th-75th',
+            '[75%, min(same-journal-no-known-link))': '75th-min(Randomized Journal Pairs)'
+        }
+    })
 )
 binned_stats_df
 
@@ -90,8 +98,8 @@ g = (
     + p9.geom_col(fill="#a6cee3")
     + p9.coord_flip()
     + p9.labs(
-        x="Fraction Correct",
-        y="Euclidean Distance Bins"
+        y="Fraction Correct",
+        x="Euclidean Distance Percentile Bins"
     )
     + p9.theme_seaborn(
         context="paper",
