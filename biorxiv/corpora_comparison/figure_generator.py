@@ -524,7 +524,7 @@ g = (
     )
     + p9.annotate(
         "text",
-        label="bioRxiv Enriched",
+        label="PMC Enriched",
         x=9, y=2.5,
         size=12,
         alpha=0.7
@@ -567,8 +567,14 @@ print(g)
 # In[23]:
 
 
-count_plot_df = create_lemma_count_df(
-    plot_df, 'pmc', 'reference'
+count_plot_df = (
+    create_lemma_count_df(
+        plot_df, 'pmc', 'reference'
+    )
+    .replace({
+        "pmc":"PMC",
+        "reference":"NYTAC"
+    })
 )
 count_plot_df.head()
 
