@@ -389,7 +389,11 @@ def plot_bargraph(count_plot_df, plot_df):
         p9.ggplot(count_plot_df.astype({"count":int}), p9.aes(x="lemma", y="count"))
         + p9.geom_col(position=p9.position_dodge(width=0.5), fill="#253494")
         + p9.coord_flip()
-        + p9.facet_wrap("repository", scales='free_x')
+        + p9.facet_wrap(
+            "repository", 
+            scales='free_x',
+            dir='h'
+        )
         + p9.scale_x_discrete(
             limits=(
                 plot_df
@@ -404,70 +408,14 @@ def plot_bargraph(count_plot_df, plot_df):
             context='paper',
             style="ticks",
             font="Arial",
-            font_scale=0.95
+            font_scale=1.1
         )
         + p9.theme(
-            # 640 x 480
-            figure_size=(6.66, 5),
+            figure_size=(10, 6),
             strip_background=p9.element_rect(fill="white"),
             strip_text=p9.element_text(size=12),
             axis_title=p9.element_text(size=12),
             axis_text_x=p9.element_text(size=10),
-        )
-    )
-    return graph
-
-def plot_pointplot(plot_df, y_axis_label="", use_log10=False, limits=[0,3.2]):
-    """
-    Plots the pointplot
-    Arguments:
-        plot_df - the dataframe that contains the odds ratio and lemmas
-        y_axis_label - the label for the y axis
-        use_log10 - use log10 for the y axis?
-    """
-    graph = (
-        p9.ggplot(plot_df, p9.aes(x="lemma", y="odds_ratio"))
-        + p9.geom_pointrange(
-            p9.aes(
-                ymin="lower_odds", 
-                ymax="upper_odds"
-            ), 
-            position=p9.position_dodge(width=1),
-            size=0.3,
-            color="#253494"
-        )
-        + p9.scale_x_discrete(
-            limits=(
-                plot_df
-                .sort_values("odds_ratio", ascending=True)
-                .lemma
-                .tolist()
-            )
-        )
-        + (
-            p9.scale_y_log10() 
-            if use_log10 else 
-            p9.scale_y_continuous(limits=limits)
-        )
-        
-        + p9.geom_hline(p9.aes(yintercept=1), linetype = '--', color='grey')
-        + p9.coord_flip()
-        + p9.theme_seaborn(
-            context='paper', 
-            style="ticks", 
-            font_scale=1, 
-            font='Arial'
-        )
-        + p9.theme(
-            # 640 x 480
-            figure_size=(6.66, 5),
-            panel_grid_minor=p9.element_blank(),
-            axis_title=p9.element_text(size=12),
-            axis_text_x=p9.element_text(size=10)
-        )
-        + p9.labs(
-            x=None,
-            y=y_axis_label
         )
     )
     return graph
@@ -480,23 +428,43 @@ def plot_point_bar_figure(figure_one_path, figure_two_path):
         figure_one_path - The pointplot figure
         figure_two_path - The barplot figure
     """
-    
-    fig = sg.SVGFigure("1280", "960")
-    fig.append([etree.Element("rect", {"width":"100%", "height":"100%", "fill":"white"})])
-
     fig1 = sg.fromfile(figure_one_path)
-    plot1 = fig1.getroot()
-    plot1.moveto(22, 25, scale=1.35)
-
     fig2 = sg.fromfile(figure_two_path)
-    plot2 = fig2.getroot()
-    plot2.moveto(662, 0, scale=1.35)
 
-    fig.append([plot1,plot2])
+    fig1_width_size = np.round(float(fig1.root.attrib['width'][:-2])*1.33, 0)
+    fig1_height_size = np.round(float(fig1.root.attrib['height'][:-2])*1.33, 0)
+    
+    fig2_width_size = np.round(float(fig2.root.attrib['width'][:-2])*1.33, 0) 
+    fig2_height_size = np.round(float(fig2.root.attrib['height'][:-2])*1.33, 0)
+
+    fig = sg.SVGFigure(
+        str((fig1_width_size+fig2_width_size)-360),
+        str(min(fig1_height_size, fig2_height_size)-50)
+    )
+    
+    fig.append([
+        etree.Element(
+            "rect", 
+            {
+                "width":"100%", 
+                "height":"100%", 
+                "fill":"white"
+            }
+        )
+    ])
+    
+    plot1 = fig1.getroot()
+    plot1.moveto(10, 30)
+
+    plot2 = fig2.getroot()
+    plot2.moveto(fig1_width_size - 160, 12)
 
     text_A = sg.TextElement(10, 30, "A", size=18, weight="bold")
-    text_B = sg.TextElement(640, 30, "B", size=18, weight="bold")
+    text_B = sg.TextElement(fig1_width_size - 160, 30, "B", size=18, weight="bold")
 
-    fig.append([text_A, text_B])
+    fig.append([
+        plot1, plot2, 
+        text_A, text_B
+    ])
     
     return fig

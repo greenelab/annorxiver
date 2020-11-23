@@ -198,7 +198,11 @@ g = (
         y="proportion of unpublished biorxiv paper",
         title="Preprint Survival Curves",
     )
-    + p9.theme_seaborn(context="paper", style="white", font_scale=1.2)
+    + p9.theme_seaborn(
+        context="paper", 
+        style="white", 
+        font_scale=1.2
+    )
     + p9.theme(
         axis_ticks_minor_x=p9.element_blank(),
         # legend_position=(0.5, -0.2),
@@ -224,12 +228,16 @@ category_half_life
 
 g = (
     p9.ggplot(
-        category_half_life.query("category!='none'").assign(
+        category_half_life.query("category!='none'")
+        .assign(
             half_life_time=lambda x: pd.to_timedelta(x.half_life_time, "D"),
             half_life_ci_l=lambda x: pd.to_timedelta(x.half_life_ci_l, "D"),
             half_life_ci_u=lambda x: pd.to_timedelta(x.half_life_ci_u, "D"),
         ),
-        p9.aes(x="category", y="half_life_time", ymin="half_life_ci_l", ymax="half_life_ci_u"),
+        p9.aes(
+            x="category", y="half_life_time", 
+            ymin="half_life_ci_l", ymax="half_life_ci_u"
+        ),
     )
     + p9.geom_col(fill="#1f78b4")
     + p9.geom_errorbar()
@@ -247,10 +255,17 @@ g = (
         y="Time Until 50% of Preprints are Published",
         title="Preprint Category Half-Life",
     )
-    + p9.theme_seaborn(context="paper", style="white", font_scale=1.2)
-    + p9.theme(axis_ticks_minor_x=p9.element_blank(),)
+    + p9.theme_seaborn(
+        context='paper', 
+        style="white", 
+        font_scale=1.2, 
+        font='Arial'
+    )
+    + p9.theme(
+        axis_ticks_minor_x=p9.element_blank()
+    )
 )
-g.save("output/preprint_category_halflife.svg", dpi=250)
+g.save("output/preprint_category_halflife.svg")
 g.save("output/preprint_category_halflife.png", dpi=250)
 print(g)
 
