@@ -41,23 +41,26 @@ get_ipython().run_line_magic('load_ext', 'rpy2.ipython')
 
 
 results = [
-    {"value":.00517, "model":"random_baseline", "distance":"N/A", "dataset":"train (cross validation)"},
-    {"value":.39982, "model":"paper_paper", "distance":"euclidean", "dataset":"train (cross validation)"},
-    {"value":.37340, "model":"centroid", "distance":"euclidean", "dataset":"train (cross validation)"},
-    {"value":.39824, "model":"paper_paper", "distance":"manhattan", "dataset":"train (cross validation)"},
-    {"value":.39824, "model":"centroid", "distance":"manhattan", "dataset":"train (cross validation)"},
-    {"value":.00445, "model":"random_baseline", "distance":"N/A", "dataset":"test"},
-    {"value":.20638, "model":"paper_paper", "distance":"euclidean", "dataset":"test"},
-    {"value":.21636, "model":"centroid", "distance":"euclidean", "dataset":"test"},
-    {"value":.20380, "model":"paper_paper", "distance":"manhattan", "dataset":"test"},
-    {"value":.21523, "model":"centroid", "distance":"manhattan", "dataset":"test"}
+    {"value":.00517/.00517, "model":"random_baseline", "distance":"N/A", "dataset":"train (cross validation)"},
+    {"value":.39982/.00517, "model":"paper_paper", "distance":"euclidean", "dataset":"train (cross validation)"},
+    {"value":.37340/.00517, "model":"centroid", "distance":"euclidean", "dataset":"train (cross validation)"},
+    {"value":.39824/.00517, "model":"paper_paper", "distance":"manhattan", "dataset":"train (cross validation)"},
+    {"value":.39824/.00517, "model":"centroid", "distance":"manhattan", "dataset":"train (cross validation)"},
+    {"value":.00445/.00445, "model":"random_baseline", "distance":"N/A", "dataset":"test"},
+    {"value":.20638/.00445, "model":"paper_paper", "distance":"euclidean", "dataset":"test"},
+    {"value":.21636/.00445, "model":"centroid", "distance":"euclidean", "dataset":"test"},
+    {"value":.20380/.00445, "model":"paper_paper", "distance":"manhattan", "dataset":"test"},
+    {"value":.21523/.00445, "model":"centroid", "distance":"manhattan", "dataset":"test"}
 ]
 
 
 # In[4]:
 
 
-result_df = pd.DataFrame.from_records(results)
+result_df = (
+    pd.DataFrame
+    .from_records(results)
+)
 
 result_df['dataset'] = pd.Categorical(
     result_df.dataset.tolist(), 
@@ -67,15 +70,23 @@ result_df['dataset'] = pd.Categorical(
 result_df.head()
 
 
-# In[5]:
+# In[32]:
 
 
 g = (
-    p9.ggplot(result_df.query("distance in ['euclidean', 'N/A']"), p9.aes(x="model", y="value"))
-    + p9.geom_col(p9.aes(fill="factor(distance)"), position="dodge")
+    p9.ggplot(
+        result_df
+        .query("distance in ['euclidean']")
+        .rename(index=str, columns={"value":"fold_change"}), 
+        p9.aes(x="model", y="fold_change")
+    )
+    + p9.geom_col(
+        position="dodge", 
+        show_legend=False,
+        fill="#1f78b4"
+    )
     + p9.coord_flip()
     + p9.facet_wrap("dataset")
-    + p9.scale_fill_manual(["#808080", "#1f78b4"])
     + p9.theme_seaborn(
         context='paper',
         style="ticks",
@@ -86,7 +97,7 @@ g = (
         figure_size=(6.66, 5)
     )
     + p9.labs(
-        y="Accuracy",
+        y="Fold Change Over Random",
         fill="Distance Metric"
     )
 )
@@ -94,15 +105,14 @@ g = (
 g.save(
     Path("output")/
     Path("figures")/
-    Path("knn_result.svg"), 
-    dpi=500
+    Path("knn_result.svg")
 )
 
 g.save(
     Path("output")/
     Path("figures")/
     Path("knn_result.png"),
-    dpi=500
+    dpi=250
 )
 
 print(g)

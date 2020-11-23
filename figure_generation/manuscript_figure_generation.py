@@ -567,7 +567,10 @@ time_to_publication_path = Path(
 
 
 panel_one = (
-    sg.fromfile(publication_delay_path/"article_distance_vs_publication_time_hex.svg")
+    sg.fromfile(
+        time_to_publication_path/
+        "preprint_category_halflife.svg"
+    )
 )
 
 panel_one_size = (
@@ -575,7 +578,7 @@ panel_one_size = (
     np.round(float(panel_one.root.attrib['height'][:-2])*1.33, 0)
 )
 
-scale_x = 1.2
+scale_x = 1
 scale_y = 1
 
 print(f"original: {panel_one_size}")
@@ -590,7 +593,10 @@ panel_one.moveto(30,20)
 
 
 panel_two = (
-    sg.fromfile(publication_delay_path/"version_count_vs_publication_time_violin.svg")
+    sg.fromfile(
+        publication_delay_path/
+        "version_count_vs_publication_time_violin.svg"
+    )
 )
 
 panel_two_size = (
@@ -606,14 +612,17 @@ print(f"scaled: {(panel_two_size[0]*scale_x, panel_two_size[1]*scale_y)}")
 
 panel_two = panel_two.getroot()
 panel_two.scale_xy(x=scale_x, y=scale_y)
-panel_two.moveto(580,20)
+panel_two.moveto(730,0)
 
 
 # In[30]:
 
 
 panel_three = (
-    sg.fromfile(time_to_publication_path/"preprint_category_halflife.svg")
+    sg.fromfile(
+        publication_delay_path/
+        "article_distance_vs_publication_time_hex.svg"
+    )
 )
 
 panel_three_size = (
@@ -621,7 +630,7 @@ panel_three_size = (
     np.round(float(panel_three.root.attrib['height'][:-2])*1.33, 0)
 )
 
-scale_x = 1
+scale_x = 1.2
 scale_y = 1
 
 print(f"original: {panel_three_size}")
@@ -629,14 +638,14 @@ print(f"scaled: {(panel_three_size[0]*scale_x, panel_three_size[1]*scale_y)}")
 
 panel_three = panel_three.getroot()
 panel_three.scale_xy(x=scale_x, y=scale_y)
-panel_three.moveto(20,420)
+panel_three.moveto(40,390)
 
 
 # In[31]:
 
 
 panel_one_label = sg.TextElement(10, 30, "A", size=22, weight="bold")
-panel_two_label = sg.TextElement(560, 30, "B", size=22, weight="bold")
+panel_two_label = sg.TextElement(730, 30, "B", size=22, weight="bold")
 panel_three_label = sg.TextElement(10, 420, "C", size=22, weight="bold")
 
 
@@ -649,12 +658,12 @@ figure_four = sg.SVGFigure(
             panel_one_size[0]+panel_two_size[0],
             panel_three_size[0]
         ]) -
-        100
+        130
     ),
     str(
          max(panel_one_size[1],panel_two_size[1])+
         panel_three_size[1] - 
-        150
+        200
     )
 )
 figure_four.append([
