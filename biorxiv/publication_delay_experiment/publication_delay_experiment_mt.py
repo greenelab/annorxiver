@@ -320,11 +320,28 @@ g.set(yticks=[])
 g.despine(bottom=True, left=True)
 
 
+# In[12]:
+
+
+g = sns.lmplot(
+    x="version_count",
+    y="days_to_published",
+    data=published_date_distances,
+    x_bins=np.unique(x),
+    palette="YlGnBu",
+)
+_ = g.set_ylabels("Time Elapsed Until Preprint is Published (Days)")
+_ = g.set_xlabels("# of Preprint Versions")
+_ = g.axes[0][0].annotate(f"Y={results_2.slope:.2f}*X+{results_2.intercept:.2f}", (2, 700))
+_ = g.axes[0][0].set_xlim(.5, 12.5)
+_ = g.axes[0][0].set_ylim(0, g.axes[0][0].get_ylim()[1])
+
+
 # # Construct Scatter Plot of Date vs Document Distances
 
 # Preprints are delayed on an average of 17 days as changes are demanded from the peer-review process. This section regresses a preprint's document distance against the time it takes to have a preprint published. A scatter and square bin plot are generated below.
 
-# In[12]:
+# In[13]:
 
 
 # Get smoothed linear regression line
@@ -340,7 +357,7 @@ results_2 = linregress(x, y)
 print(results_2)
 
 
-# In[13]:
+# In[14]:
 
 
 g = (
@@ -367,7 +384,7 @@ g = (
 print(g)
 
 
-# In[14]:
+# In[15]:
 
 
 g = (
@@ -402,7 +419,7 @@ print(g)
 # # Hex grid options
 # A couple hex grid options just to see what they look like
 
-# In[15]:
+# In[16]:
 
 
 x_line = np.array(
@@ -414,7 +431,7 @@ x_line = np.array(
 y_line = x_line * results_2.slope + results_2.intercept
 
 
-# In[16]:
+# In[17]:
 
 
 plt.figure(figsize=(6, 5))
@@ -441,7 +458,7 @@ plt.savefig("output/article_distance_vs_publication_time_hex.svg", dpi=250)
 plt.savefig("output/article_distance_vs_publication_time_hex.png", dpi=250)
 
 
-# In[17]:
+# In[18]:
 
 
 plt.figure(figsize=(6, 5))
@@ -465,7 +482,7 @@ cbar = plt.colorbar()
 _ = cbar.ax.set_ylabel("count", rotation=270)
 
 
-# In[18]:
+# In[19]:
 
 
 hexplot = sns.jointplot(
@@ -495,7 +512,7 @@ plt.colorbar(cax=cbar_ax)
 _ = cbar_ax.set_ylabel("count", rotation=270)
 
 
-# In[19]:
+# In[20]:
 
 
 hexplot = sns.jointplot(
