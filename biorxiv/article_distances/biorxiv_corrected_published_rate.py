@@ -362,7 +362,7 @@ color_mapper = {
 }
 
 
-# In[21]:
+# In[22]:
 
 
 g = (
@@ -436,6 +436,7 @@ g = (
     + p9.theme_seaborn(
         style='ticks', 
         context='paper',
+        font="Arial",
         font_scale=1.5
     )
     + p9.theme(
@@ -450,7 +451,7 @@ g = (
         x="Month"
     )
 )
-g.save("output/figures/publication_rate.svg", dpi=250)
+g.save("output/figures/publication_rate.svg")
 g.save("output/figures/publication_rate.png", dpi=250)
 print(g)
 
