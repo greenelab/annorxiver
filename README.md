@@ -26,25 +26,24 @@ We also created a [web app](greenelab.github.io/preprint-similarity-search) that
 
 ## Set up Environment
 
-Annorxiver uses [conda](http://conda.pydata.org/docs/intro.html) as a python package manager. Before moving on to the instructions below, please make sure to have it installed. [Download conda here!!](https://docs.conda.io/en/latest/miniconda.html)
+Annorxiver uses [conda](http://conda.pydata.org/docs/intro.html) as a python package manager.
+Before moving on to the instructions below, please make sure to have it installed.
+[Download conda here!!](https://docs.conda.io/en/latest/miniconda.html)
   
 Once everything has been installed, type following command in the terminal: 
 
 ```bash
-conda env create --file environment.yml
+bash install.sh
 ``` 
+_Note_: 
+There is a bash command within the install.sh that only works on unix systems.
+If you are on windows (and possibly macOS), you should remove that file or execute each command individually.
 
 You can activate the environment by using the following command: 
 
 ```bash
-source activate annorxiver
+conda activate annorxiver
 ```  
-
-_Note_: If you want to leave the environment, just enter the following command:
-
-```bash
-source deactivate 
-```
 
 ## License
 
