@@ -1,0 +1,21 @@
+repos:
+
+- repo: local
+  hooks:
+  - id: jupytext_format
+    name: jupytext_format
+    entry: jupytext --from ipynb --pipe black --check flake8 --pre-commit
+    pass_filenames: false
+    language: python
+
+  - id: jupytext_conversion
+    name: jupytext_conversion
+    entry: jupytext --from ipynb --to py:light --pre-commit
+    pass_filenames: false
+    language: python
+
+- repo: https://gitlab.com/pycqa/flake8
+  rev: 3.7.9
+  hooks:
+  - id: flake8
+
