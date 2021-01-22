@@ -1,11 +1,4 @@
-fail-fast: true
 repos:
--   repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: 43f5ffaeab549e15168317892bf217dd450aa41b
-    hooks:
-    - id: check-yaml
-    - id: end-of-file-fixer
-    - id: trailing-whitespace
 
 - repo: https://github.com/mwouts/jupytext
   rev: 41b7e9c93b50da1d6feb486aceb2c4d534374090
@@ -13,12 +6,12 @@ repos:
   - id: jupytext
     args: [--from, ipynb, --pipe, black, --to, py:light, --sync]
 
-- repo: https://github.com/psf/black.git
-  rev: 692c0f50d91e3163bb87401e4a0e070b2eb5b163
-  hooks:
-    - id: black
-
 - repo: https://gitlab.com/pycqa/flake8
   rev: 6de8252c035844f1e679f509b5f37340b44d5c39
   hooks:
   - id: flake8
+
+-   repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: 43f5ffaeab549e15168317892bf217dd450aa41b
+    hooks:
+    - id: trailing-whitespace
