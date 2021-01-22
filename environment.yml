@@ -33,6 +33,6 @@ dependencies:
     - tqdm==4.35.0
     - seaborn==0.11.0
     - spacy==2.2.3
-    - svgutils==0.3.1
+    - svgutils==0.3.2
     - umap-learn==0.3.10
     - wordcloud==1.5.0
