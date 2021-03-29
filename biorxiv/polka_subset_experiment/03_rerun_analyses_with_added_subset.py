@@ -20,6 +20,7 @@ from datetime import timedelta, date
 from pathlib import Path
 import sys
 
+from IPython.display import Image
 import matplotlib.pyplot as plt
 import matplotlib as mpl
 from matplotlib.patches import ConnectionPatch
@@ -32,8 +33,10 @@ import requests
 from scipy.spatial.distance import cdist
 from scipy.stats import linregress
 import seaborn as sns
+from sklearn.model_selection import GridSearchCV
 from sklearn.linear_model import LogisticRegressionCV
 from sklearn.preprocessing import StandardScaler
+from sklearn.tree import DecisionTreeClassifier, export_graphviz
 import spacy
 import tqdm
 
@@ -283,11 +286,15 @@ biorxiv_pca_sim_df.head()
 
 # ## PC Regression
 
+# ### Logistic Regression
+
+# Goal here is to determine if we can figure out which PCs bisect the bioRxiv subset against Polka et al.'s subset. Given that their dataset is only 60 papers we downsampled our dataset to contain only 60 papers.
+
 dataset_df = biorxiv_pca_sim_df.sample(60, random_state=100).append(polka_pca_sim_df)
 dataset_df.head()
 
 model = LogisticRegressionCV(
-    cv=10, Cs=20, max_iter=1000, penalty="l1", solver="liblinear"
+    cv=10, Cs=100, max_iter=1000, penalty="l1", solver="liblinear"
 )
 model.fit(
     StandardScaler().fit_transform(dataset_df[[f"pc{idx+1}" for idx in range(50)]]),
@@ -325,6 +332,29 @@ g.save("output/figures/pca_log_regression_weights.svg")
 g.save("output/figures/pca_log_regression_weights.png", dpi=250)
 print(g)
 
+# ### Decision Tree
+
+model = DecisionTreeClassifier(random_state=100)
+search_grid = GridSearchCV(
+    model, {"criterion": ["gini", "entropy"], "max_features": ["auto", None]}, cv=10
+)
+search_grid.fit(dataset_df[[f"pc{idx+1}" for idx in range(50)]], dataset_df["label"])
+
+print(search_grid.best_params_)
+print(search_grid.best_score_)
+
+export_graphviz(
+    search_grid.best_estimator_,
+    out_file="output/figures/pca_tree.dot",
+    feature_names=[f"pc{idx+1}" for idx in range(50)],
+    class_names=["bioRxiv", "polka et al."],
+    rotate=True,
+)
+
+# ! dot -Tpng output/figures/pca_tree.dot -o output/figures/pca_tree.png
+
+Image(filename="output/figures/pca_tree.png")
+
 # ## Saucie Subset
 
 saucie_model = SAUCIE(
@@ -352,7 +382,7 @@ pmc_data_df.head()
 #
 # bin_num <- 50
 # g <- (
-#     ggplot(pmc_data_df, aes(x=dim1, y=dim2))
+#      ggplot(pmc_data_df, aes(x=dim1, y=dim2))
 # + geom_bin2d(bins=bin_num, binwidth=0.85)
 
 # + theme(legend.position="left")
@@ -361,7 +391,6 @@ pmc_data_df.head()
 # )
 # print(g)
 # -
-
 # ## Publication Time Analysis
 
 # ### Get publication dates
