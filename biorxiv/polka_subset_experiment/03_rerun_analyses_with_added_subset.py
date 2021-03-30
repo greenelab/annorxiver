@@ -132,7 +132,7 @@ published_count_df = (
     pd.DataFrame.from_records(
         [
             {
-                "lemma": token[0],
+                "token": token[0],
                 "pos_tag": token[1],
                 "dep_tag": token[2],
                 "count": published_count[token],
@@ -140,8 +140,8 @@ published_count_df = (
             for token in published_count
         ]
     )
-    .query(f"lemma not in {stop_word_list}")
-    .groupby("lemma")
+    .query(f"token not in {stop_word_list}")
+    .groupby("token")
     .agg({"count": "sum"})
     .reset_index()
     .sort_values("count", ascending=False)
@@ -176,7 +176,7 @@ plot_df.head()
 
 g = (
     p9.ggplot(
-        plot_df, p9.aes(y="lemma", x="lower_odds", xend="upper_odds", yend="lemma")
+        plot_df, p9.aes(y="token", x="lower_odds", xend="upper_odds", yend="lemma")
     )
     + p9.geom_segment(color="#253494", size=3.5, alpha=0.7)
     + p9.scale_y_discrete(
@@ -240,6 +240,8 @@ pca_components.head()
 
 # ## PCA Components
 
+# This section aims to see which principal components have a high association with Polka et al's subset. Furthermore, we also aim to see if we can use linear models to explain which PCs affect preprint prediction.
+
 document_pca_sim = 1 - cdist(
     polka_preprints_df.drop("document", axis=1).values, pca_components.values, "cosine"
 )
@@ -288,7 +290,7 @@ biorxiv_pca_sim_df.head()
 
 # ### Logistic Regression
 
-# Goal here is to determine if we can figure out which PCs bisect the bioRxiv subset against Polka et al.'s subset. Given that their dataset is only 60 papers we downsampled our dataset to contain only 60 papers.
+# Goal here is to determine if we can figure out which PCs separate the bioRxiv subset from Polka et al.'s subset. Given that their dataset is only 60 papers we downsampled our dataset to contain only 60 papers.
 
 dataset_df = biorxiv_pca_sim_df.sample(60, random_state=100).append(polka_pca_sim_df)
 dataset_df.head()
@@ -334,6 +336,8 @@ print(g)
 
 # ### Decision Tree
 
+# Given that Logistic regression doesn't return sparse weights, we may get better insight into this analysis by using a decision tree to determine which PCs are important in prediction.
+
 model = DecisionTreeClassifier(random_state=100)
 search_grid = GridSearchCV(
     model, {"criterion": ["gini", "entropy"], "max_features": ["auto", None]}, cv=10
@@ -356,6 +360,8 @@ export_graphviz(
 Image(filename="output/figures/pca_tree.png")
 
 # ## Saucie Subset
+
+# Where do the preprints in this subset lie along the SAUCIE map?
 
 saucie_model = SAUCIE(
     300,
@@ -383,13 +389,6 @@ pmc_data_df.head()
 # bin_num <- 50
 # g <- (
 #      ggplot(pmc_data_df, aes(x=dim1, y=dim2))
-# + geom_bin2d(bins=bin_num, binwidth=0.85)
-
-# + theme(legend.position="left")
-
-# + geom_point(data=subset_df, aes(x=dim1, y=dim2, colour = "red"))
-# )
-# print(g)
 # -
 # ## Publication Time Analysis
 

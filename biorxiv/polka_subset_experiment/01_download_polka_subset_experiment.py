@@ -15,6 +15,9 @@
 
 # # Grab the bioRxiv subset from Polka et al 2021
 
+# This notebook is designed to download preprints that have been manually annotated by [Polka et al](https://www.biorxiv.org/content/10.1101/2021.02.20.432090v1).
+# Once these preprints have been downloaded they will be processed by my constructed pipeline.
+
 # +
 from pathlib import Path
 import tarfile
@@ -134,20 +137,26 @@ if not any(Path("output/pmcoa_xml_files").iterdir()):
         open_stream = tarfile.open(fileobj=requested_file_stream, mode="r:gz")
 
         while True:
-            pmc_paper = open_stream.next()
+            try:
+                pmc_paper = open_stream.next()
 
-            if pmc_paper is None:
+                if pmc_paper is None:
+                    break
+
+                if pmc_paper.isdir():
+                    continue
+
+                paper_pathlib = Path("output/pmcoa_xml_files") / Path(pmc_paper.name)
+                if paper_pathlib.stem in pmcid_list:
+
+                    new_paper = open_stream.extractfile(pmc_paper)
+                    paper_pathlib.parent.mkdir(exist_ok=True)
+
+                    with open(f"{str(paper_pathlib)}", "wb") as outfile:
+                        outfile.write(new_paper.read())
+            except tarfile.ReadError:
+                print(f"There is an error in {requested_file_stream}.")
                 break
 
-            if pmc_paper.isdir():
-                continue
-
-            paper_pathlib = Path("output/pmcoa_xml_files") / Path(pmc_paper.name)
-            if paper_pathlib.stem in pmcid_list:
-
-                new_paper = open_stream.extractfile(pmc_paper)
-                paper_pathlib.parent.mkdir(exist_ok=True)
-
-                with open(f"{str(paper_pathlib)}", "wb") as outfile:
-                    outfile.write(new_paper.read())
+        open_stream.close()
 

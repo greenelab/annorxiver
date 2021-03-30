@@ -15,6 +15,8 @@
 
 # # Get Token Counts and Word Vectors
 
+# This notebook is designed to calculate token frequencies for each token within processed preprints. Plus, this notebook generates document vector representations for preprints to be analyzed downstream of the pipeline.
+
 # +
 import csv
 from pathlib import Path
