@@ -50,15 +50,10 @@ sys.path.append(str(Path("../../../preprint_similarity_search/server").resolve()
 from SAUCIE import SAUCIE, Loader  # noqa: E402
 
 mpl.rcParams["figure.dpi"] = 250
-
-# +
-# Set up porting from python to R
-# and R to python :mindblown:
-
-import rpy2.rinterface  # noqa: E402
-
-# %load_ext rpy2.ipython
 # -
+
+import rpy2.robjects as robjects  # noqa: E402
+from rpy2.robjects import pandas2ri  # noqa: E402
 
 # # Corpora Comparison Preprint-Published Update
 
@@ -132,7 +127,7 @@ published_count_df = (
     pd.DataFrame.from_records(
         [
             {
-                "token": token[0],
+                "lemma": token[0],
                 "pos_tag": token[1],
                 "dep_tag": token[2],
                 "count": published_count[token],
@@ -140,8 +135,8 @@ published_count_df = (
             for token in published_count
         ]
     )
-    .query(f"token not in {stop_word_list}")
-    .groupby("token")
+    .query(f"lemma not in {stop_word_list}")
+    .groupby("lemma")
     .agg({"count": "sum"})
     .reset_index()
     .sort_values("count", ascending=False)
@@ -152,7 +147,7 @@ published_count_df.head()
 
 # ## Get Token Stats
 
-preprint_vs_published = get_term_statistics(preprint_count_df, published_count_df, 100)
+preprint_vs_published = get_term_statistics(published_count_df, preprint_count_df, 100)
 preprint_vs_published.to_csv(
     "output/updated_preprint_to_published_comparison.tsv", sep="\t", index=False
 )
@@ -162,10 +157,10 @@ full_plot_df = calculate_confidence_intervals(preprint_vs_published)
 full_plot_df.head()
 
 plot_df = (
-    full_plot_df.sort_values("odds_ratio", ascending=True)
+    full_plot_df.sort_values("odds_ratio", ascending=False)
     .iloc[3:]
     .head(20)
-    .append(full_plot_df.sort_values("odds_ratio", ascending=False).head(20))
+    .append(full_plot_df.sort_values("odds_ratio", ascending=True).head(20))
     .assign(
         odds_ratio=lambda x: x.odds_ratio.apply(lambda x: np.log2(x)),
         lower_odds=lambda x: x.lower_odds.apply(lambda x: np.log2(x)),
@@ -176,7 +171,7 @@ plot_df.head()
 
 g = (
     p9.ggplot(
-        plot_df, p9.aes(y="token", x="lower_odds", xend="upper_odds", yend="lemma")
+        plot_df, p9.aes(y="lemma", x="lower_odds", xend="upper_odds", yend="lemma")
     )
     + p9.geom_segment(color="#253494", size=3.5, alpha=0.7)
     + p9.scale_y_discrete(
@@ -382,18 +377,13 @@ pmc_data_df = pd.read_csv(
 )
 pmc_data_df.head()
 
-# + magic_args="-i pmc_data_df -i subset_df" language="R"
-#
-# library(ggplot2)
-#
-# bin_num <- 50
-# g <- (
-#      ggplot(pmc_data_df, aes(x=dim1, y=dim2))
-# -
+pandas2ri.activate()
+robjects.globalenv["pmc_data_df"] = robjects.conversion.py2rpy(pmc_data_df)
+robjects.globalenv["subset_df"] = robjects.conversion.py2rpy(subset_df)
+robjects.r.source("saucie_plot.R")
+Image(filename="output/figures/saucie_plot.png")
 # ## Publication Time Analysis
-
 # ### Get publication dates
-
 url = "https://api.biorxiv.org/pub/2019-11-01/3000-01-01/"
 
 # +
