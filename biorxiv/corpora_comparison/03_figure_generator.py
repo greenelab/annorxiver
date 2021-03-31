@@ -116,7 +116,7 @@ g = (
     p9.ggplot(
         plot_df, p9.aes(y="lemma", x="lower_odds", xend="upper_odds", yend="lemma")
     )
-    + p9.geom_segment(color="#253494", size=1, alpha=0.7)
+    + p9.geom_segment(color="#253494", size=3.5, alpha=0.7)
     + p9.scale_y_discrete(
         limits=(plot_df.sort_values("odds_ratio", ascending=True).lemma.tolist())
     )
@@ -218,7 +218,7 @@ g = (
     p9.ggplot(
         plot_df, p9.aes(y="lemma", x="lower_odds", xend="upper_odds", yend="lemma")
     )
-    + p9.geom_segment(color="#253494", size=1, alpha=0.7)
+    + p9.geom_segment(color="#253494", size=3.5, alpha=0.7)
     + p9.scale_y_discrete(
         limits=(plot_df.sort_values("odds_ratio", ascending=True).lemma.tolist())
     )
@@ -317,7 +317,7 @@ g = (
     p9.ggplot(
         plot_df, p9.aes(y="lemma", x="lower_odds", xend="upper_odds", yend="lemma")
     )
-    + p9.geom_segment(color="#253494", size=1, alpha=0.7)
+    + p9.geom_segment(color="#253494", size=3.5, alpha=0.7)
     + p9.scale_y_discrete(
         limits=(plot_df.sort_values("odds_ratio", ascending=True).lemma.tolist())
     )
@@ -409,7 +409,7 @@ g = (
     p9.ggplot(
         plot_df, p9.aes(y="lemma", x="lower_odds", xend="upper_odds", yend="lemma")
     )
-    + p9.geom_segment(color="#253494", size=1, alpha=0.7)
+    + p9.geom_segment(color="#253494", size=3.5, alpha=0.7)
     + p9.scale_y_discrete(
         limits=(plot_df.sort_values("odds_ratio", ascending=True).lemma.tolist())
     )

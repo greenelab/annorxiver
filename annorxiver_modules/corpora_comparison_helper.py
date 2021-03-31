@@ -284,7 +284,7 @@ def get_word_stats(
 
         sentence_length[document] = [len(sent) for sent in doc.sents]
 
-        with open(f"{output_folder}/{document}.tsv", "w") as file:
+        with open(f"{output_folder}/{document.stem}.tsv", "w") as file:
             writer = csv.DictWriter(
                 file,
                 fieldnames=["lemma", "pos_tag", "dep_tag", "count"],
