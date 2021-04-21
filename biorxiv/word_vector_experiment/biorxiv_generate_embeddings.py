@@ -119,7 +119,7 @@ for word_model_path in Path().rglob("output/word2vec_models/*/*.model"):
     )
 
     biorxiv_vec_df.to_csv(
-        f"output/word2vec_output/biorxiv_all_articles_{model_dim}_fixed.tsv.xz",
+        f"output/word2vec_output/biorxiv_all_articles_{model_dim}.tsv.xz",
         sep="\t",
         index=False,
         compression="xz",
