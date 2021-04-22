@@ -141,6 +141,8 @@ def generate_doc_vector_parallel(
 ):
     """
     This method is designed to construct document vectors for a given xml document.
+    Assumes the document queue will have a None value at the end of the queue so each process can
+    terminate correctly.
     Every document has specific tags that are striped in order to have accurate embeddings
         e.g. we want to remove tags such as xref -> (<xref rid="fig4" ref-type="fig">Fig. 4</xref>)
 
