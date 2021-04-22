@@ -142,6 +142,7 @@ def generate_doc_vector_parallel(
     """
     This method is designed to construct document vectors for a given xml document.
     Every document has specific tags that are striped in order to have accurate embeddings
+        e.g. we want to remove tags such as xref -> (<xref rid="fig4" ref-type="fig">Fig. 4</xref>)
 
     Keyword arguments:
         model - the model to extract word vectors from
@@ -195,6 +196,17 @@ def generate_doc_vector_parallel(
 
 
 def write_document_vector_parallel(vector_queue, file_path_name, dim, n_jobs):
+    """
+    This method is designed to write document vectors from a given xml document to a tsv file.
+    This is the output part of the parallel processing workframe to parse PubMed articles at a faster rate.
+
+    Keyword arguments:
+        vector_queue - the queue that contains an entry for the tsv file
+        file_path_name - the name of the file that will contain all document vectors
+        dim - the number of dimension for each document vector
+        n_jobs - the number of working jobs that convert xml docs to vectors
+    """
+
     if "xz" in file_path_name:
         outfile = lzma.open(file_path_name, "wt")
     else:
