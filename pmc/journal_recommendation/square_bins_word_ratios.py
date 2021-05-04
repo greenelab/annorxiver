@@ -1,234 +1,165 @@
-#!/usr/bin/env python
-# coding: utf-8
+# ---
+# jupyter:
+#   jupytext:
+#     formats: ipynb,py
+#     text_representation:
+#       extension: .py
+#       format_name: light
+#       format_version: '1.5'
+#       jupytext_version: 1.9.1+dev
+#   kernelspec:
+#     display_name: Python [conda env:annorxiver]
+#     language: python
+#     name: conda-env-annorxiver-py
+# ---
 
 # # Calculate Odds Ratios for each Square Bin
 
-# In[1]:
+# +
+# %load_ext autoreload
+# %autoreload 2
 
-
-get_ipython().run_line_magic('load_ext', 'autoreload')
-get_ipython().run_line_magic('autoreload', '2')
-
-from collections import Counter
 import csv
+from collections import Counter, defaultdict
 import json
+import lzma
+from multiprocessing import Process, Manager
 from pathlib import Path
 import pickle
 import re
+import sys
+from threading import Thread
 
 import numpy as np
 import pandas as pd
-import spacy
 from tqdm import tqdm_notebook
 
 from annorxiver_modules.corpora_comparison_helper import (
     aggregate_word_counts,
-    get_term_statistics
+    get_term_statistics,
 )
 
+from annorxiver_modules.word_bin_helper import lemmatize_tokens, write_lemma_counts
+# -
 
 # # Gather Paper Bins Dataframe
 
-# In[2]:
-
-
-pmc_df = pd.read_csv(
-    "output/paper_dataset/paper_dataset_tsne_square.tsv",
-    sep="\t"
-)
+pmc_df = pd.read_csv("output/paper_dataset/paper_dataset_tsne_square.tsv", sep="\t")
+print(pmc_df.shape)
 pmc_df.head()
-
-
-# In[3]:
-
 
 word_count_folder = Path("../pmc_corpus/pmc_word_counts/")
 
+word_counter_file = "output/app_plots/global_doc_word_counter.tsv.xz"
+field_names = ["document", "lemma", "count"]
+n_jobs = 3
+QUEUE_SIZE = 75000  # Queue Size if too big then will need to make smaller
+doc_xpath = "//abstract/sec/*|//abstract/p|//body/sec/*|//body/p"
 
-# In[4]:
+with Manager() as m:
 
+    # Set up the Queue
+    doc_path_queue = m.JoinableQueue(QUEUE_SIZE)
+    lemma_queue = m.JoinableQueue(QUEUE_SIZE)
 
-bin_group = pmc_df.groupby("squarebin_id")
-
-
-# In[5]:
-
-
-spacy_nlp = spacy.load('en_core_web_sm')
-stop_word_list = list(spacy_nlp.Defaults.stop_words)
-
-
-# In[6]:
-
-
-word_counter_path = "output/app_plots/global_word_counter.pkl"
-if Path(word_counter_path).exists():
-    global_word_counter = pickle.load(
-        open(word_counter_path, "rb")
+    # Start the document object feeder
+    t = Thread(
+        target=write_lemma_counts,
+        args=(word_counter_file, field_names, lemma_queue, n_jobs),
     )
-    
-else:
-    global_word_counter = Counter()
-    for name, group in tqdm_notebook(bin_group):
-        files = [
-            f"{word_count_folder.resolve()}/{doc}.tsv"
-            for doc in group.document.tolist()
-        ]
+    t.start()
 
-        agg_word_count = aggregate_word_counts(files, disable_progressbar=True)
+    running_jobs = []
+    # Start the jobs
+    for job in range(n_jobs):
+        p = Process(
+            target=lemmatize_tokens, args=(doc_xpath, doc_path_queue, lemma_queue)
+        )
+        running_jobs.append(p)
+        p.start()
 
-        filtered_agg_word_count = {
-           term[0]:agg_word_count[term] 
-            for term in agg_word_count 
-            if term[1] != 'SPACE' and term[0] not in stop_word_list
-        }
+    for idx, row in tqdm_notebook(pmc_df.iterrows()):
+        doc_path = f"../journals/{row['journal']}/{row['document']}.nxml"
+        doc_path_queue.put(doc_path)
 
-        global_word_counter.update(Counter(filtered_agg_word_count))
+    # Poison pill to end running jobs
+    for job in running_jobs:
+        doc_path_queue.put(None)
 
-    pickle.dump(
-        global_word_counter, 
-        open(word_counter_path, "wb")
-    )
+    # Wait for jobs to finish
+    for job in running_jobs:
+        job.join()
 
+    # Wait until thread is done running
+    t.join()
 
-# In[7]:
+with lzma.open(word_counter_file, "rt") as infile:
+    reader = csv.DictReader(infile, delimiter="\t")
 
-
-for bin_id, group in tqdm_notebook(bin_group):
-    files = [
-        f"{word_count_folder.resolve()}/{doc}.tsv"
-        for doc in group.document.tolist()
-    ]
-    
-    agg_word_count = aggregate_word_counts(files, disable_progressbar=True)
-    
-    filtered_agg_word_count = {
-       term[0]:agg_word_count[term] 
-        for term in agg_word_count 
-        if global_word_counter[term[0]] > 1000 and
-        term[0] not in stop_word_list and 
-        term[1] != 'SPACE'
+    background_bin_dictionaries = defaultdict(Counter)
+    word_bin_dictionaries = {
+        squarebin_id: defaultdict(Counter)
+        for squarebin_id in pmc_df.squarebin_id.unique()
     }
-    
-    bin_counter = Counter(filtered_agg_word_count)
-    remaining_words = (
-        Counter({
-            term:global_word_counter[term] 
-            for term in filtered_agg_word_count
-        })  - bin_counter
-    )
 
-    bin_df = (
-        pd.DataFrame.from_dict(
-            dict(bin_counter),
-            orient="index",
-            columns=["count"]
-        )
-        .rename_axis("lemma")
-        .reset_index()
-    )
-    
-    background_df = (
-        pd.DataFrame.from_dict(
-            {
-                key:remaining_words[key]
-                for key in bin_counter
-                if key in remaining_words
-            },
-            orient="index",
-            columns=["count"]
-        )
-        .rename_axis("lemma")
-        .reset_index()
-    )
-    
-    # Calculate the odds ratio
-    word_odds_df = get_term_statistics(
-        bin_df,
-        background_df,
-        100, 
-        psudeocount=1,
-        disable_progressbar=True
-    )
-    
-    file_name = (
-        '000'+str(bin_id) if bin_id < 10 else 
-        '00'+str(bin_id) if bin_id < 100 else 
-        '0'+str(bin_id) if bin_id < 1000 else 
-        str(bin_id)
-    )
-    
-    (
-        word_odds_df
-        .sort_values("odds_ratio", ascending=False)
-        .to_csv(
-            f"output/word_odds/word_odds_bin_{file_name}.tsv", 
-            sep="\t", index=False
-        )
-    )
+    document_mapper = dict(zip(pmc_df.document.tolist(), pmc_df.squarebin_id.tolist()))
 
+    for line in tqdm_notebook(reader):
+        squarebin_id = document_mapper[line["document"]]
+        background_bin_dictionaries.update({line["lemma"]: int(line["count"])})
+        word_bin_dictionaries[squarebin_id].update({line["lemma"]: int(line["count"])})
+
+# +
+cutoff_score = 20
+background_sum = sum(background_bin_dictionaries.values())
+bin_ratios = {}
+
+for squarebin in tqdm_notebook(word_bin_dictionaries):
+
+    bin_dict = word_bin_dictionaries[squarebin]
+    bin_sum = sum(word_bin_dictionaries[squarebin].values())
+
+    # Try and filter out low count tokens to speed function up
+    filtered_bin_dict = {
+        lemma: bin_dict[lemma] for lemma in bin_dict if bin_dict[lemma] > cutoff_score
+    }
+
+    if len(filtered_bin_dict) > 0:
+        bin_dict = filtered_bin_dict
+
+    # Calculate odds ratio
+    bin_words = set(bin_dict.keys())
+    background_words = set(background_bin_dictionaries.keys())
+    words_to_compute = bin_words & background_words
+
+    word_odd_ratio_records = []
+    for idx, word in enumerate(words_to_compute):
+        top = float(bin_dict[word] * background_sum)
+        bottom = float(background_bin_dictionaries[word] * bin_sum)
+        word_odd_ratio_records.append(
+            {"lemma": word, "odds_ratio": np.log(top / bottom)}
+        )
+
+    sorted(word_odd_ratio_records, key=lambda x: x["odds_ratio"], reverse=True)
+    bin_ratios[squarebin] = word_odd_ratio_records[0:20]
+# -
 
 # # Insert Bin Word Associations in JSON File
 
-# In[8]:
-
-
 square_bin_plot_df = pd.read_json(
-    open(
-        Path("output")/
-        Path("app_plots")/
-        Path("pmc_square_plot.json")
-    )
+    open(Path("output") / Path("app_plots") / Path("pmc_square_plot.json"))
 )
 square_bin_plot_df.head()
 
-
-# In[9]:
-
-
-lemma_bin_records = []
-for bin_id in tqdm_notebook(square_bin_plot_df.bin_id.tolist()):
-    
-    file_name = (
-        '000'+str(bin_id) if bin_id < 10 else 
-        '00'+str(bin_id) if bin_id < 100 else 
-        '0'+str(bin_id) if bin_id < 1000 else 
-        str(bin_id)
-    )
-    
-    bin_assoc_df = pd.read_csv(
-        f"output/word_odds/word_odds_bin_{file_name}.tsv",
-        sep="\t"
-    )
-    
-    high_odds_words = (
-        bin_assoc_df
-        .sort_values("odds_ratio", ascending=False)
-        .head(20)
-        [["lemma", "odds_ratio"]]
-    )
-      
-    lemma_bin_records.append([
-        {
-            "lemma": pair[0],
-            "odds_ratio": pair[1]
-        }
-        for pair in zip(high_odds_words.lemma, high_odds_words.odds_ratio)
-    ])
-
-
-# In[10]:
-
+bin_odds_df = pd.DataFrame.from_records(
+    [{"bin_id": key, "bin_odds": bin_ratios[key]} for key in bin_ratios]
+)
+bin_odds_df.head()
 
 (
-    square_bin_plot_df
-    .assign(bin_odds=lemma_bin_records)
-    .to_json(
-        Path("output")/
-        Path("app_plots")/
-        Path("pmc_square_plot.json"),
-        orient = 'records',
-        lines = False
+    square_bin_plot_df.merge(bin_odds_df, on=["bin_id"]).to_json(
+        Path("output") / Path("app_plots") / Path("pmc_square_plot.json"),
+        orient="records",
+        lines=False,
     )
 )
-
