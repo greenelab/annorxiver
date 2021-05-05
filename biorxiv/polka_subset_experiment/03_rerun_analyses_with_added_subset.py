@@ -20,6 +20,7 @@ from datetime import timedelta, date
 from pathlib import Path
 import sys
 
+from cairosvg import svg2png
 from IPython.display import Image
 import matplotlib.pyplot as plt
 import matplotlib as mpl
@@ -34,7 +35,7 @@ from scipy.spatial.distance import cdist
 from scipy.stats import linregress
 import seaborn as sns
 from sklearn.model_selection import GridSearchCV
-from sklearn.linear_model import LogisticRegressionCV
+from sklearn.linear_model import LogisticRegressionCV, LogisticRegression
 from sklearn.preprocessing import StandardScaler
 from sklearn.tree import DecisionTreeClassifier, export_graphviz
 import spacy
@@ -43,7 +44,10 @@ import tqdm
 from annorxiver_modules.corpora_comparison_helper import (
     aggregate_word_counts,
     calculate_confidence_intervals,
+    create_lemma_count_df,
     get_term_statistics,
+    plot_bargraph,
+    plot_point_bar_figure,
 )
 
 sys.path.append(str(Path("../../../preprint_similarity_search/server").resolve()))
@@ -158,7 +162,7 @@ full_plot_df.head()
 
 plot_df = (
     full_plot_df.sort_values("odds_ratio", ascending=False)
-    .iloc[3:]
+    .iloc[4:]
     .head(20)
     .append(full_plot_df.sort_values("odds_ratio", ascending=True).head(20))
     .assign(
@@ -213,6 +217,31 @@ g = (
 g.save("output/figures/preprint_published_frequency_odds.svg")
 g.save("output/figures/preprint_published_frequency_odds.png", dpi=250)
 print(g)
+
+count_plot_df = create_lemma_count_df(plot_df, "published", "preprint").assign(
+    repository=lambda x: pd.Categorical(
+        x.repository.tolist(), categories=["preprint", "published"]
+    )
+)
+count_plot_df.head()
+
+g = plot_bargraph(count_plot_df, plot_df)
+g.save("output/figures/preprint_published_frequency_bar.svg")
+print(g)
+
+# +
+fig_output_path = "output/figures/polka_preprint_published_frequency.png"
+
+fig = plot_point_bar_figure(
+    "output/figures/preprint_published_frequency_odds.svg",
+    "output/figures/preprint_published_frequency_bar.svg",
+)
+
+# save generated SVG files
+svg2png(bytestring=fig.to_str(), write_to=fig_output_path, dpi=75)
+
+Image(fig_output_path)
+# -
 
 # # Document Embeddings
 
@@ -278,7 +307,6 @@ biorxiv_pca_sim_df = (
     .rename(index=str, columns={"index": "document"})
     .assign(label="biorxiv")
 )
-# biorxiv_pca_sim_df.to_csv("output/polka_pca_enrichment.tsv", sep="\t")
 biorxiv_pca_sim_df.head()
 
 # ## PC Regression
@@ -328,6 +356,70 @@ g = (
 g.save("output/figures/pca_log_regression_weights.svg")
 g.save("output/figures/pca_log_regression_weights.png", dpi=250)
 print(g)
+
+fold_features = model.coefs_paths_["polka"].transpose(1, 0, 2)
+model_performance_df = pd.DataFrame.from_dict(
+    {
+        "feat_num": ((fold_features.astype(bool).sum(axis=1)) > 0).sum(axis=1),
+        "C": model.Cs_,
+        "score": model.scores_["polka"].mean(axis=0),
+    }
+)
+model_performance_df.head()
+
+# +
+fig, ax1 = plt.subplots()
+ax1.set_xscale("log")
+ax2 = plt.twinx()
+
+ax1.plot(
+    model_performance_df.C.tolist(),
+    model_performance_df.feat_num.tolist(),
+    label="Features",
+    marker=".",
+)
+ax1.set_ylabel("# of Features")
+ax1.set_xlabel("Inverse Regularization (C)")
+ax1.legend(loc=0)
+
+ax2.plot(
+    model_performance_df.C.tolist(),
+    model_performance_df.score.tolist(),
+    label="Score",
+    marker=".",
+    color="green",
+)
+ax2.set_ylabel("Score (Accuracy %)")
+ax2.legend(loc=4)
+plt.savefig("output/preprint_classifier_results.png")
+# -
+
+plot_path = list(
+    zip(
+        model.Cs_,
+        model.scores_["polka"].transpose(),
+        model.coefs_paths_["polka"].transpose(1, 0, 2),
+    )
+)
+
+data_records = []
+for cs in plot_path[33:40]:
+    model = LogisticRegression(C=cs[0], max_iter=1000, penalty="l1", solver="liblinear")
+    model.fit(
+        StandardScaler().fit_transform(dataset_df[[f"pc{idx+1}" for idx in range(50)]]),
+        dataset_df["label"],
+    )
+    data_records.append(
+        {
+            "C": cs[0],
+            "PCs": ",".join(map(str, model.coef_.nonzero()[1] + 1)),
+            "feat_num": len(model.coef_.nonzero()[1]),
+            "accuracy": cs[1].mean(),
+        }
+    )
+
+model_coefs_df = pd.DataFrame.from_records(data_records)
+model_coefs_df
 
 # ### Decision Tree
 
@@ -382,10 +474,9 @@ robjects.globalenv["pmc_data_df"] = robjects.conversion.py2rpy(pmc_data_df)
 robjects.globalenv["subset_df"] = robjects.conversion.py2rpy(subset_df)
 robjects.r.source("saucie_plot.R")
 Image(filename="output/figures/saucie_plot.png")
-# ## Publication Time Analysis
-# ### Get publication dates
+# Publication Time Analysis
+# Get publication dates
 url = "https://api.biorxiv.org/pub/2019-11-01/3000-01-01/"
-
 # +
 # Get preprint publication dates for 2019 -> 2020
 already_downloaded = Path("output/biorxiv_published_dates_post_2019.tsv").exists()
@@ -460,7 +551,8 @@ polka_published_preprint_df.head()
 # ### Document version count plot
 
 biorxiv_published_distances = pd.read_csv(
-    "../publication_delay_experiment/output/preprint_published_distances.tsv", sep="\t"
+    "../publication_delay_experiment/output/preprint_published_distances_rerun.tsv",
+    sep="\t",
 )
 biorxiv_published_distances["time_to_published"] = pd.to_timedelta(
     biorxiv_published_distances["time_to_published"]
@@ -468,6 +560,7 @@ biorxiv_published_distances["time_to_published"] = pd.to_timedelta(
 biorxiv_published_distances["days_to_published"] = biorxiv_published_distances[
     "time_to_published"
 ].dt.days
+biorxiv_published_distances = biorxiv_published_distances.query("days_to_published > 0")
 biorxiv_published_distances.head()
 
 # +
@@ -492,6 +585,28 @@ x_line = np.array(
 )
 y_line = x_line * results_2.slope + results_2.intercept
 
+# +
+# Get smoothed linear regression line
+polka_x = polka_published_preprint_df.version_count.values.tolist()
+
+polka_y = polka_published_preprint_df.time_to_published.apply(
+    lambda x: x / timedelta(days=1)
+).tolist()
+
+xseq_2 = np.linspace(np.min(x), np.max(x), 80)
+
+results_3 = linregress(polka_x, polka_y)
+print(results_3)
+# -
+
+polka_x_line = np.array(
+    [
+        polka_published_preprint_df["version_count"].min(),
+        polka_published_preprint_df["version_count"].max(),
+    ]
+)
+polka_y_line = polka_x_line * results_3.slope + results_3.intercept
+
 # Graph here?
 plt.figure(figsize=(8, 5))
 g = sns.violinplot(
@@ -505,13 +620,17 @@ g = sns.violinplot(
 _ = g.set_ylabel("Time Elapsed Until Preprint is Published (Days)")
 _ = g.set_xlabel("# of Preprint Versions")
 _ = g.plot(x_line - 1, y_line, "--k")
+_ = g.plot(polka_x_line - 1, polka_y_line, "--k", color="red")
 _ = g.scatter(
     polka_published_preprint_df["version_count"] - 1,
     polka_published_preprint_df["days_to_published"],
     c="red",
     s=12,
 )
-_ = g.annotate(f"Y={results_2.slope:.2f}*X+{results_2.intercept:.2f}", (7, 1470))
+_ = g.annotate(f"Y={results_2.slope:.2f}*X+{results_2.intercept:.2f}", (7, 1540))
+_ = g.annotate(
+    f"Y={results_3.slope:.2f}*X+{results_3.intercept:.2f}", (7, 1470), color="red"
+)
 _ = g.set_xlim(-0.5, 11.5)
 _ = g.set_ylim(0, g.get_ylim()[1])
 plt.savefig("output/figures/version_count_vs_publication_time_violin.svg", dpi=500)
@@ -560,6 +679,24 @@ x_line = np.array(
 )
 y_line = x_line * results_2.slope + results_2.intercept
 
+# +
+polka_x = (polka_published_preprint_df["doc_distances"].values.tolist(),)
+polka_y = polka_published_preprint_df.time_to_published.apply(
+    lambda x: x / timedelta(days=1)
+).tolist()
+
+results_3 = linregress(polka_x, polka_y)
+print(results_3)
+# -
+
+polka_x_line = np.array(
+    [
+        polka_published_preprint_df["doc_distances"].min(),
+        polka_published_preprint_df["doc_distances"].max(),
+    ]
+)
+polka_y_line = polka_x_line * results_3.slope + results_3.intercept
+
 # graph here?
 plt.figure(figsize=(6, 5))
 ax = plt.hexbin(
@@ -572,11 +709,17 @@ ax = plt.hexbin(
     linewidths=(0.15,)
     #     edgecolors=None
 )
+plt.xlim([0, 12])
+plt.ylim([0, 1800])
 ax = plt.gca()
 ax.plot(x_line, y_line, "--k")
+ax.plot(polka_x_line, polka_y_line, "--k", color="red")
 ax.annotate(
     f"Y={results_2.slope:.2f}*X+{results_2.intercept:.2f}",
-    (8, 1490),
+    (5.5, 1530),
+)
+_ = ax.annotate(
+    f"Y={results_3.slope:.2f}*X+{results_3.intercept:.2f}", (5.5, 1450), color="red"
 )
 _ = ax.set_xlabel("Euclidian Distance of Preprint-Published Versions")
 _ = ax.set_ylabel("Time Elapsed Until Preprint is Published (Days)")
