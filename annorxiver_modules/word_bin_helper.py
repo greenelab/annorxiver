@@ -39,7 +39,7 @@ def write_lemma_counts(file_name, field_names, lemma_queue, n_jobs=3):
     tab delimited file
 
     Parameters:
-        file_name - name of the file to write to
+        file_name - name of the file to write to (only compression that is supported is xz but more can be added later)
         field_names - the header for the tabbed file
         lemma_queue - the queue that contains the lemmaa counts
         n_jobs - the number of processes running for this section

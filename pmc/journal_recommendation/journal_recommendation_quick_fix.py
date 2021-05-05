@@ -15,7 +15,7 @@
 
 # # Re-Run KNearestNeighbors for Journal Recommendation
 
-# This notebook is designed to predict journals based on an updated version of document vector generation. Before I was doing a simple token analysis using spaces, but now I incorporated Spacy with lemma generation. To simplify running the recommendation notebook all over again, I'm just using the 300 dimensions to train a KNN-model and to compare its performance against a random baseline.
+# This notebook is designed to predict journals based on an updated version of document vector generation. Before I was doing a simple token analysis via breaking each sentence based on whitespace (e.g. ' '), but now I incorporated Spacy with lemma generation. To simplify running the recommendation notebook all over again, I'm just using the 300 dimensions to train a KNN-model and to compare its performance against a random baseline.
 
 # +
 from pathlib import Path
