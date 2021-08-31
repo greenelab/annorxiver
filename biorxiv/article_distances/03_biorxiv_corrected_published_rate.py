@@ -185,9 +185,9 @@ snapshot_wo_links_df = (
     .groupby("pub_month")
     .agg(
         {
-            "published": lambda x: (x is True).sum(),
+            "published": lambda x: x.sum(),
             "pub_month": "count",
-            "published_closed": lambda x: (x is True).sum(),
+            "published_closed": lambda x: x.sum(),
         }
     )
     .rename(index=str, columns={"pub_month": "posted"})
@@ -199,7 +199,7 @@ snapshot_wo_links_df.head()
 snapshot_w_links_df = (
     final_mapped_df.replace({"2013-10": "2013-11"})
     .groupby("pub_month")
-    .agg({"published": lambda x: (x is True).sum(), "pub_month": "count"})
+    .agg({"published": lambda x: x.sum(), "pub_month": "count"})
     .rename(index=str, columns={"pub_month": "posted"})
     .reset_index()
     .assign(rate=lambda x: x.published / x.posted, label="2020 Snapshot+Missing Links")
@@ -225,11 +225,17 @@ publish_rate_df["pub_month"] = pd.Categorical(
     publish_rate_df.pub_month.values.tolist(), ordered=True
 )
 
-posted = publish_rate_df.query("label=='2020 Snapshot+Missing Links'").posted.sum()
+posted = (
+    publish_rate_df.query("label=='2020 Snapshot+Missing Links'")
+    .query("pub_month < '2019-01'")
+    .posted.sum()
+)
 
-published = publish_rate_df.query(
-    "label=='2020 Snapshot+Missing Links'"
-).published.sum()
+published = (
+    publish_rate_df.query("label=='2020 Snapshot+Missing Links'")
+    .query("pub_month < '2019-01'")
+    .published.sum()
+)
 print(f"Published: {published}")
 print(f"Posted: {posted}")
 print(f"Overall proportion published: {published/posted:.4f}")
@@ -289,6 +295,6 @@ g = (
     )
     + p9.labs(y="Proportion Published", x="Month")
 )
-g.save("output/figures/publication_rate_rerun.svg")
-g.save("output/figures/publication_rate_rerun.png", dpi=250)
+# g.save("output/figures/publication_rate_rerun.svg")
+# g.save("output/figures/publication_rate_rerun.png", dpi=250)
 print(g)
