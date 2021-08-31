@@ -226,6 +226,7 @@ g = (
     p9.ggplot(plot_df)
     + p9.aes(x="full_text_distance_log10", y="abstract_only_distance_log10")
     + p9.geom_point(fill="#a6cee3")
+    + p9.xlim([-1, 6])
     + p9.labs(x="Full Text Distance (-log 10)", y="Abstract Only Distance (-log 10)")
     + p9.theme_seaborn(context="paper", style="ticks", font="Arial", font_scale=1.35)
 )
