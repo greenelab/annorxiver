@@ -225,17 +225,11 @@ publish_rate_df["pub_month"] = pd.Categorical(
     publish_rate_df.pub_month.values.tolist(), ordered=True
 )
 
-posted = (
-    publish_rate_df.query("label=='2020 Snapshot+Missing Links'")
-    .query("pub_month < '2019-01'")
-    .posted.sum()
-)
+posted = publish_rate_df.query("label=='2020 Snapshot+Missing Links'").posted.sum()
 
-published = (
-    publish_rate_df.query("label=='2020 Snapshot+Missing Links'")
-    .query("pub_month < '2019-01'")
-    .published.sum()
-)
+published = publish_rate_df.query(
+    "label=='2020 Snapshot+Missing Links'"
+).published.sum()
 print(f"Published: {published}")
 print(f"Posted: {posted}")
 print(f"Overall proportion published: {published/posted:.4f}")
@@ -295,6 +289,85 @@ g = (
     )
     + p9.labs(y="Proportion Published", x="Month")
 )
-# g.save("output/figures/publication_rate_rerun.svg")
-# g.save("output/figures/publication_rate_rerun.png", dpi=250)
+g.save("output/figures/publication_rate_rerun.svg")
+g.save("output/figures/publication_rate_rerun.png", dpi=250)
+print(g)
+
+# # Plot Publication Rate
+
+# +
+publish_rate_df["pub_month"] = pd.Categorical(
+    publish_rate_df.pub_month.values.tolist(), ordered=True
+)
+
+posted = (
+    publish_rate_df.query("label=='2020 Snapshot+Missing Links'")
+    .query("pub_month < '2019-01'")
+    .posted.sum()
+)
+
+published = (
+    publish_rate_df.query("label=='2020 Snapshot+Missing Links'")
+    .query("pub_month < '2019-01'")
+    .published.sum()
+)
+print(f"Published: {published}")
+print(f"Posted: {posted}")
+print(f"Overall proportion published: {published/posted:.4f}")
+# -
+
+color_mapper = {
+    "2018": "#a6cee3",
+    "2020ML": "#33a02c",
+    "2020": "#1f78b4",
+}
+
+g = (
+    p9.ggplot(publish_rate_df.rename(index=str, columns={"label": "Label"}))
+    + p9.aes(
+        x="pub_month",
+        y="rate",
+        fill="Label",
+        group="Label",
+        color="Label",
+        linetype="Label",
+        shape="Label",
+    )
+    + p9.geom_point(size=2)
+    + p9.geom_line()
+    + p9.scale_linetype_manual(["solid", "solid", "solid"])
+    + p9.scale_color_manual(
+        [color_mapper["2020"], color_mapper["2020ML"], color_mapper["2018"]]
+    )
+    + p9.scale_fill_manual(
+        [color_mapper["2020"], color_mapper["2020ML"], color_mapper["2018"]]
+    )
+    + p9.scale_shape_manual(["o", "o", "o"])
+    # plot the x axis titles
+    + p9.geom_vline(xintercept=[2.5, 14.5, 26.5, 38.5, 50.5, 62.5, 74.5])
+    + p9.geom_text(label="2014", x=8.5, y=0, color="black")
+    + p9.geom_text(label="2015", x=20.5, y=0, color="black")
+    + p9.geom_text(label="2016", x=32.5, y=0, color="black")
+    + p9.geom_text(label="2017", x=44.5, y=0, color="black")
+    + p9.geom_text(label="2018", x=56.5, y=0, color="black")
+    + p9.geom_text(label="2019", x=68.5, y=0, color="black")
+    # Plot the overall proportion published
+    + p9.geom_hline(yintercept=0.4196, linetype="solid", color=color_mapper["2018"])
+    + p9.geom_hline(
+        yintercept=published / posted, linetype="solid", color=color_mapper["2020ML"]
+    )
+    + p9.annotate("text", x=8.5, y=0.395, label="overall: 0.4196", size=8)
+    + p9.annotate(
+        "text", x=8.5, y=0.628, label=f"overall: {published/posted:.4f}", size=8
+    )
+    + p9.theme_seaborn(style="ticks", context="paper", font="Arial", font_scale=1.5)
+    + p9.theme(
+        figure_size=(10, 4.5),
+        axis_text_x=p9.element_blank(),
+        axis_title_x=p9.element_text(margin={"t": 15}),
+    )
+    + p9.labs(y="Proportion Published", x="Month")
+)
+g.save("output/figures/publication_rate_reviewer_request.svg")
+g.save("output/figures/publication_rate_reviewer_request.png", dpi=250)
 print(g)
