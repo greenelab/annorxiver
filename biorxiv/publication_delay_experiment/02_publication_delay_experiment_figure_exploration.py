@@ -47,7 +47,7 @@ warnings.filterwarnings("ignore")
 # # Load the Document Distances
 
 published_date_distances = pd.read_csv(
-    "output/preprint_published_distances_rerun.tsv", sep="\t"
+    "output/preprint_published_distances.tsv", sep="\t"
 )
 for col in ["preprint_date", "published_date"]:
     published_date_distances[col] = pd.to_datetime(published_date_distances[col])
@@ -136,7 +136,8 @@ _ = g.set_xlabel("# of Preprint Versions")
 _ = g.plot(x_line - 1, y_line, "--k")
 _ = g.annotate(f"Y={results_2.slope:.2f}*X+{results_2.intercept:.2f}", (7, 1470))
 
-plt.figure(figsize=(8, 5))
+plt.figure(figsize=(11, 8.5))
+plt.rcParams.update({"font.size": 22})
 g = sns.violinplot(
     x="version_count",
     y="days_to_published",
@@ -151,8 +152,8 @@ _ = g.plot(x_line - 1, y_line, "--k")
 _ = g.annotate(f"Y={results_2.slope:.2f}*X+{results_2.intercept:.2f}", (7, 1470))
 _ = g.set_xlim(-0.5, 11.5)
 _ = g.set_ylim(0, g.get_ylim()[1])
-plt.savefig("output/version_count_vs_publication_time_violin_rerun.svg", dpi=500)
-plt.savefig("output/version_count_vs_publication_time_violin_rerun.png", dpi=500)
+plt.savefig("output/version_count_vs_publication_time_violin.svg", dpi=500)
+plt.savefig("output/version_count_vs_publication_time_violin.png", dpi=500)
 
 # +
 sns.set_theme(style="white", rc={"axes.facecolor": (0, 0, 0, 0)})
@@ -394,7 +395,9 @@ x_line = np.array(
 )
 y_line = x_line * results_2.slope + results_2.intercept
 
-plt.figure(figsize=(7, 5))
+# +
+plt.figure(figsize=(11, 8.5))
+plt.rcParams.update({"font.size": 25})
 ax = plt.hexbin(
     published_date_distances["doc_distances"],
     published_date_distances["days_to_published"],
@@ -409,6 +412,16 @@ plt.xlim([0, 12])
 plt.ylim([0, 1800])
 ax = plt.gca()
 ax.plot(x_line, y_line, "--k")
+
+for tick in ax.xaxis.get_major_ticks():
+    tick.label.set_size(20)
+
+for tick in ax.yaxis.get_major_ticks():
+    tick.label.set_size(20)
+
+ax.xaxis.label.set_size(20)
+ax.yaxis.label.set_size(20)
+
 ax.annotate(
     f"Y={results_2.slope:.2f}*X+{results_2.intercept:.2f}",
     (6, 1490),
@@ -419,8 +432,9 @@ cbar = plt.colorbar()
 _ = cbar.ax.set_ylabel("count", rotation=270)
 plt.savefig("output/article_distance_vs_publication_time_hex.svg", dpi=250)
 plt.savefig("output/article_distance_vs_publication_time_hex.png", dpi=250)
+# -
 
-plt.figure(figsize=(6, 5))
+plt.figure(figsize=(11, 8.5))
 ax = plt.hexbin(
     published_date_distances["doc_distances"],
     published_date_distances["days_to_published"],
