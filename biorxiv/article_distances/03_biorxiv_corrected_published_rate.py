@@ -178,6 +178,7 @@ if not file_path.exists():
         )
     )
 
+# replacing 2013-10 with 2013-11 as bioRxiv officially started in nov 2013
 snapshot_wo_links_df = (
     biorxiv_journal_df.assign(published_closed=lambda x: (x.pmcoa != x.published))
     .merge(final_mapped_df[["document", "pub_month"]], on="document")
@@ -266,31 +267,31 @@ g = (
     + p9.scale_shape_manual(["o", "o", "o"])
     # plot the x axis titles
     + p9.geom_vline(xintercept=[2.5, 14.5, 26.5, 38.5, 50.5, 62.5, 74.5])
-    + p9.geom_text(label="2014", x=8.5, y=0, color="black")
-    + p9.geom_text(label="2015", x=20.5, y=0, color="black")
-    + p9.geom_text(label="2016", x=32.5, y=0, color="black")
-    + p9.geom_text(label="2017", x=44.5, y=0, color="black")
-    + p9.geom_text(label="2018", x=56.5, y=0, color="black")
-    + p9.geom_text(label="2019", x=68.5, y=0, color="black")
+    + p9.geom_text(label="2014", x=8.5, y=0, color="black", size=13)
+    + p9.geom_text(label="2015", x=20.5, y=0, color="black", size=13)
+    + p9.geom_text(label="2016", x=32.5, y=0, color="black", size=13)
+    + p9.geom_text(label="2017", x=44.5, y=0, color="black", size=13)
+    + p9.geom_text(label="2018", x=56.5, y=0, color="black", size=13)
+    + p9.geom_text(label="2019", x=68.5, y=0, color="black", size=13)
     # Plot the overall proportion published
     + p9.geom_hline(yintercept=0.4196, linetype="solid", color=color_mapper["2018"])
     + p9.geom_hline(
         yintercept=published / posted, linetype="solid", color=color_mapper["2020ML"]
     )
-    + p9.annotate("text", x=8.5, y=0.395, label="overall: 0.4196", size=8)
+    + p9.annotate("text", x=8.5, y=0.395, label="overall: 0.4196", size=14)
     + p9.annotate(
-        "text", x=8.5, y=0.48, label=f"overall: {published/posted:.4f}", size=8
+        "text", x=8.5, y=0.48, label=f"overall: {published/posted:.4f}", size=14
     )
-    + p9.theme_seaborn(style="ticks", context="paper", font="Arial", font_scale=1.5)
+    + p9.theme_seaborn(style="ticks", context="paper", font="Arial", font_scale=2)
     + p9.theme(
-        figure_size=(10, 4.5),
+        figure_size=(11, 6.5),
         axis_text_x=p9.element_blank(),
         axis_title_x=p9.element_text(margin={"t": 15}),
     )
     + p9.labs(y="Proportion Published", x="Month")
 )
-g.save("output/figures/publication_rate_rerun.svg")
-g.save("output/figures/publication_rate_rerun.png", dpi=250)
+g.save("output/figures/publication_rate.svg")
+g.save("output/figures/publication_rate.png", dpi=250)
 print(g)
 
 # # Plot Publication Rate
@@ -345,24 +346,24 @@ g = (
     + p9.scale_shape_manual(["o", "o", "o"])
     # plot the x axis titles
     + p9.geom_vline(xintercept=[2.5, 14.5, 26.5, 38.5, 50.5, 62.5, 74.5])
-    + p9.geom_text(label="2014", x=8.5, y=0, color="black")
-    + p9.geom_text(label="2015", x=20.5, y=0, color="black")
-    + p9.geom_text(label="2016", x=32.5, y=0, color="black")
-    + p9.geom_text(label="2017", x=44.5, y=0, color="black")
-    + p9.geom_text(label="2018", x=56.5, y=0, color="black")
-    + p9.geom_text(label="2019", x=68.5, y=0, color="black")
+    + p9.geom_text(label="2014", x=8.5, y=0, color="black", size=13)
+    + p9.geom_text(label="2015", x=20.5, y=0, color="black", size=13)
+    + p9.geom_text(label="2016", x=32.5, y=0, color="black", size=13)
+    + p9.geom_text(label="2017", x=44.5, y=0, color="black", size=13)
+    + p9.geom_text(label="2018", x=56.5, y=0, color="black", size=13)
+    + p9.geom_text(label="2019", x=68.5, y=0, color="black", size=13)
     # Plot the overall proportion published
     + p9.geom_hline(yintercept=0.4196, linetype="solid", color=color_mapper["2018"])
     + p9.geom_hline(
         yintercept=published / posted, linetype="solid", color=color_mapper["2020ML"]
     )
-    + p9.annotate("text", x=8.5, y=0.395, label="overall: 0.4196", size=8)
+    + p9.annotate("text", x=8.5, y=0.395, label="overall: 0.4196", size=14)
     + p9.annotate(
-        "text", x=8.5, y=0.628, label=f"overall: {published/posted:.4f}", size=8
+        "text", x=8.5, y=0.628, label=f"overall: {published/posted:.4f}", size=14
     )
-    + p9.theme_seaborn(style="ticks", context="paper", font="Arial", font_scale=1.5)
+    + p9.theme_seaborn(style="ticks", context="paper", font="Arial", font_scale=2)
     + p9.theme(
-        figure_size=(10, 4.5),
+        figure_size=(11, 6.5),
         axis_text_x=p9.element_blank(),
         axis_title_x=p9.element_text(margin={"t": 15}),
     )

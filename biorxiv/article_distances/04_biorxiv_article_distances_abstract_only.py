@@ -19,11 +19,13 @@
 from pathlib import Path
 import pickle
 
+import matplotlib.pyplot as plt
 import numpy as np
-import scipy.stats
 import pandas as pd
 import plotnine as p9
 from scipy.spatial.distance import cdist
+import scipy.stats
+import seaborn as sns
 from sklearn.linear_model import LogisticRegressionCV
 import tqdm
 # -
@@ -215,25 +217,70 @@ plot_df = (
         )[["document", "abstract_only_distance"]],
         on="document",
     )
-    .assign(
-        abstract_only_distance_log10=lambda x: -np.log10(x.abstract_only_distance),
-        full_text_distance_log10=lambda x: -np.log10(x.full_text_distance),
-    )
+    # .assign(
+    #    abstract_only_distance_log10=lambda x: -np.log10(x.abstract_only_distance),
+    #    full_text_distance_log10=lambda x: -np.log10(x.full_text_distance),
+    # )
 )
 plot_df.head()
 
+# Pearson's R for correlation
+# Shows a weak but positive correlation
+scipy.stats.pearsonr(plot_df.full_text_distance, plot_df.abstract_only_distance)
+
 g = (
     p9.ggplot(plot_df)
-    + p9.aes(x="full_text_distance_log10", y="abstract_only_distance_log10")
+    + p9.aes(x="full_text_distance", y="abstract_only_distance")
     + p9.geom_point(fill="#a6cee3")
-    + p9.xlim([-1, 6])
-    + p9.labs(x="Full Text Distance (-log 10)", y="Abstract Only Distance (-log 10)")
+    + p9.scale_y_continuous(trans="log10")
+    + p9.labs(x="Full Text Distance", y="Abstract Only Distance")
     + p9.theme_seaborn(context="paper", style="ticks", font="Arial", font_scale=1.35)
 )
 g.save("output/figures/biorxiv_full_text_v_abstract_only.svg", dpi=250)
 g.save("output/figures/biorxiv_full_text_v_abstract_only.png", dpi=250)
 print(g)
 
-plot_df.sort_values("abstract_only_distance_log10", ascending=False).head(10)
+# Remove outliers for shape of distribution
+g = (
+    p9.ggplot(plot_df.query("abstract_only_distance>1e-3"))
+    + p9.aes(x="full_text_distance", y="abstract_only_distance")
+    + p9.geom_point(fill="#a6cee3")
+    + p9.scale_y_continuous(trans="log10")
+    + p9.labs(x="Full Text Distance", y="Abstract Only Distance")
+    + p9.theme_seaborn(context="paper", style="ticks", font="Arial", font_scale=1.35)
+)
+print(g)
 
-# The negative values for abstract only consist of high confidence scores for a true match. The table for the first few entries have an abstract only distance of practically zero. This means the log version will be highly negative.
+# +
+sns.set_theme(
+    context="paper", style="white", rc={"figure.figsize": (11, 8.5), "font.size": 22}
+)
+
+g = sns.jointplot(
+    x=plot_df.full_text_distance,
+    y=plot_df.abstract_only_distance,
+    kind="hist",
+    height=8.5,
+)
+
+g.set_axis_labels("Full Text Distance", "Abstract Only Distance", fontsize=22)
+g.ax_joint.set_xticklabels(g.ax_joint.get_xticks(), size=22)
+g.ax_joint.set_yticklabels(g.ax_joint.get_yticks(), size=22)
+plt.tight_layout()
+
+plt.savefig("output/abstract_full_text_histogram_plot.svg")
+plt.savefig("output/abstract_full_text_histogram_plot.png", dpi=500)
+# -
+
+plot_df.sort_values("abstract_only_distance").head(10)
+
+plot_df.sort_values("abstract_only_distance", ascending=False).head(10)
+
+# Take Home Points:
+# 1. Abstract only distances are greater than full text as I suspect the vectors generated are susceptible to minor changes compared to full text.
+# 2. Both the abstract only and full text distributions have majority of their distances centered around 0-5
+# 3. Since majority of both distributions are around that way, I'd argue that using abstracts alone could suffice in matching preprints with their published counter parts. By using only abstracts we can detect documents that are published closed access instead of relying full text to be available.
+# 4. The pairs with distances close to zero (abstract only) are practically the same abstract. There might be minor word or phrase changes, but those changes haven't affected the vector much.
+# 5. The points with the highest distance either have a structural change or significant phrase changes.
+#
+# Feel free to manually check these via [diffchecker](https://www.diffchecker.com) the preprint abstract and its published version.

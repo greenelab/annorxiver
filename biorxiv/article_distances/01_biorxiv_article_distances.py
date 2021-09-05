@@ -192,10 +192,10 @@ g = (
     + p9.aes(x="label", y="distance")
     + p9.geom_violin(fill="#a6cee3")
     + p9.labs(x="Document Pair Groups", y="Euclidean Distance")
-    + p9.theme_seaborn(context="paper", style="ticks", font="Arial", font_scale=1.35)
+    + p9.theme_seaborn(context="paper", style="ticks", font="Arial", font_scale=2)
 )
-g.save("output/figures/biorxiv_article_distance.svg", dpi=250)
-g.save("output/figures/biorxiv_article_distance.png", dpi=250)
+g.save("output/figures/biorxiv_article_distance.svg")
+g.save("output/figures/biorxiv_article_distance.png")
 print(g)
 
 # # Logistic Regression bioRxiv preprints -> published PMC articles

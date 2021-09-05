@@ -76,10 +76,10 @@ g = (
     + p9.geom_col(fill="#a6cee3")
     + p9.coord_flip()
     + p9.labs(y="Fraction Correct", x="Euclidean Distance Percentile Bins")
-    + p9.theme_seaborn(context="paper", style="ticks", font="Arial", font_scale=1.5)
+    + p9.theme_seaborn(context="paper", style="ticks", font="Arial", font_scale=2)
 )
 g.save("output/figures/distance_bin_accuracy.svg")
-g.save("output/figures/distance_bin_accuracy.png", dpi=250)
+g.save("output/figures/distance_bin_accuracy.png")
 print(g)
 
 # # Logsitic Regression Performance
