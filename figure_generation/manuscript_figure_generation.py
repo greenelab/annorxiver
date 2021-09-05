@@ -50,7 +50,7 @@ print(f"scaled:{(panel_one_size[0]*scale_x,panel_one_size[1]*scale_y)}")
 
 panel_one = panel_one.getroot()
 panel_one.scale(x=scale_x, y=scale_y)
-panel_one.moveto(30, 30)
+panel_one.moveto(300, 30)
 
 # +
 panel_two = sg.fromfile(
@@ -107,7 +107,7 @@ print(f"scaled:{(panel_four_size[0]*scale_x, panel_four_size[1]*scale_y)}")
 
 panel_four = panel_four.getroot()
 panel_four.scale(x=scale_x, y=scale_y)
-panel_four.moveto(20, 1018)
+panel_four.moveto(20, 1170)
 
 # +
 panel_five = sg.fromfile(
@@ -126,14 +126,14 @@ print(f"scaled:{(panel_five_size[0]*scale_x, panel_five_size[1]*scale_y)}")
 
 panel_five = panel_five.getroot()
 panel_five.scale(x=scale_x, y=scale_y)
-panel_five.moveto(800, 1000)
+panel_five.moveto(800, 1150)
 # -
 
-panel_one_label = sg.TextElement(10, 30, "A", size=22, weight="bold")
-panel_two_label = sg.TextElement(10, 600, "B", size=22, weight="bold")
-panel_three_label = sg.TextElement(800, 600, "C", size=22, weight="bold")
-panel_four_label = sg.TextElement(30, 1010, "D", size=22, weight="bold")
-panel_five_label = sg.TextElement(800, 1010, "E", size=22, weight="bold")
+panel_one_label = sg.TextElement(30, 30, "A", size=30, weight="bold")
+panel_two_label = sg.TextElement(10, 600, "B", size=30, weight="bold")
+panel_three_label = sg.TextElement(800, 600, "C", size=30, weight="bold")
+panel_four_label = sg.TextElement(30, 1170, "D", size=30, weight="bold")
+panel_five_label = sg.TextElement(800, 1170, "E", size=30, weight="bold")
 
 # +
 figure_one = sg.SVGFigure(
@@ -151,7 +151,7 @@ figure_one = sg.SVGFigure(
         panel_one_size[1]
         + max(panel_two_size[1], panel_three_size[1])
         + max(panel_four_size[1], panel_five_size[1])
-        - 150,
+        - 100,
     ),
 )
 
@@ -175,6 +175,9 @@ display(SVG(figure_one.to_str()))
 
 # save generated SVG files
 figure_one.save("output/figure_one_panels.svg")
+svg2png(
+    bytestring=figure_one.to_str(), write_to="output/figure_one_panels.png", dpi=600
+)
 
 # ## Figure 2
 
@@ -195,15 +198,15 @@ panel_one_size = (
     np.round(float(panel_one.root.attrib["height"][:-2]) * 1.33, 0),
 )
 
-scale_x = 1.2
-scale_y = 1.2
+scale_x = 1.4
+scale_y = 1.4
 
 print(f"original: {panel_one_size}")
 print(f"scaled:{(panel_one_size[0]*scale_x, panel_one_size[1]*scale_y)}")
 
 panel_one = panel_one.getroot()
 panel_one.scale(x=scale_x, y=scale_y)
-panel_one.moveto(50, 20)
+panel_one.moveto(450, 20)
 
 # +
 panel_two = load_clouds(
@@ -215,15 +218,15 @@ panel_two_size = (
     float(panel_two.root.attrib["height"]),
 )
 
-scale_x = 1
-scale_y = 1
+scale_x = 1.2
+scale_y = 1.2
 
 print(f"original: {panel_two_size}")
 print(f"scaled:{(panel_two_size[0]*scale_x, panel_two_size[1]*scale_y)}")
 
 panel_two = panel_two.getroot()
 panel_two.scale(x=scale_x, y=scale_y)
-panel_two.moveto(50, 520)
+panel_two.moveto(150, 600)
 
 # +
 panel_three = load_clouds(
@@ -235,15 +238,15 @@ panel_three_size = (
     float(panel_three.root.attrib["height"]),
 )
 
-scale_x = 1
-scale_y = 1
+scale_x = 1.2
+scale_y = 1.2
 
 print(f"original: {panel_three_size}")
 print(f"scaled:{(panel_three_size[0]*scale_x, panel_three_size[1]*scale_y)}")
 
 panel_three = panel_three.getroot()
 panel_three.scale(x=scale_x, y=scale_y)
-panel_three.moveto(660, 520)
+panel_three.moveto(1300, 600)
 
 # +
 panel_four = sg.fromfile(
@@ -256,15 +259,15 @@ panel_four_size = (
     np.round(float(panel_four.root.attrib["height"][:-2]) * 1.33, 0),
 )
 
-scale_x = 1.1
-scale_y = 1.1
+scale_x = 1
+scale_y = 1
 
 print(f"original: {panel_four_size}")
 print(f"scaled:{(panel_four_size[0]*scale_x, panel_four_size[1]*scale_y)}")
 
 panel_four = panel_four.getroot()
 panel_four.scale(x=scale_x, y=scale_y)
-panel_four.moveto(20, 1000)
+panel_four.moveto(20, 1200)
 
 # +
 panel_five = sg.fromfile(
@@ -277,24 +280,24 @@ panel_five_size = (
     np.round(float(panel_five.root.attrib["height"][:-2]) * 1.33, 0),
 )
 
-scale_x = 1.1
-scale_y = 1.1
+scale_x = 1
+scale_y = 1
 
 print(f"original: {panel_five_size}")
 print(f"scaled:{(panel_five_size[0]*scale_x, panel_five_size[1]*scale_y)}")
 
 panel_five = panel_five.getroot()
 panel_five.scale(x=scale_x, y=scale_y)
-panel_five.moveto(650, 1000)
+panel_five.moveto(1020, 1200)
 # -
 
-panel_one_label = sg.TextElement(20, 20, "A", size=22, weight="bold")
-panel_one_image_label = sg.TextElement(250, 930, "PC 1", size=22, weight="bold")
-panel_two_label = sg.TextElement(10, 520, "B", size=22, weight="bold")
-panel_two_image_label = sg.TextElement(860, 930, "PC 2", size=22, weight="bold")
-panel_three_label = sg.TextElement(640, 520, "C", size=22, weight="bold")
-panel_four_label = sg.TextElement(10, 1000, "D", size=22, weight="bold")
-panel_five_label = sg.TextElement(640, 1000, "E", size=22, weight="bold")
+panel_one_label = sg.TextElement(20, 30, "A", size=30, weight="bold")
+panel_one_image_label = sg.TextElement(400, 1100, "PC 1", size=30, weight="bold")
+panel_two_label = sg.TextElement(10, 600, "B", size=30, weight="bold")
+panel_two_image_label = sg.TextElement(1580, 1100, "PC 2", size=30, weight="bold")
+panel_three_label = sg.TextElement(1200, 600, "C", size=30, weight="bold")
+panel_four_label = sg.TextElement(10, 1200, "D", size=30, weight="bold")
+panel_five_label = sg.TextElement(1200, 1200, "E", size=30, weight="bold")
 
 # +
 figure_two = sg.SVGFigure(
@@ -312,7 +315,7 @@ figure_two = sg.SVGFigure(
         panel_one_size[1]
         + max(panel_two_size[1], panel_three_size[1])
         + max(panel_four_size[1], panel_five_size[1])
-        + 150,
+        + 200,
     ),
 )
 
@@ -338,6 +341,9 @@ display(SVG(figure_two.to_str()))
 
 # save generated SVG files
 figure_two.save("output/figure_two_panels.svg")
+svg2png(
+    bytestring=figure_two.to_str(), write_to="output/figure_two_panels.png", dpi=600
+)
 
 # ## Figure 3
 
@@ -398,9 +404,9 @@ panel_three.scale(x=scale_x, y=scale_y)
 panel_three.moveto(40, 420)
 # -
 
-panel_one_label = sg.TextElement(10, 20, "A", size=22, weight="bold")
-panel_two_label = sg.TextElement(560, 20, "B", size=22, weight="bold")
-panel_three_label = sg.TextElement(10, 420, "C", size=22, weight="bold")
+panel_one_label = sg.TextElement(10, 30, "A", size=30, weight="bold")
+panel_two_label = sg.TextElement(560, 30, "B", size=30, weight="bold")
+panel_three_label = sg.TextElement(10, 420, "C", size=30, weight="bold")
 
 figure_three = sg.SVGFigure(
     Unit(max([panel_one_size[0] + panel_two_size[0], panel_three_size[0]]) - 100),
@@ -421,6 +427,9 @@ display(SVG(figure_three.to_str()))
 
 # save generated SVG files
 figure_three.save("output/figure_three_panels.svg")
+svg2png(
+    bytestring=figure_three.to_str(), write_to="output/figure_three_panels.png", dpi=600
+)
 
 # ## Figure 4
 
@@ -463,7 +472,7 @@ print(f"scaled: {(panel_two_size[0]*scale_x, panel_two_size[1]*scale_y)}")
 
 panel_two = panel_two.getroot()
 panel_two.scale(x=scale_x, y=scale_y)
-panel_two.moveto(730, 0)
+panel_two.moveto(1100, 0)
 
 # +
 panel_three = sg.fromfile(
@@ -475,7 +484,7 @@ panel_three_size = (
     np.round(float(panel_three.root.attrib["height"][:-2]) * 1.33, 0),
 )
 
-scale_x = 1.2
+scale_x = 1
 scale_y = 1
 
 print(f"original: {panel_three_size}")
@@ -483,12 +492,12 @@ print(f"scaled: {(panel_three_size[0]*scale_x, panel_three_size[1]*scale_y)}")
 
 panel_three = panel_three.getroot()
 panel_three.scale(x=scale_x, y=scale_y)
-panel_three.moveto(40, 390)
+panel_three.moveto(40, 620)
 # -
 
-panel_one_label = sg.TextElement(10, 30, "A", size=22, weight="bold")
-panel_two_label = sg.TextElement(730, 30, "B", size=22, weight="bold")
-panel_three_label = sg.TextElement(10, 420, "C", size=22, weight="bold")
+panel_one_label = sg.TextElement(10, 30, "A", size=30, weight="bold")
+panel_two_label = sg.TextElement(1030, 30, "B", size=30, weight="bold")
+panel_three_label = sg.TextElement(10, 620, "C", size=30, weight="bold")
 
 figure_four = sg.SVGFigure(
     Unit(max([panel_one_size[0] + panel_two_size[0], panel_three_size[0]]) - 130),
@@ -509,3 +518,155 @@ display(SVG(figure_four.to_str()))
 
 # save generated SVG files
 figure_four.save("output/figure_four_panels.svg")
+svg2png(
+    bytestring=figure_four.to_str(), write_to="output/figure_four_panels.png", dpi=600
+)
+
+# ## Figure Five
+
+polka_subset_path = Path("../biorxiv/polka_subset_experiment/output/figures")
+
+# +
+panel_one = sg.fromfile(polka_subset_path / "preprint_published_frequency_odds.svg")
+
+panel_one_size = (
+    np.round(float(panel_one.root.attrib["width"][:-2]) * 1.33, 0),
+    np.round(float(panel_one.root.attrib["height"][:-2]) * 1.33, 0),
+)
+
+scale_x = 1
+scale_y = 1
+
+print(f"original: {panel_one_size}")
+print(f"scaled:{(panel_one_size[0]*scale_x, panel_one_size[1]*scale_y)}")
+
+panel_one = panel_one.getroot()
+panel_one.scale(x=scale_x, y=scale_y)
+panel_one.moveto(30, 30)
+
+# +
+panel_two = sg.fromfile(polka_subset_path / "preprint_published_frequency_bar.svg")
+
+panel_two_size = (
+    np.round(float(panel_two.root.attrib["width"][:-2]) * 1.33, 0),
+    np.round(float(panel_two.root.attrib["height"][:-2]) * 1.33, 0),
+)
+
+scale_x = 1
+scale_y = 1
+
+print(f"original: {panel_two_size}")
+print(f"scaled: {(panel_two_size[0]*scale_x, panel_two_size[1]*scale_y)}")
+
+panel_two = panel_two.getroot()
+panel_two.scale(x=scale_x, y=scale_y)
+panel_two.moveto(930, 20)
+
+# +
+# Overloading clouds to work with png images
+panel_three = load_clouds(
+    str(polka_subset_path / "saucie_plot.png"), figure_size=(11, 8.5)
+)
+
+panel_three_size = (
+    np.round(float(panel_three.root.attrib["width"][:-2]) * 1.33, 0),
+    np.round(float(panel_three.root.attrib["height"][:-2]) * 1.33, 0),
+)
+
+scale_x = 1
+scale_y = 1
+
+print(f"original: {panel_three_size}")
+print(f"scaled: {(panel_three_size[0]*scale_x, panel_three_size[1]*scale_y)}")
+
+panel_three = panel_three.getroot()
+panel_three.scale(x=scale_x, y=scale_y)
+panel_three.moveto(0, 760)
+
+# +
+panel_four = sg.fromfile(
+    polka_subset_path / "version_count_vs_publication_time_violin.svg"
+)
+
+panel_four_size = (
+    np.round(float(panel_four.root.attrib["width"][:-2]) * 1.33, 0),
+    np.round(float(panel_four.root.attrib["height"][:-2]) * 1.33, 0),
+)
+
+scale_x = 1
+scale_y = 1
+
+print(f"original: {panel_four_size}")
+print(f"scaled: {(panel_four_size[0]*scale_x, panel_three_size[1]*scale_y)}")
+
+panel_four = panel_four.getroot()
+panel_four.scale(x=scale_x, y=scale_y)
+panel_four.moveto(930, 720)
+
+# +
+panel_five = sg.fromfile(
+    polka_subset_path / "article_distance_vs_publication_time_hex.svg"
+)
+
+panel_five_size = (
+    np.round(float(panel_five.root.attrib["width"][:-2]) * 1.33, 0),
+    np.round(float(panel_five.root.attrib["height"][:-2]) * 1.33, 0),
+)
+
+scale_x = 1.2
+scale_y = 1.2
+
+print(f"original: {panel_five_size}")
+print(f"scaled: {(panel_five_size[0]*scale_x, panel_three_size[1]*scale_y)}")
+
+panel_five = panel_five.getroot()
+panel_five.scale(x=scale_x, y=scale_y)
+panel_five.moveto(30, 1300)
+# -
+
+panel_one_label = sg.TextElement(10, 30, "A", size=30, weight="bold")
+panel_two_label = sg.TextElement(930, 30, "B", size=30, weight="bold")
+panel_three_label = sg.TextElement(10, 740, "C", size=30, weight="bold")
+panel_four_label = sg.TextElement(930, 740, "D", size=30, weight="bold")
+panel_five_label = sg.TextElement(10, 1350, "E", size=30, weight="bold")
+
+figure_five = sg.SVGFigure(
+    Unit(
+        max(
+            [
+                panel_one_size[0],
+                panel_two_size[0] + panel_three_size[0],
+                panel_four_size[0] + panel_five_size[0],
+            ]
+        )
+        - 100
+    ),
+    Unit(
+        panel_one_size[1]
+        + max(panel_two_size[1], panel_three_size[1])
+        + max(panel_four_size[1], panel_five_size[1])
+        - 200
+    ),
+)
+figure_five.append(
+    [
+        etree.Element("rect", {"width": "100%", "height": "100%", "fill": "white"}),
+        panel_one,
+        panel_two,
+        panel_three,
+        panel_four,
+        panel_five,
+        panel_one_label,
+        panel_two_label,
+        panel_three_label,
+        panel_four_label,
+        panel_five_label,
+    ]
+)
+display(SVG(figure_five.to_str()))
+
+# save generated SVG files
+figure_five.save("output/figure_five_panels.svg")
+svg2png(
+    bytestring=figure_five.to_str(), write_to="output/figure_five_panels.png", dpi=600
+)
