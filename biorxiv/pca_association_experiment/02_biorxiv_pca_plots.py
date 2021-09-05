@@ -1,7 +1,7 @@
 # ---
 # jupyter:
 #   jupytext:
-#     formats: ipynb,py:light
+#     formats: ipynb,py
 #     text_representation:
 #       extension: .py
 #       format_name: light
@@ -138,9 +138,13 @@ pca_sample_df = (
 )
 pca_sample_df.head()
 
-# + magic_args="-i pca_sample_df" language="R"
-# # have to switch to R as it has a better "layout manager"
-# # https://github.com/has2k1/plotnine/issues/46
+# This is mardown to preserve the code.
+# jupytext is terrible and handling magic cells.
+# This cell needs to be R so I can use cowplot effectivelyfunction:
+# https://github.com/has2k1/plotnine/issues/46
+#
+# # %%R -i pca_sample_df
+#
 # library(ggplot2)
 #
 # color_mapper <- c(
@@ -153,24 +157,19 @@ pca_sample_df.head()
 #
 # g <- (
 #         ggplot(pca_sample_df)
-# + aes(x=pca1, y=pca2, color=factor(category))
-
-# + theme_bw()
-
-# + theme(
+#         + aes(x=pca1, y=pca2, color=factor(category))
+#         + theme_bw()
+#         + theme(
 #             legend.position="left",
 #             text=element_text(family = "Arial", size=16),
 #             rect=element_rect(color="black"),
 #             panel.grid.major = element_blank(),
 #             panel.grid.minor = element_blank()
 #         )
-# + geom_point()
-
-# + scale_y_continuous(position="right")
-
-# + scale_color_manual(values=color_mapper)
-
-# + labs(
+#         + geom_point()
+#         + scale_y_continuous(position="right")
+#         + scale_color_manual(values=color_mapper)
+#         + labs(
 #             x="PC1",
 #             y="PC2",
 #             color="Article Category",
@@ -185,8 +184,6 @@ pca_sample_df.head()
 # )
 #
 # print(g)
-# -
-
 generate_scatter_plots(
     pca_df,
     x="pca1",
