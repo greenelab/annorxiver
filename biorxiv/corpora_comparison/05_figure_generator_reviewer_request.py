@@ -169,7 +169,7 @@ g = (
     p9.ggplot(
         plot_df, p9.aes(y="lemma", x="lower_odds", xend="upper_odds", yend="lemma")
     )
-    + p9.geom_segment(color="#253494", size=3.5, alpha=0.7)
+    + p9.geom_segment(color="#253494", size=5, alpha=0.7)
     + p9.scale_y_discrete(
         limits=(plot_df.sort_values("odds_ratio", ascending=True).lemma.tolist())
     )
@@ -199,7 +199,7 @@ g = (
         arrow=p9.arrow(length=0.1),
     )
     + p9.annotate("text", label="PMC Enriched", x=-1.5, y=38.5, size=18, alpha=0.7)
-    + p9.theme_seaborn(context="paper", style="ticks", font_scale=1.8, font="Arial")
+    + p9.theme_seaborn(context="paper", style="ticks", font_scale=1.4, font="Arial")
     + p9.theme(
         figure_size=(11, 8.5),
         panel_grid_minor=p9.element_blank(),
@@ -242,7 +242,11 @@ Image(fig_output_path)
 # ### Special Char Removed
 
 full_plot_special_char_df = calculate_confidence_intervals(
-    full_text_comparison_special_char
+    # Hard coded fix to remove duplicates
+    # Next time use Spacy and lemmatize each token
+    full_text_comparison_special_char.query("lemma != 'patient'").query(
+        "lemma != 'groups'"
+    )
 )
 full_plot_special_char_df.head()
 
@@ -302,10 +306,11 @@ g = (
         arrow=p9.arrow(length=0.1),
     )
     + p9.annotate("text", label="PMC Enriched", x=-1.5, y=38.5, size=18, alpha=0.7)
-    + p9.theme_seaborn(context="paper", style="ticks", font_scale=1.8, font="Arial")
+    + p9.theme_seaborn(context="paper", style="ticks", font_scale=1.2, font="Arial")
     + p9.theme(
         figure_size=(11, 8.5),
         panel_grid_minor=p9.element_blank(),
+        axis_text_y=p9.element_text(size=12),
     )
     + p9.labs(y=None, x="bioRxiv vs PMC log2(Odds Ratio)")
 )
@@ -820,7 +825,7 @@ g = (
         arrow=p9.arrow(length=0.1),
     )
     + p9.annotate("text", label="Preprint Enriched", x=-1.5, y=38.5, size=18, alpha=0.7)
-    + p9.theme_seaborn(context="paper", style="ticks", font_scale=1.8, font="Arial")
+    + p9.theme_seaborn(context="paper", style="ticks", font_scale=1.4, font="Arial")
     + p9.theme(
         figure_size=(11, 8.5),
         panel_grid_minor=p9.element_blank(),
@@ -916,7 +921,7 @@ g = (
         arrow=p9.arrow(length=0.1),
     )
     + p9.annotate("text", label="Preprint Enriched", x=-1.5, y=38.5, size=18, alpha=0.7)
-    + p9.theme_seaborn(context="paper", style="ticks", font_scale=1.8, font="Arial")
+    + p9.theme_seaborn(context="paper", style="ticks", font_scale=1.4, font="Arial")
     + p9.theme(
         figure_size=(11, 8.5),
         panel_grid_minor=p9.element_blank(),
