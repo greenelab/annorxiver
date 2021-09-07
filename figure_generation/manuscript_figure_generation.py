@@ -42,8 +42,8 @@ panel_one_size = (
     np.round(float(panel_one.root.attrib["height"][:-2]) * 1.33, 0),
 )
 
-scale_x = 1.4
-scale_y = 1.4
+scale_x = 1
+scale_y = 1
 
 print(f"original: {panel_one_size}")
 print(f"scaled:{(panel_one_size[0]*scale_x,panel_one_size[1]*scale_y)}")
