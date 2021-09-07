@@ -186,14 +186,14 @@ def get_term_statistics(
 
     # Remove special characters here when calculating odds ratio
     term_list = set(
-        corpus_one.query("lemma.str.len() > 2")
+        corpus_one.query("lemma.str.len() > 1")
         .query("lemma.str.contains(r'[a-z]')")
         .query(f"lemma not in {stop_word_list}")
         .sort_values("count", ascending=False)
         .head(freq_num)
         .lemma.values
     ) | set(
-        corpus_two.query("lemma.str.len() > 2")
+        corpus_two.query("lemma.str.len() > 1")
         .query("lemma.str.contains(r'[a-z]')")
         .query(f"lemma not in {stop_word_list}")
         .sort_values("count", ascending=False)
