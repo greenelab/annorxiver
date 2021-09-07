@@ -62,7 +62,7 @@ g = (
         color="Comparison",
         group="Comparison",
     )
-    + p9.geom_point(size=2)
+    + p9.geom_point(size=3)
     + p9.geom_line(linetype="dashed")
     + p9.scale_fill_brewer(type="qual", palette="Paired", direction=-1)
     + p9.scale_color_brewer(
@@ -77,7 +77,7 @@ g = (
     + p9.theme_seaborn(
         context="paper",
         style="ticks",
-        font_scale=1.2,
+        font_scale=2,
     )
     + p9.theme(figure_size=(10, 6), text=p9.element_text(family="Arial"))
 )
@@ -116,7 +116,7 @@ g = (
     p9.ggplot(
         plot_df, p9.aes(y="lemma", x="lower_odds", xend="upper_odds", yend="lemma")
     )
-    + p9.geom_segment(color="#253494", size=3.5, alpha=0.7)
+    + p9.geom_segment(color="#253494", size=6, alpha=0.7)
     + p9.scale_y_discrete(
         limits=(plot_df.sort_values("odds_ratio", ascending=True).lemma.tolist())
     )
@@ -133,7 +133,7 @@ g = (
         alpha=1,
         arrow=p9.arrow(length=0.1),
     )
-    + p9.annotate("text", label="bioRxiv Enriched", x=1.5, y=2.5, size=12, alpha=0.7)
+    + p9.annotate("text", label="bioRxiv Enriched", x=1.5, y=2.5, size=14, alpha=0.7)
     + p9.annotate(
         "segment",
         x=-0.5,
@@ -145,16 +145,16 @@ g = (
         alpha=1,
         arrow=p9.arrow(length=0.1),
     )
-    + p9.annotate("text", label="PMC Enriched", x=-1.5, y=38.5, size=12, alpha=0.7)
-    + p9.theme_seaborn(context="paper", style="ticks", font_scale=1.1, font="Arial")
+    + p9.annotate("text", label="PMC Enriched", x=-1.5, y=38.5, size=14, alpha=0.7)
+    + p9.theme_seaborn(context="paper", style="ticks", font_scale=1.8, font="Arial")
     + p9.theme(
-        figure_size=(10, 6),
+        figure_size=(11, 8.5),
         panel_grid_minor=p9.element_blank(),
     )
     + p9.labs(y=None, x="bioRxiv vs PMC log2(Odds Ratio)")
 )
 g.save("output/svg_files/biorxiv_pmc_frequency_odds.svg")
-g.save("output/svg_files/biorxiv_pmc_frequency_odds.png", dpi=75)
+g.save("output/svg_files/biorxiv_pmc_frequency_odds.png")
 print(g)
 
 count_plot_df = (
@@ -181,7 +181,7 @@ fig = plot_point_bar_figure(
 )
 
 # save generated SVG files
-svg2png(bytestring=fig.to_str(), write_to=fig_output_path, dpi=75)
+svg2png(bytestring=fig.to_str(), write_to=fig_output_path, dpi=600)
 
 Image(fig_output_path)
 # -
@@ -218,7 +218,7 @@ g = (
     p9.ggplot(
         plot_df, p9.aes(y="lemma", x="lower_odds", xend="upper_odds", yend="lemma")
     )
-    + p9.geom_segment(color="#253494", size=3.5, alpha=0.7)
+    + p9.geom_segment(color="#253494", size=6, alpha=0.7)
     + p9.scale_y_discrete(
         limits=(plot_df.sort_values("odds_ratio", ascending=True).lemma.tolist())
     )
@@ -234,7 +234,7 @@ g = (
         alpha=1,
         arrow=p9.arrow(length=0.1),
     )
-    + p9.annotate("text", label="bioRxiv Enriched", x=9, y=2.5, size=12, alpha=0.7)
+    + p9.annotate("text", label="bioRxiv Enriched", x=9, y=2.5, size=14, alpha=0.7)
     + p9.annotate(
         "segment",
         x=-5,
@@ -246,10 +246,10 @@ g = (
         alpha=1,
         arrow=p9.arrow(length=0.1),
     )
-    + p9.annotate("text", label="NYTAC Enriched", x=-9, y=38.5, size=12, alpha=0.7)
-    + p9.theme_seaborn(context="paper", style="ticks", font_scale=1.1, font="Arial")
+    + p9.annotate("text", label="NYTAC Enriched", x=-9, y=38.5, size=14, alpha=0.7)
+    + p9.theme_seaborn(context="paper", style="ticks", font_scale=1.8, font="Arial")
     + p9.theme(
-        figure_size=(10, 6),
+        figure_size=(11, 8.5),
         panel_grid_minor=p9.element_blank(),
     )
     + p9.labs(y=None, x="bioRxiv vs NYTAC log2(Odds Ratio)")
@@ -317,7 +317,7 @@ g = (
     p9.ggplot(
         plot_df, p9.aes(y="lemma", x="lower_odds", xend="upper_odds", yend="lemma")
     )
-    + p9.geom_segment(color="#253494", size=3.5, alpha=0.7)
+    + p9.geom_segment(color="#253494", size=6, alpha=0.7)
     + p9.scale_y_discrete(
         limits=(plot_df.sort_values("odds_ratio", ascending=True).lemma.tolist())
     )
@@ -333,7 +333,7 @@ g = (
         alpha=1,
         arrow=p9.arrow(length=0.1),
     )
-    + p9.annotate("text", label="PMC Enriched", x=9, y=2.5, size=12, alpha=0.7)
+    + p9.annotate("text", label="PMC Enriched", x=9, y=2.5, size=14, alpha=0.7)
     + p9.annotate(
         "segment",
         x=-5,
@@ -345,10 +345,10 @@ g = (
         alpha=1,
         arrow=p9.arrow(length=0.1),
     )
-    + p9.annotate("text", label="NYTAC Enriched", x=-9, y=38.5, size=12, alpha=0.7)
-    + p9.theme_seaborn(context="paper", style="ticks", font_scale=1.1, font="Arial")
+    + p9.annotate("text", label="NYTAC Enriched", x=-9, y=38.5, size=14, alpha=0.7)
+    + p9.theme_seaborn(context="paper", style="ticks", font_scale=1.8, font="Arial")
     + p9.theme(
-        figure_size=(10, 6),
+        figure_size=(11, 8.5),
         panel_grid_minor=p9.element_blank(),
     )
     + p9.labs(y=None, x="PMC vs NYTAC log2(Odds Ratio)")
@@ -409,7 +409,7 @@ g = (
     p9.ggplot(
         plot_df, p9.aes(y="lemma", x="lower_odds", xend="upper_odds", yend="lemma")
     )
-    + p9.geom_segment(color="#253494", size=3.5, alpha=0.7)
+    + p9.geom_segment(color="#253494", size=6, alpha=0.7)
     + p9.scale_y_discrete(
         limits=(plot_df.sort_values("odds_ratio", ascending=True).lemma.tolist())
     )
@@ -426,7 +426,7 @@ g = (
         alpha=1,
         arrow=p9.arrow(length=0.1),
     )
-    + p9.annotate("text", label="Published  Enriched", x=1.5, y=2.5, size=12, alpha=0.7)
+    + p9.annotate("text", label="Published  Enriched", x=1.5, y=2.5, size=14, alpha=0.7)
     + p9.annotate(
         "segment",
         x=-0.5,
@@ -438,16 +438,16 @@ g = (
         alpha=1,
         arrow=p9.arrow(length=0.1),
     )
-    + p9.annotate("text", label="Preprint Enriched", x=-1.5, y=38.5, size=12, alpha=0.7)
-    + p9.theme_seaborn(context="paper", style="ticks", font_scale=1.1, font="Arial")
+    + p9.annotate("text", label="Preprint Enriched", x=-1.5, y=38.5, size=14, alpha=0.7)
+    + p9.theme_seaborn(context="paper", style="ticks", font_scale=1.7, font="Arial")
     + p9.theme(
-        figure_size=(10, 6),
+        figure_size=(11, 8.5),
         panel_grid_minor=p9.element_blank(),
     )
     + p9.labs(y=None, x="Preprint vs Published log2(Odds Ratio)")
 )
 g.save("output/svg_files/preprint_published_frequency_odds.svg")
-g.save("output/svg_files/preprint_published_frequency_odds.png", dpi=250)
+g.save("output/svg_files/preprint_published_frequency_odds.png")
 print(g)
 
 count_plot_df = create_lemma_count_df(plot_df, "preprint", "published").replace(
@@ -456,7 +456,7 @@ count_plot_df = create_lemma_count_df(plot_df, "preprint", "published").replace(
 count_plot_df.head()
 
 g = plot_bargraph(count_plot_df, plot_df)
-g.save("output/svg_files/preprint_published_frequency_bar.svg", dpi=75)
+g.save("output/svg_files/preprint_published_frequency_bar.svg")
 print(g)
 
 # +
@@ -468,6 +468,6 @@ fig = plot_point_bar_figure(
 )
 
 # save generated SVG files
-svg2png(bytestring=fig.to_str(), write_to=fig_output_path, dpi=75)
+svg2png(bytestring=fig.to_str(), write_to=fig_output_path, dpi=600)
 
 Image(fig_output_path)
