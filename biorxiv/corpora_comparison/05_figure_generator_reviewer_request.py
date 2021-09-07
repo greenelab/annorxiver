@@ -77,9 +77,9 @@ g = (
     + p9.theme_seaborn(
         context="paper",
         style="ticks",
-        font_scale=1.2,
+        font_scale=1.8,
     )
-    + p9.theme(figure_size=(10, 6), text=p9.element_text(family="Arial"))
+    + p9.theme(figure_size=(11, 8.5), text=p9.element_text(family="Arial"))
 )
 g.save("output/svg_files/corpora_kl_divergence.svg")
 g.save("output/figures/corpora_kl_divergence.png", dpi=500)
@@ -122,9 +122,9 @@ g = (
     + p9.theme_seaborn(
         context="paper",
         style="ticks",
-        font_scale=1.2,
+        font_scale=1.8,
     )
-    + p9.theme(figure_size=(10, 6), text=p9.element_text(family="Arial"))
+    + p9.theme(figure_size=(11, 8.5), text=p9.element_text(family="Arial"))
 )
 # g.save("output/svg_files/corpora_kl_divergence.svg")
 # g.save("output/figures/corpora_kl_divergence.png", dpi=500)
@@ -198,10 +198,10 @@ g = (
         alpha=1,
         arrow=p9.arrow(length=0.1),
     )
-    + p9.annotate("text", label="PMC Enriched", x=-1.5, y=38.5, size=12, alpha=0.7)
-    + p9.theme_seaborn(context="paper", style="ticks", font_scale=1.1, font="Arial")
+    + p9.annotate("text", label="PMC Enriched", x=-1.5, y=38.5, size=18, alpha=0.7)
+    + p9.theme_seaborn(context="paper", style="ticks", font_scale=1.8, font="Arial")
     + p9.theme(
-        figure_size=(10, 6),
+        figure_size=(11, 8.5),
         panel_grid_minor=p9.element_blank(),
     )
     + p9.labs(y=None, x="bioRxiv vs PMC log2(Odds Ratio)")
@@ -250,9 +250,9 @@ plot_special_char_df = (
     full_plot_special_char_df.sort_values("odds_ratio", ascending=False)
     .head(subset)
     .append(
-        full_plot_special_char_df.sort_values("odds_ratio", ascending=False)
-        .iloc[:-2]
-        .tail(subset)
+        full_plot_special_char_df.sort_values("odds_ratio", ascending=False).tail(
+            subset
+        )
     )
     .replace("rna", "RNA")
     .assign(
@@ -301,10 +301,10 @@ g = (
         alpha=1,
         arrow=p9.arrow(length=0.1),
     )
-    + p9.annotate("text", label="PMC Enriched", x=-1.5, y=38.5, size=12, alpha=0.7)
-    + p9.theme_seaborn(context="paper", style="ticks", font_scale=1.1, font="Arial")
+    + p9.annotate("text", label="PMC Enriched", x=-1.5, y=38.5, size=18, alpha=0.7)
+    + p9.theme_seaborn(context="paper", style="ticks", font_scale=1.8, font="Arial")
     + p9.theme(
-        figure_size=(10, 6),
+        figure_size=(11, 8.5),
         panel_grid_minor=p9.element_blank(),
     )
     + p9.labs(y=None, x="bioRxiv vs PMC log2(Odds Ratio)")
@@ -411,9 +411,9 @@ g = (
         arrow=p9.arrow(length=0.1),
     )
     + p9.annotate("text", label="NYTAC Enriched", x=-9, y=38.5, size=12, alpha=0.7)
-    + p9.theme_seaborn(context="paper", style="ticks", font_scale=1.1, font="Arial")
+    + p9.theme_seaborn(context="paper", style="ticks", font_scale=1.8, font="Arial")
     + p9.theme(
-        figure_size=(10, 6),
+        figure_size=(11, 8.5),
         panel_grid_minor=p9.element_blank(),
     )
     + p9.labs(y=None, x="bioRxiv vs NYTAC log2(Odds Ratio)")
@@ -511,9 +511,9 @@ g = (
         arrow=p9.arrow(length=0.1),
     )
     + p9.annotate("text", label="NYTAC Enriched", x=-1.5, y=38.5, size=12, alpha=0.7)
-    + p9.theme_seaborn(context="paper", style="ticks", font_scale=1.1, font="Arial")
+    + p9.theme_seaborn(context="paper", style="ticks", font_scale=1.8, font="Arial")
     + p9.theme(
-        figure_size=(10, 6),
+        figure_size=(11, 8.5),
         panel_grid_minor=p9.element_blank(),
     )
     + p9.labs(y=None, x="bioRxiv vs NYTAC log2(Odds Ratio)")
@@ -617,9 +617,9 @@ g = (
         arrow=p9.arrow(length=0.1),
     )
     + p9.annotate("text", label="NYTAC Enriched", x=-9, y=38.5, size=12, alpha=0.7)
-    + p9.theme_seaborn(context="paper", style="ticks", font_scale=1.1, font="Arial")
+    + p9.theme_seaborn(context="paper", style="ticks", font_scale=1.8, font="Arial")
     + p9.theme(
-        figure_size=(10, 6),
+        figure_size=(11, 8.5),
         panel_grid_minor=p9.element_blank(),
     )
     + p9.labs(y=None, x="PMC vs NYTAC log2(Odds Ratio)")
@@ -662,9 +662,9 @@ plot_special_char_df = (
     full_plot_special_char_df.sort_values("odds_ratio", ascending=False)
     .head(subset)
     .append(
-        full_plot_special_char_df.sort_values("odds_ratio", ascending=False)
-        .iloc[:-2]
-        .tail(subset)
+        full_plot_special_char_df.sort_values("odds_ratio", ascending=False).tail(
+            subset
+        )
     )
     .replace("rna", "RNA")
     .assign(
@@ -713,9 +713,9 @@ g = (
         arrow=p9.arrow(length=0.1),
     )
     + p9.annotate("text", label="NYTAC Enriched", x=-1.5, y=38.5, size=12, alpha=0.7)
-    + p9.theme_seaborn(context="paper", style="ticks", font_scale=1.1, font="Arial")
+    + p9.theme_seaborn(context="paper", style="ticks", font_scale=1.8, font="Arial")
     + p9.theme(
-        figure_size=(10, 6),
+        figure_size=(11, 8.5),
         panel_grid_minor=p9.element_blank(),
     )
     + p9.labs(y=None, x="PMC vs NYTAC log2(Odds Ratio)")
@@ -819,10 +819,10 @@ g = (
         alpha=1,
         arrow=p9.arrow(length=0.1),
     )
-    + p9.annotate("text", label="Preprint Enriched", x=-1.5, y=38.5, size=12, alpha=0.7)
-    + p9.theme_seaborn(context="paper", style="ticks", font_scale=1.1, font="Arial")
+    + p9.annotate("text", label="Preprint Enriched", x=-1.5, y=38.5, size=18, alpha=0.7)
+    + p9.theme_seaborn(context="paper", style="ticks", font_scale=1.8, font="Arial")
     + p9.theme(
-        figure_size=(10, 6),
+        figure_size=(11, 8.5),
         panel_grid_minor=p9.element_blank(),
     )
     + p9.labs(y=None, x="Preprint vs Published log2(Odds Ratio)")
@@ -903,7 +903,7 @@ g = (
         alpha=1,
         arrow=p9.arrow(length=0.1),
     )
-    + p9.annotate("text", label="Published  Enriched", x=1.5, y=2.5, size=12, alpha=0.7)
+    + p9.annotate("text", label="Published  Enriched", x=1.5, y=2.5, size=18, alpha=0.7)
     + p9.annotate(
         "segment",
         x=-0.5,
@@ -915,10 +915,10 @@ g = (
         alpha=1,
         arrow=p9.arrow(length=0.1),
     )
-    + p9.annotate("text", label="Preprint Enriched", x=-1.5, y=38.5, size=12, alpha=0.7)
-    + p9.theme_seaborn(context="paper", style="ticks", font_scale=1.1, font="Arial")
+    + p9.annotate("text", label="Preprint Enriched", x=-1.5, y=38.5, size=18, alpha=0.7)
+    + p9.theme_seaborn(context="paper", style="ticks", font_scale=1.8, font="Arial")
     + p9.theme(
-        figure_size=(10, 6),
+        figure_size=(11, 8.5),
         panel_grid_minor=p9.element_blank(),
     )
     + p9.labs(y=None, x="Preprint vs Published log2(Odds Ratio)")
