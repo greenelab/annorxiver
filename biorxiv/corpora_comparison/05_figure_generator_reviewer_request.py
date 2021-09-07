@@ -186,7 +186,7 @@ g = (
         alpha=1,
         arrow=p9.arrow(length=0.1),
     )
-    + p9.annotate("text", label="bioRxiv Enriched", x=1.5, y=2.5, size=12, alpha=0.7)
+    + p9.annotate("text", label="bioRxiv Enriched", x=1.5, y=2.5, size=18, alpha=0.7)
     + p9.annotate(
         "segment",
         x=-0.5,
@@ -289,7 +289,7 @@ g = (
         alpha=1,
         arrow=p9.arrow(length=0.1),
     )
-    + p9.annotate("text", label="bioRxiv Enriched", x=1.5, y=2.5, size=12, alpha=0.7)
+    + p9.annotate("text", label="bioRxiv Enriched", x=1.5, y=2.5, size=18, alpha=0.7)
     + p9.annotate(
         "segment",
         x=-0.5,
@@ -807,7 +807,7 @@ g = (
         alpha=1,
         arrow=p9.arrow(length=0.1),
     )
-    + p9.annotate("text", label="Published  Enriched", x=1.5, y=2.5, size=12, alpha=0.7)
+    + p9.annotate("text", label="Published Enriched", x=1.5, y=2.5, size=18, alpha=0.7)
     + p9.annotate(
         "segment",
         x=-0.5,
