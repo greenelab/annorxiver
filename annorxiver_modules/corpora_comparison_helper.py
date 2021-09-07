@@ -7,6 +7,7 @@ from mizani.formatters import custom_format, log_format
 import numpy as np
 import pandas as pd
 import plotnine as p9
+from scipy.stats import norm
 import spacy
 import svgutils.transform as sg
 from svgutils.compose import Unit
@@ -21,9 +22,7 @@ def aggregate_word_counts(doc_iterator, disable_progressbar=False):
     Arguments:
         doc_iterator - a pathlib generator that returns file paths to be parsed
         disable_progressbar - show the progressbar?
-
     Example tsv file:
-
     | lemma | pos_tag | dep_tag | count |
     | --- | --- | --- | --- |
     | genome | NOUN | compound | 23 |
@@ -52,10 +51,14 @@ def aggregate_word_counts(doc_iterator, disable_progressbar=False):
 def calculate_confidence_intervals(data_df):
     """
     Calculates the 95% confidence intervals for the odds ratio
+    confidence intervals calculated from https://www.ncbi.nlm.nih.gov/pmc/articles/PMC2938757/
+    p-values obtained from https://www.bmj.com/content/343/bmj.d2304 except using scipy.stats.norm.sf function *2
+    (two-sided)
     Arguments:
         data_df - the dataframe used to calculate the bars
     """
-
+    # 95% confidence
+    crit_value = 1.96
     ci_df = data_df.assign(
         lower_odds=lambda x: np.exp(
             np.log(x.odds_ratio)
@@ -81,6 +84,17 @@ def calculate_confidence_intervals(data_df):
                     + 1 / x.corpus_one_c
                     + 1 / x.corpus_two_d
                 )
+            )
+        ),
+    ).assign(
+        z_value=lambda x: (
+            np.log(x.odds_ratio)
+            / ((np.log(x.upper_odds) - np.log(x.lower_odds)) / (2 * crit_value))
+        ),
+        p_value=lambda x: norm.sf(
+            np.abs(
+                np.log(x.odds_ratio)
+                / ((np.log(x.upper_odds) - np.log(x.lower_odds)) / (2 * crit_value))
             )
         ),
     )
@@ -121,7 +135,6 @@ def dump_to_dataframe(count_dict, file_name):
     This function outputs the counter data object in
     the form of a tsv file. This was created to avoid
     the memory issue PMC creates.
-
     Arguments:
         count_dict - the counter object to be outputted
         file_name - the name of the file for the output to be written to
@@ -156,7 +169,6 @@ def get_term_statistics(
     This function is designed to perform the folllowing calculations:
         - log likelihood of contingency table
         - log odds ratio
-
     keywords:
         corpus_one - a dataframe object with terms and counts
         corpus_two - a datafram object with terms and counts
@@ -164,10 +176,25 @@ def get_term_statistics(
         psudeocount - the psudocount to avoid divide by zero
         disable_progressbar - show the progress bar?
     """
+
+    spacy_nlp = spacy.load("en_core_web_sm")
+    stop_word_list = list(spacy_nlp.Defaults.stop_words)
+
+    # Remove special characters here when calculating odds ratio
     term_list = set(
-        corpus_one.sort_values("count", ascending=False).head(freq_num).lemma.values
+        corpus_one.query("lemma.str.len() > 1")
+        .query("lemma.str.contains(r'[a-z]')")
+        .query(f"lemma not in {stop_word_list}")
+        .sort_values("count", ascending=False)
+        .head(freq_num)
+        .lemma.values
     ) | set(
-        corpus_two.sort_values("count", ascending=False).head(freq_num).lemma.values
+        corpus_two.query("lemma.str.len() > 1")
+        .query("lemma.str.contains(r'[a-z]')")
+        .query(f"lemma not in {stop_word_list}")
+        .sort_values("count", ascending=False)
+        .head(freq_num)
+        .lemma.values
     )
 
     corpus_one_total = corpus_one["count"].sum()
@@ -250,7 +277,6 @@ def get_word_stats(
 ):
     """
     This function calculates the token statistics for each corpus
-
     Arguments:
         document_list - the list of document paths
         document_folder - the folder to look for each document
@@ -391,13 +417,13 @@ def plot_bargraph(count_plot_df, plot_df):
         )
         + p9.scale_y_continuous(labels=custom_format("{:,.0g}"))
         + p9.labs(x=None)
-        + p9.theme_seaborn(context="paper", style="ticks", font="Arial", font_scale=1.1)
+        + p9.theme_seaborn(context="paper", style="ticks", font="Arial", font_scale=1.8)
         + p9.theme(
-            figure_size=(10, 6),
+            figure_size=(11, 8.5),
             strip_background=p9.element_rect(fill="white"),
-            strip_text=p9.element_text(size=12),
-            axis_title=p9.element_text(size=12),
-            axis_text_x=p9.element_text(size=10),
+            strip_text=p9.element_text(size=14),
+            axis_title=p9.element_text(size=14),
+            axis_text_x=p9.element_text(size=12),
         )
     )
     return graph
