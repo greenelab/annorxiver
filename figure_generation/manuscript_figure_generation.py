@@ -581,11 +581,11 @@ print(f"scaled: {(panel_three_size[0]*scale_x, panel_three_size[1]*scale_y)}")
 
 panel_three = panel_three.getroot()
 panel_three.scale(x=scale_x, y=scale_y)
-panel_three.moveto(0, 760)
+panel_three.moveto(50, 760)
 
 # +
 panel_four = sg.fromfile(
-    polka_subset_path / "version_count_vs_publication_time_violin.svg"
+    polka_subset_path / "version_count_vs_publication_time_violin_filtered.svg"
 )
 
 panel_four_size = (
@@ -605,7 +605,7 @@ panel_four.moveto(930, 720)
 
 # +
 panel_five = sg.fromfile(
-    polka_subset_path / "article_distance_vs_publication_time_hex.svg"
+    polka_subset_path / "article_distance_vs_publication_time_hex_filtered.svg"
 )
 
 panel_five_size = (
