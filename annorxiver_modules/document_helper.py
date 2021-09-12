@@ -2,10 +2,12 @@ import csv
 import lzma
 import re
 
+from gensim.models.doc2vec import TaggedDocument
 import lxml.etree as ET
 import numpy as np
 import pandas as pd
 import spacy
+import tqdm
 
 disabled_pipelines = ["parser", "ner"]
 nlp = spacy.load("en_core_web_sm", disable=disabled_pipelines)
@@ -261,3 +263,41 @@ class DocIterator:
                 for tok in nlp(line)
                 if tok.lemma_ not in nlp.Defaults.stop_words
             ]
+
+
+class TaggedDocIterator:
+    """
+    A class designed to feed lines into the word2vec model
+    """
+
+    def __init__(self, document_pathlib_list, xpath, filter_tags=filter_tag_list):
+        self.document_pathlib_list = document_pathlib_list
+        self.xpath = xpath
+        self.filter_tags = filter_tags
+
+    def __iter__(self):
+        for document in tqdm.tqdm(self.document_pathlib_list):
+
+            tree = ET.parse(open(document, "rb"), parser=parser)
+
+            # Process xml without specified tags
+            ET.strip_tags(tree, *self.filter_tags)
+
+            root = tree.getroot()
+            all_text = root.xpath(self.xpath)
+            all_text = list(map(lambda x: "".join(list(x.itertext())), all_text))
+            all_text = " ".join(all_text)
+
+            all_tokens = list(
+                map(
+                    lambda x: x.lemma_.lower(),
+                    filter(
+                        lambda tok: tok.lemma_ not in nlp.Defaults.stop_words,
+                        nlp(all_text),
+                    ),
+                )
+            )
+
+            yield TaggedDocument(
+                all_tokens, [f"{str(document.parent.stem)}/{str(document.stem)}"]
+            )
