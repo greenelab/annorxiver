@@ -111,6 +111,7 @@ excel_print_df = published_date_distances.drop(
 ]
 excel_print_df
 
+excel_print_df = excel_print_df[excel_print_df["days_till_published"] > pd.Timedelta(0)]
 excel_print_df["posted_date"] = excel_print_df.posted_date.dt.date
 excel_print_df["published_date"] = excel_print_df.published_date.dt.date
 
