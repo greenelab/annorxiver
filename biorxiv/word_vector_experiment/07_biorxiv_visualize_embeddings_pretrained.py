@@ -132,6 +132,12 @@ biorxiv_pca_models_latest = {
 
 # # UMAP of the Documents
 
+# This section is to highlight the differences between embedding models using UMAP.
+# The three models being compared are:
+# 1. initialized Word2Vec Model
+# 2. Doc2vec model
+# 3. Pretrained Word2Vec Model - first trained on Google news dataset 300 dim, then trained on bioRxiv
+
 g = (
     p9.ggplot(biorxiv_umap_models_latest["original"])
     + p9.aes(x="umap1", y="umap2", color="factor(category)")
@@ -164,6 +170,12 @@ print(g)
 
 # # PCA of the Documents
 
+# This section is to highlight the differences between embedding models using PCA.
+# The three models being compared are:
+# 1. initialized Word2Vec Model
+# 2. Doc2vec model
+# 3. Pretrained Word2Vec Model - first trained on Google news dataset 300 dim, then trained on bioRxiv
+
 g = (
     p9.ggplot(biorxiv_pca_models_latest["original"])
     + p9.aes(x="pca1", y="pca2", color="factor(category)")
@@ -193,3 +205,8 @@ g = (
 )
 g.save("output/embedding_output/pca/figures/biorxiv_pca_300_pretrained.png", dpi=500)
 print(g)
+
+# Main take home points for this notebook:
+# 1. As expected doc2vec changes the bioRxiv landscape as the embedding space seems more squeezed (UMAP) than both word2vec models.
+# 2. The pretrained model and randomly initialized model seem to generate similar results in terms of UMAP and PCA.
+# 3. PCA model for pretrained vs random looks like a flipped version of each other, which provides a bit of evidence that there isn't an significant advantage of pretrained vs randomly intialized word2vec model (at least qualitatively).
