@@ -58,7 +58,7 @@ biorxiv_articles_df = pd.read_csv(
     Path("..")
     / Path("word_vector_experiment")
     / Path("output/word2vec_output")
-    / Path("biorxiv_all_articles_300_fixed.tsv.xz"),
+    / Path("biorxiv_all_articles_300.tsv.xz"),
     sep="\t",
 )
 biorxiv_articles_df = biorxiv_articles_df.dropna()
@@ -165,13 +165,12 @@ g = (
     + p9.theme_bw()
     + p9.scale_x_discrete(limits=category_sim_df.category.tolist()[::-1])
     + p9.theme(
-        figure_size=(11, 7),
+        figure_size=(11, 8.5),
         text=p9.element_text(size=12),
         panel_grid_major_y=p9.element_blank(),
     )
     + p9.labs(y="PC1 Cosine Similarity")
 )
-g.save("output/pca_plots/figures/category_pca1_95_ci.svg", dpi=500)
 g.save("output/pca_plots/figures/category_pca1_95_ci.png", dpi=500)
 print(g)
 
@@ -188,13 +187,12 @@ g = (
     + p9.theme_bw()
     + p9.scale_x_discrete(limits=category_sim_df.category.tolist()[::-1])
     + p9.theme(
-        figure_size=(11, 7),
+        figure_size=(11, 8.5),
         text=p9.element_text(size=12),
         panel_grid_major_y=p9.element_blank(),
     )
     + p9.labs(y="PC2 Cosine Similarity")
 )
-g.save("output/pca_plots/figures/category_pca2_95_ci.svg", dpi=500)
 g.save("output/pca_plots/figures/category_pca2_95_ci.png", dpi=500)
 print(g)
 
@@ -233,8 +231,8 @@ g = (
         )
     )
     + p9.labs(x="Article Category", y="PC1")
-    + p9.theme(figure_size=(6.66, 5))
-    + p9.theme_seaborn(context="paper", style="ticks", font="Arial", font_scale=1)
+    + p9.theme_seaborn(context="paper", style="ticks", font="Arial", font_scale=2)
+    + p9.theme(figure_size=(11, 8.5))
 )
 g.save("output/pca_plots/figures/category_box_plot_pc1.png", dpi=250)
 g.save(
@@ -262,8 +260,8 @@ g = (
         )
     )
     + p9.labs(x="Article Category", y="PC2")
-    + p9.theme(figure_size=(6.66, 5))
-    + p9.theme_seaborn(context="paper", style="ticks", font="Arial", font_scale=1)
+    + p9.theme_seaborn(context="paper", style="ticks", font="Arial", font_scale=2)
+    + p9.theme(figure_size=(11, 8.5))
 )
 g.save("output/pca_plots/figures/category_box_plot_pc2.png", dpi=250)
 g.save(
