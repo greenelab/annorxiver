@@ -174,7 +174,7 @@ for pc, component in tqdm_notebook(enumerate(pca_dimensions, start=1)):
         }
     )
 
-    pc = f"{pc}" if pc > 9 else f"0{pc}"
+    pc = f"{pc:02d}"
 
     polarity_cloud = (
         wordcloud.WordCloud(
