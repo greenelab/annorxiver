@@ -177,7 +177,7 @@ g = (
     p9.ggplot(
         plot_df, p9.aes(y="lemma", x="lower_odds", xend="upper_odds", yend="lemma")
     )
-    + p9.geom_segment(color="#253494", size=3.5, alpha=0.7)
+    + p9.geom_segment(color="#253494", size=6, alpha=0.7)
     + p9.scale_y_discrete(
         limits=(plot_df.sort_values("odds_ratio", ascending=True).lemma.tolist())
     )
@@ -206,10 +206,10 @@ g = (
         alpha=1,
         arrow=p9.arrow(length=0.1),
     )
-    + p9.annotate("text", label="Preprint Enriched", x=-5, y=38.5, size=12, alpha=0.7)
-    + p9.theme_seaborn(context="paper", style="ticks", font_scale=1.1, font="Arial")
+    + p9.annotate("text", label="Preprint Enriched", x=-5, y=38.5, size=14, alpha=0.7)
+    + p9.theme_seaborn(context="paper", style="ticks", font_scale=1.8, font="Arial")
     + p9.theme(
-        figure_size=(10, 6),
+        figure_size=(11, 8.5),
         panel_grid_minor=p9.element_blank(),
     )
     + p9.labs(y=None, x="Preprint vs Published log2(Odds Ratio)")
@@ -551,7 +551,7 @@ polka_published_preprint_df.head()
 # ### Document version count plot
 
 biorxiv_published_distances = pd.read_csv(
-    "../publication_delay_experiment/output/preprint_published_distances_rerun.tsv",
+    "../publication_delay_experiment/output/preprint_published_distances.tsv",
     sep="\t",
 )
 biorxiv_published_distances["time_to_published"] = pd.to_timedelta(
@@ -607,8 +607,10 @@ polka_x_line = np.array(
 )
 polka_y_line = polka_x_line * results_3.slope + results_3.intercept
 
+# +
 # Graph here?
-plt.figure(figsize=(8, 5))
+plt.figure(figsize=(11, 8.5))
+plt.rcParams.update({"font.size": 22})
 g = sns.violinplot(
     x="version_count",
     y="days_to_published",
@@ -617,6 +619,7 @@ g = sns.violinplot(
     scale="width",
     palette="YlGnBu",
 )
+
 _ = g.set_ylabel("Time Elapsed Until Preprint is Published (Days)")
 _ = g.set_xlabel("# of Preprint Versions")
 _ = g.plot(x_line - 1, y_line, "--k")
@@ -629,12 +632,23 @@ _ = g.scatter(
 )
 _ = g.annotate(f"Y={results_2.slope:.2f}*X+{results_2.intercept:.2f}", (7, 1540))
 _ = g.annotate(
-    f"Y={results_3.slope:.2f}*X+{results_3.intercept:.2f}", (7, 1470), color="red"
+    f"Y={results_3.slope:.2f}*X+{results_3.intercept:.2f}", (7, 1460), color="red"
 )
 _ = g.set_xlim(-0.5, 11.5)
 _ = g.set_ylim(0, g.get_ylim()[1])
+
+ax = plt.gca()
+for tick in ax.xaxis.get_major_ticks():
+    tick.label.set_fontsize(20)
+ax.xaxis.label.set_size(20)
+
+for tick in ax.yaxis.get_major_ticks():
+    tick.label.set_fontsize(20)
+ax.yaxis.label.set_size(20)
+
 plt.savefig("output/figures/version_count_vs_publication_time_violin.svg", dpi=500)
 plt.savefig("output/figures/version_count_vs_publication_time_violin.png", dpi=500)
+# -
 
 # ### Document embedding pair
 
@@ -697,8 +711,10 @@ polka_x_line = np.array(
 )
 polka_y_line = polka_x_line * results_3.slope + results_3.intercept
 
+# +
 # graph here?
-plt.figure(figsize=(6, 5))
+plt.figure(figsize=(11, 8.5))
+plt.rcParams.update({"font.size": 22})
 ax = plt.hexbin(
     biorxiv_published_distances["doc_distances"],
     biorxiv_published_distances["days_to_published"],
@@ -712,6 +728,15 @@ ax = plt.hexbin(
 plt.xlim([0, 12])
 plt.ylim([0, 1800])
 ax = plt.gca()
+
+for tick in ax.xaxis.get_major_ticks():
+    tick.label.set_fontsize(20)
+ax.xaxis.label.set_size(20)
+
+for tick in ax.yaxis.get_major_ticks():
+    tick.label.set_fontsize(20)
+ax.yaxis.label.set_size(20)
+
 ax.plot(x_line, y_line, "--k")
 ax.plot(polka_x_line, polka_y_line, "--k", color="red")
 ax.annotate(
