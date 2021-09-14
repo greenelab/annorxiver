@@ -26,6 +26,7 @@ from cairosvg import svg2png
 from gensim.models import Word2Vec
 from IPython.display import Image, display, SVG
 from lxml import etree
+from matplotlib.patches import Patch
 import matplotlib.pyplot as plt
 import matplotlib as mpl
 import numpy as np
@@ -197,9 +198,16 @@ _ = g.scatter(
     c="red",
     s=12,
 )
-_ = g.annotate(f"Y={results_2.slope:.2f}*X+{results_2.intercept:.2f}", (7, 1540))
-_ = g.annotate(
-    f"Y={results_3.slope:.2f}*X+{results_3.intercept:.2f}", (7, 1460), color="red"
+test_obj = g.annotate(
+    f"Y={results_2.slope:.2f}*X+{results_2.intercept:.2f}",
+    (7, 1480),
+    label="background",
+)
+test2_obj = g.annotate(
+    f"Y={results_3.slope:.2f}*X+{results_3.intercept:.2f}",
+    (7, 1400),
+    color="red",
+    label="test",
 )
 _ = g.set_xlim(-0.5, 11.5)
 _ = g.set_ylim(0, g.get_ylim()[1])
@@ -213,6 +221,13 @@ for tick in ax.yaxis.get_major_ticks():
     tick.label.set_fontsize(20)
 ax.yaxis.label.set_size(20)
 
+ax.legend(
+    handles=[
+        Patch(color="black", label="bioRxiv"),
+        Patch(color="r", label="Polka et al."),
+    ],
+    fontsize="xx-small",
+)
 plt.savefig("output/figures/version_count_vs_publication_time_violin.svg", dpi=500)
 plt.savefig("output/figures/version_count_vs_publication_time_violin.png", dpi=500)
 # -
@@ -303,6 +318,14 @@ ax.xaxis.label.set_size(20)
 for tick in ax.yaxis.get_major_ticks():
     tick.label.set_fontsize(20)
 ax.yaxis.label.set_size(20)
+ax.legend(
+    handles=[
+        Patch(color="black", label="bioRxiv"),
+        Patch(color="r", label="Polka et al."),
+    ],
+    fontsize="xx-small",
+    loc="lower right",
+)
 
 plt.savefig(
     "output/figures/version_count_vs_publication_time_violin_filtered.svg", dpi=500
@@ -408,7 +431,7 @@ ax.annotate(
     (5.5, 1530),
 )
 _ = ax.annotate(
-    f"Y={results_3.slope:.2f}*X+{results_3.intercept:.2f}", (5.5, 1450), color="red"
+    f"Y={results_3.slope:.2f}*X+{results_3.intercept:.2f}", (5.5, 1440), color="red"
 )
 _ = ax.set_xlabel("Euclidian Distance of Preprint-Published Versions")
 _ = ax.set_ylabel("Time Elapsed Until Preprint is Published (Days)")
@@ -419,6 +442,13 @@ _ = ax.scatter(
     polka_published_preprint_df["days_to_published"],
     c="red",
     s=6,
+)
+ax.legend(
+    handles=[
+        Patch(color="black", label="bioRxiv"),
+        Patch(color="r", label="Polka et al."),
+    ],
+    fontsize="xx-small",
 )
 plt.savefig("output/figures/article_distance_vs_publication_time_hex.svg", dpi=250)
 plt.savefig("output/figures/article_distance_vs_publication_time_hex.png", dpi=250)
@@ -515,6 +545,16 @@ _ = ax.scatter(
     c="red",
     s=6,
 )
+
+ax.legend(
+    handles=[
+        Patch(color="black", label="bioRxiv"),
+        Patch(color="r", label="Polka et al."),
+    ],
+    fontsize="xx-small",
+    loc="lower right",
+)
+
 plt.savefig(
     "output/figures/article_distance_vs_publication_time_hex_filtered.svg", dpi=250
 )
