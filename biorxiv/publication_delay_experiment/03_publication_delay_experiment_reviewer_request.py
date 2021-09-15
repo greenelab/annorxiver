@@ -15,7 +15,10 @@
 
 # # Measure the Difference between Preprint-Published similarity and Published Articles
 
-# This notebook is designed to output an excel file that contains all preprint published pairs and their respective publication information.
+# This notebook is designed to answer the question how much do preprints change with each new version.
+# Based on results within my manuscript a review wanted to know the answer to the above question.
+# Also this notebook outputs an excel file that contains all preprint published pairs and their respective publication information.
+# Allows people to manually inspect practical consequences (if any) for preprints that take longer to publish.
 
 from datetime import timedelta
 import numpy as np
@@ -82,6 +85,8 @@ g = (
 g.save("output/version_count_doc_distances.svg")
 g.save("output/version_count_doc_distances.png", dpi=600)
 print(g)
+
+# Overall, preprints change with each new version; however, based on the magnitude of the slope I'd argue that these changes are minor compared to substantial changes (~6 distance units)
 
 # # Output published dates to Excel
 
