@@ -1,13 +1,23 @@
-#!/usr/bin/env python
-# coding: utf-8
+# ---
+# jupyter:
+#   jupytext:
+#     formats: ipynb,py
+#     text_representation:
+#       extension: .py
+#       format_name: light
+#       format_version: '1.5'
+#       jupytext_version: 1.9.1+dev
+#   kernelspec:
+#     display_name: Python [conda env:annorxiver]
+#     language: python
+#     name: conda-env-annorxiver-py
+# ---
 
 # # Restructure Hazard Function Calculations
 
 # This notebook builds off of Marvin's work where I change the KaplanMeier Estimators to reflect days rather than years. Given that the lines are a bit difficult to read, I decided to report the values in the form of halflife estimates.
 
-# In[1]:
-
-
+# +
 from datetime import timedelta, date
 from pathlib import Path
 
@@ -20,12 +30,9 @@ import tqdm
 
 from mizani.breaks import date_breaks
 from mizani.formatters import timedelta_format
-
+# -
 
 # # Load the Data
-
-# In[2]:
-
 
 published_dates = pd.read_csv(
     "../publication_delay_experiment/output/biorxiv_published_dates.tsv", sep="\t"
@@ -37,10 +44,6 @@ published_dates = pd.read_csv(
 )
 print(published_dates.shape)
 published_dates.head()
-
-
-# In[3]:
-
 
 biorxiv_journal_df = (
     pd.read_csv("../journal_tracker/output/mapped_published_doi.tsv", sep="\t")
@@ -61,10 +64,6 @@ biorxiv_journal_df = (
 )
 print(biorxiv_journal_df.shape)
 biorxiv_journal_df.head()
-
-
-# In[4]:
-
 
 preprints_w_published_dates = (
     biorxiv_journal_df.sort_values("document")
@@ -87,51 +86,27 @@ preprints_w_published_dates = preprints_w_published_dates[
 print(preprints_w_published_dates.shape)
 preprints_w_published_dates.head()
 
-
 # # Calculate Overall Survival Function
 
 # This section loads up the KaplanMeier Estimator for preprints. It measures the lifetime of unpublished preprints. Overtime preprints start to become published which is what decreases the population size.
 
-# In[5]:
-
-
 kmf = KaplanMeierFitter()
-
-
-# In[6]:
-
 
 kmf.fit(
     preprints_w_published_dates["time_to_published"].dt.total_seconds() / 60 / 60 / 24,
     event_observed=~preprints_w_published_dates["published_doi"].isna(),
 )
 
-
-# In[7]:
-
-
 kmf.median_survival_time_
-
-
-# In[8]:
-
 
 median_ci = median_survival_times(kmf.confidence_interval_)
 median_ci_l, median_ci_u = median_ci.values.flatten()
 median_ci_l, median_ci_u
 
-
-# In[9]:
-
-
 overall_preprint_survival = kmf.survival_function_.reset_index().assign(
     label="all_papers"
 )
 overall_preprint_survival.head()
-
-
-# In[10]:
-
 
 g = (
     p9.ggplot(
@@ -146,13 +121,9 @@ g = (
 )
 print(g)
 
-
 # # Calculate Category Survival Function
 
 # This section measures how long it takes for certain categories to get preprints published.
-
-# In[11]:
-
 
 entire_preprint_df = pd.DataFrame([], columns=["timeline", "KM_estimate", "category"])
 half_life = []
@@ -179,10 +150,6 @@ for cat, grouped_df in preprints_w_published_dates.groupby("category"):
         kmf.survival_function_.reset_index().assign(category=cat)
     )
 
-
-# In[12]:
-
-
 g = (
     p9.ggplot(
         entire_preprint_df.assign(
@@ -198,11 +165,7 @@ g = (
         y="proportion of unpublished biorxiv paper",
         title="Preprint Survival Curves",
     )
-    + p9.theme_seaborn(
-        context="paper", 
-        style="white", 
-        font_scale=1.2
-    )
+    + p9.theme_seaborn(context="paper", style="white", font_scale=1.2)
     + p9.theme(
         axis_ticks_minor_x=p9.element_blank(),
         # legend_position=(0.5, -0.2),
@@ -213,30 +176,23 @@ g.save("output/preprint_category_survival_curves.svg", dpi=500)
 g.save("output/preprint_category_survival_curves.png", dpi=500)
 print(g)
 
-
-# In[13]:
-
-
 category_half_life = pd.DataFrame.from_records(half_life).replace(
     np.inf, (temp_df["time_to_published"].dt.total_seconds() / 60 / 60 / 24).max()
 )
 category_half_life
 
-
-# In[14]:
-
-
 g = (
     p9.ggplot(
-        category_half_life.query("category!='none'")
-        .assign(
+        category_half_life.query("category!='none'").assign(
             half_life_time=lambda x: pd.to_timedelta(x.half_life_time, "D"),
             half_life_ci_l=lambda x: pd.to_timedelta(x.half_life_ci_l, "D"),
             half_life_ci_u=lambda x: pd.to_timedelta(x.half_life_ci_u, "D"),
         ),
         p9.aes(
-            x="category", y="half_life_time", 
-            ymin="half_life_ci_l", ymax="half_life_ci_u"
+            x="category",
+            y="half_life_time",
+            ymin="half_life_ci_l",
+            ymax="half_life_ci_u",
         ),
     )
     + p9.geom_col(fill="#1f78b4")
@@ -255,20 +211,12 @@ g = (
         y="Time Until 50% of Preprints are Published",
         title="Preprint Category Half-Life",
     )
-    + p9.theme_seaborn(
-        context='paper', 
-        style="white", 
-        font_scale=1.2, 
-        font='Arial'
-    )
-    + p9.theme(
-        axis_ticks_minor_x=p9.element_blank()
-    )
+    + p9.theme_seaborn(context="paper", style="white", font_scale=2, font="Arial")
+    + p9.theme(figure_size=(11, 8.5), axis_ticks_minor_x=p9.element_blank())
 )
 g.save("output/preprint_category_halflife.svg")
 g.save("output/preprint_category_halflife.png", dpi=250)
 print(g)
-
 
 # Take home Results:
 #     1. The average amount of time for half of all preprints to be published is 348 days (~1 year)
