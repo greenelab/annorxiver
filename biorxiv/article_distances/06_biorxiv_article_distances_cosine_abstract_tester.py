@@ -13,7 +13,7 @@
 #     name: conda-env-annorxiver-py
 # ---
 
-# # Find published articles missing from bioRxiv
+# # Find published articles missing from bioRxiv using abstracts alone
 
 # +
 from pathlib import Path
@@ -371,7 +371,7 @@ g = (
 )
 print(g)
 
-# # ROC-Curve to do a Global Match
+# # Examine the top N predictions using Recall and Precision
 
 data_rows = []
 for df, model_label in zip(

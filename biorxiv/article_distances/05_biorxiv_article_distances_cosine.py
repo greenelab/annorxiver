@@ -385,7 +385,7 @@ g = (
 )
 print(g)
 
-# # Recall at K
+# # Examine the top N predictions using Recall and Precision
 
 data_rows = []
 for df, distance_label in zip(
