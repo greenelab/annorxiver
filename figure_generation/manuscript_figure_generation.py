@@ -42,7 +42,7 @@ panel_one_size = (
     np.round(float(panel_one.root.attrib["height"][:-2]) * 1.33, 0),
 )
 
-scale_x = 1
+scale_x = 1.3
 scale_y = 1
 
 print(f"original: {panel_one_size}")
@@ -61,15 +61,15 @@ panel_two_size = (
     np.round(float(panel_two.root.attrib["width"][:-2]) * 1.33, 0),
     np.round(float(panel_two.root.attrib["height"][:-2]) * 1.33, 0),
 )
-scale_x = 1
-scale_y = 1
+scale_x = 1.3
+scale_y = 1.3
 
 print(f"original: {panel_two_size}")
 print(f"scaled:{(panel_two_size[0]*scale_x, panel_two_size[1]*scale_y)}")
 
 panel_two = panel_two.getroot()
 panel_two.scale(x=scale_x, y=scale_y)
-panel_two.moveto(40, 598)
+panel_two.moveto(40, 620)
 
 # +
 panel_three = sg.fromfile(
@@ -80,15 +80,15 @@ panel_three_size = (
     np.round(float(panel_three.root.attrib["width"][:-2]) * 1.33, 0),
     np.round(float(panel_three.root.attrib["height"][:-2]) * 1.33, 0),
 )
-scale_x = 1
-scale_y = 1
+scale_x = 1.3
+scale_y = 1.3
 
 print(f"original: {panel_three_size}")
 print(f"scaled:{(panel_three_size[0]*scale_x, panel_three_size[1]*scale_y)}")
 
 panel_three = panel_three.getroot()
 panel_three.scale(x=scale_x, y=scale_y)
-panel_three.moveto(820, 580)
+panel_three.moveto(1000, 590)
 
 # +
 panel_four = sg.fromfile(
@@ -99,15 +99,15 @@ panel_four_size = (
     np.round(float(panel_four.root.attrib["width"][:-2]) * 1.33, 0),
     np.round(float(panel_four.root.attrib["height"][:-2]) * 1.33, 0),
 )
-scale_x = 1
-scale_y = 1
+scale_x = 1.3
+scale_y = 1.3
 
 print(f"original: {panel_four_size}")
 print(f"scaled:{(panel_four_size[0]*scale_x, panel_four_size[1]*scale_y)}")
 
 panel_four = panel_four.getroot()
 panel_four.scale(x=scale_x, y=scale_y)
-panel_four.moveto(20, 1170)
+panel_four.moveto(20, 1390)
 
 # +
 panel_five = sg.fromfile(
@@ -118,22 +118,22 @@ panel_five_size = (
     np.round(float(panel_five.root.attrib["width"][:-2]) * 1.33, 0),
     np.round(float(panel_five.root.attrib["height"][:-2]) * 1.33, 0),
 )
-scale_x = 1
-scale_y = 1
+scale_x = 1.3
+scale_y = 1.3
 
 print(f"original: {panel_five_size}")
 print(f"scaled:{(panel_five_size[0]*scale_x, panel_five_size[1]*scale_y)}")
 
 panel_five = panel_five.getroot()
 panel_five.scale(x=scale_x, y=scale_y)
-panel_five.moveto(800, 1150)
+panel_five.moveto(970, 1370)
 # -
 
 panel_one_label = sg.TextElement(30, 30, "A", size=30, weight="bold")
 panel_two_label = sg.TextElement(10, 600, "B", size=30, weight="bold")
-panel_three_label = sg.TextElement(800, 600, "C", size=30, weight="bold")
-panel_four_label = sg.TextElement(30, 1170, "D", size=30, weight="bold")
-panel_five_label = sg.TextElement(800, 1170, "E", size=30, weight="bold")
+panel_three_label = sg.TextElement(1000, 600, "C", size=30, weight="bold")
+panel_four_label = sg.TextElement(30, 1370, "D", size=30, weight="bold")
+panel_five_label = sg.TextElement(1000, 1370, "E", size=30, weight="bold")
 
 # +
 figure_one = sg.SVGFigure(
@@ -145,13 +145,11 @@ figure_one = sg.SVGFigure(
                 panel_four_size[0] + panel_five_size[0],
             ]
         )
-        - 100
     ),
     Unit(
         panel_one_size[1]
         + max(panel_two_size[1], panel_three_size[1])
         + max(panel_four_size[1], panel_five_size[1])
-        - 100,
     ),
 )
 
@@ -198,8 +196,8 @@ panel_one_size = (
     np.round(float(panel_one.root.attrib["height"][:-2]) * 1.33, 0),
 )
 
-scale_x = 1.4
-scale_y = 1.4
+scale_x = 1.7
+scale_y = 1.7
 
 print(f"original: {panel_one_size}")
 print(f"scaled:{(panel_one_size[0]*scale_x, panel_one_size[1]*scale_y)}")
@@ -218,15 +216,15 @@ panel_two_size = (
     float(panel_two.root.attrib["height"]),
 )
 
-scale_x = 1.2
-scale_y = 1.2
+scale_x = 2
+scale_y = 2
 
 print(f"original: {panel_two_size}")
 print(f"scaled:{(panel_two_size[0]*scale_x, panel_two_size[1]*scale_y)}")
 
 panel_two = panel_two.getroot()
 panel_two.scale(x=scale_x, y=scale_y)
-panel_two.moveto(150, 600)
+panel_two.moveto(150, 650)
 
 # +
 panel_three = load_clouds(
@@ -238,15 +236,15 @@ panel_three_size = (
     float(panel_three.root.attrib["height"]),
 )
 
-scale_x = 1.2
-scale_y = 1.2
+scale_x = 2
+scale_y = 2
 
 print(f"original: {panel_three_size}")
 print(f"scaled:{(panel_three_size[0]*scale_x, panel_three_size[1]*scale_y)}")
 
 panel_three = panel_three.getroot()
 panel_three.scale(x=scale_x, y=scale_y)
-panel_three.moveto(1300, 600)
+panel_three.moveto(1650, 650)
 
 # +
 panel_four = sg.fromfile(
@@ -259,15 +257,15 @@ panel_four_size = (
     np.round(float(panel_four.root.attrib["height"][:-2]) * 1.33, 0),
 )
 
-scale_x = 1
-scale_y = 1
+scale_x = 1.5
+scale_y = 1.5
 
 print(f"original: {panel_four_size}")
 print(f"scaled:{(panel_four_size[0]*scale_x, panel_four_size[1]*scale_y)}")
 
 panel_four = panel_four.getroot()
 panel_four.scale(x=scale_x, y=scale_y)
-panel_four.moveto(20, 1200)
+panel_four.moveto(20, 1500)
 
 # +
 panel_five = sg.fromfile(
@@ -280,24 +278,24 @@ panel_five_size = (
     np.round(float(panel_five.root.attrib["height"][:-2]) * 1.33, 0),
 )
 
-scale_x = 1
-scale_y = 1
+scale_x = 1.5
+scale_y = 1.5
 
 print(f"original: {panel_five_size}")
 print(f"scaled:{(panel_five_size[0]*scale_x, panel_five_size[1]*scale_y)}")
 
 panel_five = panel_five.getroot()
 panel_five.scale(x=scale_x, y=scale_y)
-panel_five.moveto(1020, 1200)
+panel_five.moveto(1500, 1500)
 # -
 
-panel_one_label = sg.TextElement(20, 30, "A", size=30, weight="bold")
-panel_one_image_label = sg.TextElement(400, 1100, "PC 1", size=30, weight="bold")
-panel_two_label = sg.TextElement(10, 600, "B", size=30, weight="bold")
-panel_two_image_label = sg.TextElement(1580, 1100, "PC 2", size=30, weight="bold")
-panel_three_label = sg.TextElement(1200, 600, "C", size=30, weight="bold")
-panel_four_label = sg.TextElement(10, 1200, "D", size=30, weight="bold")
-panel_five_label = sg.TextElement(1200, 1200, "E", size=30, weight="bold")
+panel_one_label = sg.TextElement(20, 50, "A", size=50, weight="bold")
+panel_one_image_label = sg.TextElement(600, 1450, "PC 1", size=40, weight="bold")
+panel_two_label = sg.TextElement(10, 650, "B", size=50, weight="bold")
+panel_two_image_label = sg.TextElement(2150, 1450, "PC 2", size=40, weight="bold")
+panel_three_label = sg.TextElement(1550, 650, "C", size=50, weight="bold")
+panel_four_label = sg.TextElement(10, 1500, "D", size=50, weight="bold")
+panel_five_label = sg.TextElement(1550, 1500, "E", size=50, weight="bold")
 
 # +
 figure_two = sg.SVGFigure(
@@ -309,13 +307,13 @@ figure_two = sg.SVGFigure(
                 panel_four_size[0] + panel_five_size[0],
             ]
         )
-        - 100
+        + 400
     ),
     Unit(
         panel_one_size[1]
         + max(panel_two_size[1], panel_three_size[1])
         + max(panel_four_size[1], panel_five_size[1])
-        + 200,
+        + 750
     ),
 )
 
@@ -386,7 +384,9 @@ panel_two.scale(x=scale_x, y=scale_y)
 panel_two.moveto(580, 20)
 
 # +
-panel_three = sg.fromfile(article_distance_path / "publication_rate.svg")
+panel_three = sg.fromfile(
+    article_distance_path / "publication_rate_reviewer_request.svg"
+)
 
 panel_three_size = (
     np.round(float(panel_three.root.attrib["width"][:-2]) * 1.33, 0),
@@ -444,15 +444,15 @@ panel_one_size = (
     np.round(float(panel_one.root.attrib["height"][:-2]) * 1.33, 0),
 )
 
-scale_x = 1
-scale_y = 1
+scale_x = 2
+scale_y = 2
 
 print(f"original: {panel_one_size}")
 print(f"scaled:{(panel_one_size[0]*scale_x, panel_one_size[1]*scale_y)}")
 
 panel_one = panel_one.getroot()
 panel_one.scale(x=scale_x, y=scale_y)
-panel_one.moveto(30, 20)
+panel_one.moveto(200, 20)
 
 # +
 panel_two = sg.fromfile(
@@ -464,15 +464,15 @@ panel_two_size = (
     np.round(float(panel_two.root.attrib["height"][:-2]) * 1.33, 0),
 )
 
-scale_x = 1
-scale_y = 1
+scale_x = 1.4
+scale_y = 1.4
 
 print(f"original: {panel_two_size}")
 print(f"scaled: {(panel_two_size[0]*scale_x, panel_two_size[1]*scale_y)}")
 
 panel_two = panel_two.getroot()
 panel_two.scale(x=scale_x, y=scale_y)
-panel_two.moveto(1100, 0)
+panel_two.moveto(30, 700)
 
 # +
 panel_three = sg.fromfile(
@@ -484,24 +484,24 @@ panel_three_size = (
     np.round(float(panel_three.root.attrib["height"][:-2]) * 1.33, 0),
 )
 
-scale_x = 1
-scale_y = 1
+scale_x = 1.4
+scale_y = 1.4
 
 print(f"original: {panel_three_size}")
 print(f"scaled: {(panel_three_size[0]*scale_x, panel_three_size[1]*scale_y)}")
 
 panel_three = panel_three.getroot()
 panel_three.scale(x=scale_x, y=scale_y)
-panel_three.moveto(40, 620)
+panel_three.moveto(1000, 700)
 # -
 
 panel_one_label = sg.TextElement(10, 30, "A", size=30, weight="bold")
-panel_two_label = sg.TextElement(1030, 30, "B", size=30, weight="bold")
-panel_three_label = sg.TextElement(10, 620, "C", size=30, weight="bold")
+panel_two_label = sg.TextElement(10, 720, "B", size=30, weight="bold")
+panel_three_label = sg.TextElement(1000, 720, "C", size=30, weight="bold")
 
 figure_four = sg.SVGFigure(
-    Unit(max([panel_one_size[0] + panel_two_size[0], panel_three_size[0]]) - 130),
-    Unit(max(panel_one_size[1], panel_two_size[1]) + panel_three_size[1] - 200),
+    Unit(max([panel_one_size[0] + panel_two_size[0], panel_three_size[0]]) + 180),
+    Unit(max(panel_one_size[1], panel_two_size[1]) + panel_three_size[1] + 300),
 )
 figure_four.append(
     [
@@ -534,8 +534,8 @@ panel_one_size = (
     np.round(float(panel_one.root.attrib["height"][:-2]) * 1.33, 0),
 )
 
-scale_x = 1
-scale_y = 1
+scale_x = 1.5
+scale_y = 1.5
 
 print(f"original: {panel_one_size}")
 print(f"scaled:{(panel_one_size[0]*scale_x, panel_one_size[1]*scale_y)}")
@@ -552,15 +552,15 @@ panel_two_size = (
     np.round(float(panel_two.root.attrib["height"][:-2]) * 1.33, 0),
 )
 
-scale_x = 1
-scale_y = 1
+scale_x = 1.5
+scale_y = 1.5
 
 print(f"original: {panel_two_size}")
 print(f"scaled: {(panel_two_size[0]*scale_x, panel_two_size[1]*scale_y)}")
 
 panel_two = panel_two.getroot()
 panel_two.scale(x=scale_x, y=scale_y)
-panel_two.moveto(930, 20)
+panel_two.moveto(1200, 20)
 
 # +
 # Overloading clouds to work with png images
@@ -573,15 +573,15 @@ panel_three_size = (
     np.round(float(panel_three.root.attrib["height"][:-2]) * 1.33, 0),
 )
 
-scale_x = 1
-scale_y = 1
+scale_x = 1.5
+scale_y = 1.5
 
 print(f"original: {panel_three_size}")
 print(f"scaled: {(panel_three_size[0]*scale_x, panel_three_size[1]*scale_y)}")
 
 panel_three = panel_three.getroot()
 panel_three.scale(x=scale_x, y=scale_y)
-panel_three.moveto(50, 760)
+panel_three.moveto(50, 900)
 
 # +
 panel_four = sg.fromfile(
@@ -593,15 +593,15 @@ panel_four_size = (
     np.round(float(panel_four.root.attrib["height"][:-2]) * 1.33, 0),
 )
 
-scale_x = 1
-scale_y = 1
+scale_x = 1.5
+scale_y = 1.5
 
 print(f"original: {panel_four_size}")
 print(f"scaled: {(panel_four_size[0]*scale_x, panel_three_size[1]*scale_y)}")
 
 panel_four = panel_four.getroot()
 panel_four.scale(x=scale_x, y=scale_y)
-panel_four.moveto(930, 720)
+panel_four.moveto(1250, 820)
 
 # +
 panel_five = sg.fromfile(
@@ -613,22 +613,22 @@ panel_five_size = (
     np.round(float(panel_five.root.attrib["height"][:-2]) * 1.33, 0),
 )
 
-scale_x = 1.2
-scale_y = 1.2
+scale_x = 1.5
+scale_y = 1.5
 
 print(f"original: {panel_five_size}")
 print(f"scaled: {(panel_five_size[0]*scale_x, panel_three_size[1]*scale_y)}")
 
 panel_five = panel_five.getroot()
 panel_five.scale(x=scale_x, y=scale_y)
-panel_five.moveto(30, 1300)
+panel_five.moveto(50, 1600)
 # -
 
 panel_one_label = sg.TextElement(10, 30, "A", size=30, weight="bold")
-panel_two_label = sg.TextElement(930, 30, "B", size=30, weight="bold")
-panel_three_label = sg.TextElement(10, 740, "C", size=30, weight="bold")
-panel_four_label = sg.TextElement(930, 740, "D", size=30, weight="bold")
-panel_five_label = sg.TextElement(10, 1350, "E", size=30, weight="bold")
+panel_two_label = sg.TextElement(1200, 30, "B", size=30, weight="bold")
+panel_three_label = sg.TextElement(10, 860, "C", size=30, weight="bold")
+panel_four_label = sg.TextElement(1200, 860, "D", size=30, weight="bold")
+panel_five_label = sg.TextElement(10, 1650, "E", size=30, weight="bold")
 
 figure_five = sg.SVGFigure(
     Unit(
@@ -639,13 +639,13 @@ figure_five = sg.SVGFigure(
                 panel_four_size[0] + panel_five_size[0],
             ]
         )
-        - 100
+        + 250
     ),
     Unit(
         panel_one_size[1]
         + max(panel_two_size[1], panel_three_size[1])
         + max(panel_four_size[1], panel_five_size[1])
-        - 200
+        + 270
     ),
 )
 figure_five.append(
