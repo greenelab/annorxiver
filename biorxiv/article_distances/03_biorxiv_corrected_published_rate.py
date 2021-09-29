@@ -301,17 +301,25 @@ publish_rate_df["pub_month"] = pd.Categorical(
     publish_rate_df.pub_month.values.tolist(), ordered=True
 )
 
-posted = (
+posted_recency_adj = (
     publish_rate_df.query("label=='2020 Snapshot+Missing Links'")
     .query("pub_month < '2019-01'")
     .posted.sum()
 )
 
-published = (
+published_recency_adj = (
     publish_rate_df.query("label=='2020 Snapshot+Missing Links'")
     .query("pub_month < '2019-01'")
     .published.sum()
 )
+
+posted = publish_rate_df.query("label=='2020 Snapshot+Missing Links'").posted.sum()
+
+published = publish_rate_df.query(
+    "label=='2020 Snapshot+Missing Links'"
+).published.sum()
+
+
 print(f"Published: {published}")
 print(f"Posted: {posted}")
 print(f"Overall proportion published: {published/posted:.4f}")
@@ -357,13 +365,25 @@ g = (
     + p9.geom_hline(
         yintercept=published / posted, linetype="solid", color=color_mapper["2020ML"]
     )
+    + p9.geom_hline(
+        yintercept=published_recency_adj / posted_recency_adj,
+        linetype="dashed",
+        color=color_mapper["2020ML"],
+    )
     + p9.annotate("text", x=8.5, y=0.395, label="overall: 0.4196", size=14)
     + p9.annotate(
-        "text", x=68.5, y=0.66, label=f"overall: {published/posted:.4f}", size=14
+        "text", x=8.5, y=0.48, label=f"overall: {published/posted:.4f}", size=14
+    )
+    + p9.annotate(
+        "text",
+        x=68.5,
+        y=0.66,
+        label=f"overall: {published_recency_adj/posted_recency_adj:.4f}",
+        size=14,
     )
     + p9.theme_seaborn(style="ticks", context="paper", font="Arial", font_scale=2)
     + p9.theme(
-        figure_size=(11, 6.5),
+        figure_size=(11, 8.5),
         axis_text_x=p9.element_blank(),
         axis_title_x=p9.element_text(margin={"t": 15}),
     )
