@@ -167,9 +167,16 @@ plot_df.head()
 
 g = (
     p9.ggplot(
-        plot_df, p9.aes(y="lemma", x="lower_odds", xend="upper_odds", yend="lemma")
+        plot_df.assign(lemma=lambda x: pd.Categorical(x.lemma.tolist())),
+        p9.aes(
+            y="lemma",
+            xmin="lower_odds",
+            x="odds_ratio",
+            xmax="upper_odds",
+            yend="lemma",
+        ),
     )
-    + p9.geom_segment(color="#253494", size=5, alpha=0.7)
+    + p9.geom_errorbarh(color="#253494")
     + p9.scale_y_discrete(
         limits=(plot_df.sort_values("odds_ratio", ascending=True).lemma.tolist())
     )
@@ -269,10 +276,16 @@ plot_special_char_df.head()
 
 g = (
     p9.ggplot(
-        plot_special_char_df,
-        p9.aes(y="lemma", x="lower_odds", xend="upper_odds", yend="lemma"),
+        plot_special_char_df.assign(lemma=lambda x: pd.Categorical(x.lemma.tolist())),
+        p9.aes(
+            y="lemma",
+            xmin="lower_odds",
+            x="odds_ratio",
+            xmax="upper_odds",
+            yend="lemma",
+        ),
     )
-    + p9.geom_segment(color="#253494", size=3.5, alpha=0.7)
+    + p9.geom_errorbarh(color="#253494")
     + p9.scale_y_discrete(
         limits=(
             plot_special_char_df.sort_values(
@@ -385,9 +398,16 @@ plot_df.head()
 # +
 g = (
     p9.ggplot(
-        plot_df, p9.aes(y="lemma", x="lower_odds", xend="upper_odds", yend="lemma")
+        plot_df.assign(lemma=lambda x: pd.Categorical(x.lemma.tolist())),
+        p9.aes(
+            y="lemma",
+            xmin="lower_odds",
+            x="odds_ratio",
+            xmax="upper_odds",
+            yend="lemma",
+        ),
     )
-    + p9.geom_segment(color="#253494", size=3.5, alpha=0.7)
+    + p9.geom_errorbarh(color="#253494")
     + p9.scale_y_discrete(
         limits=(plot_df.sort_values("odds_ratio", ascending=True).lemma.tolist())
     )
@@ -480,10 +500,16 @@ plot_special_char_df.head()
 
 g = (
     p9.ggplot(
-        plot_special_char_df,
-        p9.aes(y="lemma", x="lower_odds", xend="upper_odds", yend="lemma"),
+        plot_special_char_df.assign(lemma=lambda x: pd.Categorical(x.lemma.tolist())),
+        p9.aes(
+            y="lemma",
+            xmin="lower_odds",
+            x="odds_ratio",
+            xmax="upper_odds",
+            yend="lemma",
+        ),
     )
-    + p9.geom_segment(color="#253494", size=3.5, alpha=0.7)
+    + p9.geom_errorbarh(color="#253494")
     + p9.scale_y_discrete(
         limits=(
             plot_special_char_df.sort_values(
@@ -591,9 +617,16 @@ plot_df.head()
 
 g = (
     p9.ggplot(
-        plot_df, p9.aes(y="lemma", x="lower_odds", xend="upper_odds", yend="lemma")
+        plot_df.assign(lemma=lambda x: pd.Categorical(x.lemma.tolist())),
+        p9.aes(
+            y="lemma",
+            xmin="lower_odds",
+            x="odds_ratio",
+            xmax="upper_odds",
+            yend="lemma",
+        ),
     )
-    + p9.geom_segment(color="#253494", size=3.5, alpha=0.7)
+    + p9.geom_errorbarh(color="#253494")
     + p9.scale_y_discrete(
         limits=(plot_df.sort_values("odds_ratio", ascending=True).lemma.tolist())
     )
@@ -682,10 +715,16 @@ plot_special_char_df.head()
 
 g = (
     p9.ggplot(
-        plot_special_char_df,
-        p9.aes(y="lemma", x="lower_odds", xend="upper_odds", yend="lemma"),
+        plot_special_char_df.assign(lemma=lambda x: pd.Categorical(x.lemma.tolist())),
+        p9.aes(
+            y="lemma",
+            xmin="lower_odds",
+            x="odds_ratio",
+            xmax="upper_odds",
+            yend="lemma",
+        ),
     )
-    + p9.geom_segment(color="#253494", size=3.5, alpha=0.7)
+    + p9.geom_errorbarh(color="#253494")
     + p9.scale_y_discrete(
         limits=(
             plot_special_char_df.sort_values(
@@ -793,9 +832,16 @@ plot_df.head()
 
 g = (
     p9.ggplot(
-        plot_df, p9.aes(y="lemma", x="lower_odds", xend="upper_odds", yend="lemma")
+        plot_df.assign(lemma=lambda x: pd.Categorical(x.lemma.tolist())),
+        p9.aes(
+            y="lemma",
+            xmin="lower_odds",
+            x="odds_ratio",
+            xmax="upper_odds",
+            yend="lemma",
+        ),
     )
-    + p9.geom_segment(color="#253494", size=3.5, alpha=0.7)
+    + p9.geom_errorbarh(color="#253494")
     + p9.scale_y_discrete(
         limits=(plot_df.sort_values("odds_ratio", ascending=True).lemma.tolist())
     )
@@ -884,10 +930,16 @@ plot_special_char_df.head()
 
 g = (
     p9.ggplot(
-        plot_special_char_df,
-        p9.aes(y="lemma", x="lower_odds", xend="upper_odds", yend="lemma"),
+        plot_special_char_df.assign(lemma=lambda x: pd.Categorical(x.lemma.tolist())),
+        p9.aes(
+            y="lemma",
+            xmin="lower_odds",
+            x="odds_ratio",
+            xmax="upper_odds",
+            yend="lemma",
+        ),
     )
-    + p9.geom_segment(color="#253494", size=3.5, alpha=0.7)
+    + p9.geom_errorbarh(color="#253494")
     + p9.scale_y_discrete(
         limits=(
             plot_special_char_df.sort_values(
@@ -906,19 +958,21 @@ g = (
         colour="black",
         size=0.5,
         alpha=1,
-        arrow=p9.arrow(length=0.1),
+        arrow=p9.arrow(length=0.2, angle=30),
     )
     + p9.annotate("text", label="Published  Enriched", x=1.5, y=2.5, size=18, alpha=0.7)
     + p9.annotate(
         "segment",
         x=-0.5,
         xend=-2.5,
-        y=39.5,
-        yend=39.5,
+        y=40,
+        yend=40,
         colour="black",
         size=0.5,
         alpha=1,
-        arrow=p9.arrow(length=0.1),
+        lineend="projecting",
+        position=p9.position_dodge(width=5),
+        arrow=p9.arrow(length=0.2, angle=30),
     )
     + p9.annotate("text", label="Preprint Enriched", x=-1.5, y=38.5, size=18, alpha=0.7)
     + p9.theme_seaborn(context="paper", style="ticks", font_scale=1.4, font="Arial")

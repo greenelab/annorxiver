@@ -175,9 +175,16 @@ plot_df.head()
 
 g = (
     p9.ggplot(
-        plot_df, p9.aes(y="lemma", x="lower_odds", xend="upper_odds", yend="lemma")
+        plot_df.assign(lemma=lambda x: pd.Categorical(x.lemma.tolist())),
+        p9.aes(
+            y="lemma",
+            xmin="lower_odds",
+            x="odds_ratio",
+            xmax="upper_odds",
+            yend="lemma",
+        ),
     )
-    + p9.geom_segment(color="#253494", size=6, alpha=0.7)
+    + p9.geom_errorbarh(color="#253494")
     + p9.scale_y_discrete(
         limits=(plot_df.sort_values("odds_ratio", ascending=True).lemma.tolist())
     )

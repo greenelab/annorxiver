@@ -359,7 +359,7 @@ g = (
     )
     + p9.annotate("text", x=8.5, y=0.395, label="overall: 0.4196", size=14)
     + p9.annotate(
-        "text", x=8.5, y=0.628, label=f"overall: {published/posted:.4f}", size=14
+        "text", x=68.5, y=0.66, label=f"overall: {published/posted:.4f}", size=14
     )
     + p9.theme_seaborn(style="ticks", context="paper", font="Arial", font_scale=2)
     + p9.theme(
