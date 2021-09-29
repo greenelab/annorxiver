@@ -383,7 +383,7 @@ g = (
     )
     + p9.theme_seaborn(style="ticks", context="paper", font="Arial", font_scale=2)
     + p9.theme(
-        figure_size=(11, 8.5),
+        figure_size=(11, 6.5),
         axis_text_x=p9.element_blank(),
         axis_title_x=p9.element_text(margin={"t": 15}),
     )
