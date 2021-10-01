@@ -585,7 +585,7 @@ panel_three.moveto(50, 900)
 
 # +
 panel_four = sg.fromfile(
-    polka_subset_path / "version_count_vs_publication_time_violin_filtered.svg"
+    polka_subset_path / "version_count_vs_publication_time_violin.svg"
 )
 
 panel_four_size = (
@@ -605,7 +605,7 @@ panel_four.moveto(1250, 820)
 
 # +
 panel_five = sg.fromfile(
-    polka_subset_path / "article_distance_vs_publication_time_hex_filtered.svg"
+    polka_subset_path / "article_distance_vs_publication_time_hex.svg"
 )
 
 panel_five_size = (
