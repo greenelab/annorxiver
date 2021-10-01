@@ -1,8 +1,8 @@
 <?xml version='1.0' encoding='ASCII' standalone='yes'?>
-<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" width="1405.0px" viewBox="0 0 1405.0 758.0" height="758.0px">
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" width="1715.0px" viewBox="0 0 1715.0 1258.0" height="1258.0px">
   <g>
     <rect width="100%" height="100%" fill="white"/>
-    <g transform="translate(30, 20) scale(1 1) translate(0, 0) scale(1 1) "><defs>
+    <g transform="translate(200, 20) scale(1 1) translate(0, 0) scale(2 2) "><defs>
   <style type="text/css">
 *{stroke-linecap:butt;stroke-linejoin:round;}
   </style>
@@ -1167,7 +1167,7 @@
   </clipPath>
  </defs>
 </g>
-    <g transform="translate(730, 0) scale(1 1) translate(0, 0) scale(1 1) "><defs>
+    <g transform="translate(30, 700) scale(1 1) translate(0, 0) scale(1.4 1.4) "><defs>
   <style type="text/css">
 *{stroke-linecap:butt;stroke-linejoin:round;}
   </style>
@@ -1877,7 +1877,7 @@
   </clipPath>
  </defs>
 </g>
-    <g transform="translate(40, 390) scale(1 1) translate(0, 0) scale(1.2 1) "><defs>
+    <g transform="translate(1000, 700) scale(1 1) translate(0, 0) scale(1.4 1.4) "><defs>
   <style type="text/css">
 *{stroke-linecap:butt;stroke-linejoin:round;}
   </style>
@@ -4256,8 +4256,8 @@
   </clipPath>
  </defs>
 </g>
-    <text x="10" y="30" font-size="22" font-family="Verdana" font-weight="bold" letter-spacing="0" text-anchor="start" fill="black">A</text>
-    <text x="730" y="30" font-size="22" font-family="Verdana" font-weight="bold" letter-spacing="0" text-anchor="start" fill="black">B</text>
-    <text x="10" y="420" font-size="22" font-family="Verdana" font-weight="bold" letter-spacing="0" text-anchor="start" fill="black">C</text>
+    <text x="10" y="30" font-size="30" font-family="Verdana" font-weight="bold" letter-spacing="0" text-anchor="start" fill="black">A</text>
+    <text x="10" y="720" font-size="30" font-family="Verdana" font-weight="bold" letter-spacing="0" text-anchor="start" fill="black">B</text>
+    <text x="1000" y="720" font-size="30" font-family="Verdana" font-weight="bold" letter-spacing="0" text-anchor="start" fill="black">C</text>
   </g>
 </svg>
