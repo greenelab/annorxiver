@@ -40,7 +40,9 @@ from mizani.formatters import timedelta_format
 
 import warnings
 
-mpl.rcParams["figure.dpi"] = 250
+mpl.rcParams["figure.dpi"] = 600
+mpl.rcParams["font.size"] = 12
+mpl.rcParams["font.family"] = "Arial"
 warnings.filterwarnings("ignore")
 # -
 
@@ -136,8 +138,7 @@ _ = g.set_xlabel("# of Preprint Versions")
 _ = g.plot(x_line - 1, y_line, "--k")
 _ = g.annotate(f"Y={results_2.slope:.2f}*X+{results_2.intercept:.2f}", (7, 1470))
 
-plt.figure(figsize=(11, 8.5))
-plt.rcParams.update({"font.size": 22})
+plt.figure(figsize=(8, 5))
 g = sns.violinplot(
     x="version_count",
     y="days_to_published",
@@ -152,8 +153,8 @@ _ = g.plot(x_line - 1, y_line, "--k")
 _ = g.annotate(f"Y={results_2.slope:.2f}*X+{results_2.intercept:.2f}", (7, 1470))
 _ = g.set_xlim(-0.5, 11.5)
 _ = g.set_ylim(0, g.get_ylim()[1])
-plt.savefig("output/version_count_vs_publication_time_violin.svg", dpi=500)
-plt.savefig("output/version_count_vs_publication_time_violin.png", dpi=500)
+plt.savefig("output/version_count_vs_publication_time_violin_rerun.svg")
+plt.savefig("output/version_count_vs_publication_time_violin_rerun.png")
 
 # +
 sns.set_theme(style="white", rc={"axes.facecolor": (0, 0, 0, 0)})
@@ -351,7 +352,7 @@ g = (
         label=f"Y={results_2.slope:.2f}*X+{results_2.intercept:.2f}",
     )
     + p9.labs(
-        x="Euclidian Distance of Preprints First and Final Versions",
+        x="Euclidean Distance of Preprints First and Final Versions",
         y="Time Elapsed Until Preprint is Published",
     )
     + p9.theme_seaborn(context="paper", style="ticks", font="Arial", font_scale=1.3)
@@ -377,7 +378,7 @@ g = (
         label=f"Y={results_2.slope:.2f}*X+{results_2.intercept:.2f}",
     )
     + p9.labs(
-        x="Euclidian Distance of Preprint-Published Versions",
+        x="Euclidean Distance of Preprint-Published Versions",
         y="Time Elapsed Until Preprint is Published",
         legend="log(count)",
     )
@@ -395,9 +396,7 @@ x_line = np.array(
 )
 y_line = x_line * results_2.slope + results_2.intercept
 
-# +
-plt.figure(figsize=(11, 8.5))
-plt.rcParams.update({"font.size": 25})
+plt.figure(figsize=(7, 5))
 ax = plt.hexbin(
     published_date_distances["doc_distances"],
     published_date_distances["days_to_published"],
@@ -412,29 +411,18 @@ plt.xlim([0, 12])
 plt.ylim([0, 1800])
 ax = plt.gca()
 ax.plot(x_line, y_line, "--k")
-
-for tick in ax.xaxis.get_major_ticks():
-    tick.label.set_size(20)
-
-for tick in ax.yaxis.get_major_ticks():
-    tick.label.set_size(20)
-
-ax.xaxis.label.set_size(20)
-ax.yaxis.label.set_size(20)
-
 ax.annotate(
     f"Y={results_2.slope:.2f}*X+{results_2.intercept:.2f}",
     (6, 1490),
 )
-_ = ax.set_xlabel("Euclidian Distance of Preprint-Published Versions")
+_ = ax.set_xlabel("Euclidean Distance of Preprint-Published Versions")
 _ = ax.set_ylabel("Time Elapsed Until Preprint is Published (Days)")
 cbar = plt.colorbar()
 _ = cbar.ax.set_ylabel("count", rotation=270)
-plt.savefig("output/article_distance_vs_publication_time_hex.svg", dpi=250)
-plt.savefig("output/article_distance_vs_publication_time_hex.png", dpi=250)
-# -
+plt.savefig("output/article_distance_vs_publication_time_hex.svg")
+plt.savefig("output/article_distance_vs_publication_time_hex.png")
 
-plt.figure(figsize=(11, 8.5))
+plt.figure(figsize=(6, 5))
 ax = plt.hexbin(
     published_date_distances["doc_distances"],
     published_date_distances["days_to_published"],
@@ -452,7 +440,7 @@ ax.annotate(
     f"Y={results_2.slope:.2f}*X+{results_2.intercept:.2f}",
     (6, 1490),
 )
-_ = ax.set_xlabel("Euclidian Distance of Preprint-Published Versions")
+_ = ax.set_xlabel("Euclidean Distance of Preprint-Published Versions")
 _ = ax.set_ylabel("Time Elapsed Until Preprint is Published (Days)")
 cbar = plt.colorbar()
 _ = cbar.ax.set_ylabel("count", rotation=270)
