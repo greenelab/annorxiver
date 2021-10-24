@@ -48,16 +48,26 @@ from annorxiver_modules.corpora_comparison_helper import (
     get_term_statistics,
     plot_bargraph,
     plot_point_bar_figure,
+    plot_pointgraph,
 )
 
 sys.path.append(str(Path("../../../preprint_similarity_search/server").resolve()))
 from SAUCIE import SAUCIE, Loader  # noqa: E402
 
-mpl.rcParams["figure.dpi"] = 250
+mpl.rcParams["figure.dpi"] = 600
+mpl.rcParams["font.size"] = 12
+mpl.rcParams["font.family"] = "Arial"
 # -
 
 import rpy2.robjects as robjects  # noqa: E402
 from rpy2.robjects import pandas2ri  # noqa: E402
+
+# +
+from rpy2.robjects.packages import importr  # noqa: E402
+
+utils = importr("utils")
+utils.install_packages("svglite")
+# -
 
 # # Corpora Comparison Preprint-Published Update
 
@@ -173,57 +183,28 @@ plot_df = (
 )
 plot_df.head()
 
-g = (
-    p9.ggplot(
-        plot_df.assign(lemma=lambda x: pd.Categorical(x.lemma.tolist())),
-        p9.aes(
-            y="lemma",
-            xmin="lower_odds",
-            x="odds_ratio",
-            xmax="upper_odds",
-            yend="lemma",
-        ),
-    )
-    + p9.geom_errorbarh(color="#253494")
-    + p9.scale_y_discrete(
-        limits=(plot_df.sort_values("odds_ratio", ascending=True).lemma.tolist())
-    )
-    + p9.scale_x_continuous(limits=(-11, 11))
-    + p9.geom_vline(p9.aes(xintercept=0), linetype="--", color="grey")
-    + p9.annotate(
-        "segment",
-        x=2,
-        xend=8,
-        y=1.5,
-        yend=1.5,
-        colour="black",
-        size=0.5,
-        alpha=1,
-        arrow=p9.arrow(length=0.1),
-    )
-    + p9.annotate("text", label="Published Enriched", x=5, y=2.5, size=12, alpha=0.7)
-    + p9.annotate(
-        "segment",
-        x=-2,
-        xend=-8,
-        y=39.5,
-        yend=39.5,
-        colour="black",
-        size=0.5,
-        alpha=1,
-        arrow=p9.arrow(length=0.1),
-    )
-    + p9.annotate("text", label="Preprint Enriched", x=-5, y=38.5, size=14, alpha=0.7)
-    + p9.theme_seaborn(context="paper", style="ticks", font_scale=1.8, font="Arial")
-    + p9.theme(
-        figure_size=(11, 8.5),
-        panel_grid_minor=p9.element_blank(),
-    )
-    + p9.labs(y=None, x="Preprint vs Published log2(Odds Ratio)")
+# +
+g = plot_pointgraph(
+    plot_df,
+    x_axis_label="Preprint vs Published log2(Odds Ratio)",
+    left_arrow_label="Preprint Enriched",
+    right_arrow_label="Published Enriched",
+    left_arrow_start=-2,
+    left_arrow_height=39.5,
+    right_arrow_start=2,
+    right_arrow_height=1.5,
+    arrow_length=6,
+    left_arrow_label_x=-5,
+    left_arrow_label_y=38.5,
+    right_arrow_label_x=5,
+    right_arrow_label_y=2.5,
+    limits=(-11, 11),
 )
+
 g.save("output/figures/preprint_published_frequency_odds.svg")
 g.save("output/figures/preprint_published_frequency_odds.png", dpi=250)
 print(g)
+# -
 
 count_plot_df = create_lemma_count_df(plot_df, "published", "preprint").assign(
     repository=lambda x: pd.Categorical(
@@ -481,10 +462,11 @@ robjects.globalenv["pmc_data_df"] = robjects.conversion.py2rpy(pmc_data_df)
 robjects.globalenv["subset_df"] = robjects.conversion.py2rpy(subset_df)
 robjects.r.source("saucie_plot.R")
 Image(filename="output/figures/saucie_plot.png")
+# +
 # Publication Time Analysis
 # Get publication dates
 url = "https://api.biorxiv.org/pub/2019-11-01/3000-01-01/"
-# +
+
 # Get preprint publication dates for 2019 -> 2020
 already_downloaded = Path("output/biorxiv_published_dates_post_2019.tsv").exists()
 if not already_downloaded:
