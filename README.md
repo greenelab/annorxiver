@@ -1,15 +1,19 @@
 # Annorxiver
 
 ## Citation
-- [Manuscript in progress](https:/greenelab.github.io/annorxiver_manuscript)
-- doi and full citation coming soon!!
+- BioRxiv Citation: [10.1101/2021.03.04.433874](https://doi.org/10.1101/2021.03.04.433874)
+- Publication Citation: (TBD)
 
 ## About
 This repository contains code for the annorxiver project.
-This project analyzes the linguistic style and content of bioRxiv preprints and aims to understand how these features change when preprints undergo the publication process.
-We are currently working on a manuscript for the work in this repository.
-Feel free to check it out! (link above).
+This project analyzes the linguistic content and style of bioRxiv preprints and aims to understand how these features change when preprints undergo the publication process.
+Our manuscript is currently finished and under review at the Plos Biology journal.
+Feel free to check our manuscript out! (link above).
 We also created a [web app](greenelab.github.io/preprint-similarity-search) that takes a bioRxiv or medRxiv preprint doi as input and returns a set of the most linguistically similar journals and articles to serve as potential publication venues for their work.
+
+## Data Availability
+Data for each figure in our manuscript can be found in our [FIGURE_DATA_SOURCE.md](FIGURE_DATA_SOURCE.md) file.
+This file contains relative links for each data source used to generate each piece of the figure panel.
 
 ## Directory Structure
 | Folder/file | Description |
