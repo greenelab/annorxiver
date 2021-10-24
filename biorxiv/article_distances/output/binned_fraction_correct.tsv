@@ -1,0 +1,5 @@
+distance_bin	frac_correct
+0-25th	1.0
+25th-50th	0.98
+50th-75th	0.34
+75th-min(Randomized Journal Pairs)	0.0

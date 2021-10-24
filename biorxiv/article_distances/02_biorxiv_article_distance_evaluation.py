@@ -69,6 +69,7 @@ binned_stats_df = (
         }
     )
 )
+binned_stats_df.to_csv("output/binned_fraction_correct.tsv", sep="\t", index=False)
 binned_stats_df
 
 g = (

@@ -173,9 +173,7 @@ final_df = articles_distance_df.assign(label="pre_vs_published").append(
 final_df.head()
 
 final_df = biorxiv_journal_df[["document", "preprint_doi"]].merge(final_df)
-final_df.to_csv(
-    "output/annotated_links/article_distances_rerun.tsv", sep="\t", index=False
-)
+final_df.to_csv("output/annotated_links/article_distances.tsv", sep="\t", index=False)
 final_df.head()
 
 # # Distribution plot
