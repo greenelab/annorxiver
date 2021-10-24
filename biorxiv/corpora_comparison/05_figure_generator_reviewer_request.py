@@ -148,6 +148,11 @@ full_text_comparison_special_char.head()
 # ### Original
 
 full_plot_df = calculate_confidence_intervals(full_text_comparison)
+full_plot_df.to_csv(
+    "output/comparison_stats/biorxiv_vs_pmc_comparison_error_bars.tsv",
+    sep="\t",
+    index=False,
+)
 full_plot_df.head()
 
 plot_df = (
@@ -226,6 +231,11 @@ count_plot_df = (
         )
     )
 )
+count_plot_df.to_csv(
+    "output/comparison_stats/biorxiv_vs_pmc_comparison_raw_counts.tsv",
+    sep="\t",
+    index=False,
+)
 count_plot_df.head()
 
 g = plot_bargraph(count_plot_df, plot_df)
@@ -254,6 +264,11 @@ full_plot_special_char_df = calculate_confidence_intervals(
     full_text_comparison_special_char.query("lemma != 'patient'").query(
         "lemma != 'groups'"
     )
+)
+full_plot_df.to_csv(
+    "output/comparison_stats/biorxiv_vs_pmc_comparison_special_char_removed_error_bars.tsv",
+    sep="\t",
+    index=False,
 )
 full_plot_special_char_df.head()
 
@@ -339,6 +354,11 @@ count_plot_df = (
             x.repository.tolist(), categories=["bioRxiv", "PMC"]
         )
     )
+)
+count_plot_df.to_csv(
+    "output/comparison_stats/biorxiv_vs_pmc_comparison_special_char_removed_raw_counts.tsv",
+    sep="\t",
+    index=False,
 )
 count_plot_df.head()
 
@@ -815,6 +835,11 @@ preprint_published_comparison_special_char.head()
 # ### Original
 
 full_plot_df = calculate_confidence_intervals(preprint_published_comparison)
+full_plot_df.to_csv(
+    "output/comparison_stats/preprint_vs_published_comparison_error_bars.tsv",
+    sep="\t",
+    index=False,
+)
 full_plot_df.head()
 
 plot_df = (
@@ -885,6 +910,11 @@ print(g)
 count_plot_df = create_lemma_count_df(plot_df, "preprint", "published").replace(
     {"preprint": "Preprint", "published": "Published"}
 )
+count_plot_df.to_csv(
+    "output/comparison_stats/preprint_vs_published_comparison_raw_counts.tsv",
+    sep="\t",
+    index=False,
+)
 count_plot_df.head()
 
 g = plot_bargraph(count_plot_df, plot_df)
@@ -909,6 +939,11 @@ Image(fig_output_path)
 
 full_plot_special_char_df = calculate_confidence_intervals(
     preprint_published_comparison_special_char
+)
+full_plot_df.to_csv(
+    "output/comparison_stats/preprint_vs_published_comparison_special_char_removed_error_bars.tsv",
+    sep="\t",
+    index=False,
 )
 full_plot_special_char_df.head()
 
@@ -992,6 +1027,11 @@ print(g)
 count_plot_df = create_lemma_count_df(
     plot_special_char_df, "preprint", "published"
 ).replace({"preprint": "Preprint", "published": "Published"})
+count_plot_df.to_csv(
+    "output/comparison_stats/preprint_vs_published_comparison_special_char_removed_raw_counts.tsv",
+    sep="\t",
+    index=False,
+)
 count_plot_df.head()
 
 g = plot_bargraph(count_plot_df, plot_special_char_df)
