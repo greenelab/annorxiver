@@ -179,6 +179,9 @@ print(g)
 category_half_life = pd.DataFrame.from_records(half_life).replace(
     np.inf, (temp_df["time_to_published"].dt.total_seconds() / 60 / 60 / 24).max()
 )
+category_half_life.to_csv(
+    "output/preprint_category_halflife_numbers.tsv", sep="\t", index=False
+)
 category_half_life
 
 g = (
