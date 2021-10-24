@@ -481,7 +481,7 @@ os.system("mogrify -alpha off output/Figure_5.tiff")
 
 # # Supplemental Figures
 
-# ## Figure 1
+# ## Figure S1
 
 word_association_path = Path(
     "../biorxiv/pca_association_experiment/output/word_pca_similarity/figure_pieces"
@@ -871,7 +871,7 @@ os.system(
 )
 os.system("mogrify -alpha off output/Figure_S5.tiff")
 
-# ## Figure Five
+# ## Figure S6
 
 polka_subset_path = Path("../biorxiv/polka_subset_experiment/output/figures")
 
