@@ -54,7 +54,7 @@ n_components = 50
 random_state = 100
 
 biorxiv_articles_df = pd.read_csv(
-    "../word_vector_experiment/output/word2vec_output/biorxiv_all_articles_300_fixed.tsv.xz",
+    "../word_vector_experiment/output/word2vec_output/biorxiv_all_articles_300.tsv.xz",
     sep="\t",
 )
 biorxiv_articles_df = biorxiv_articles_df.dropna()
@@ -136,8 +136,12 @@ pca_sample_df = (
     .apply(lambda x: x.sample(200, random_state=100) if len(x) > 200 else x)
     .reset_index(drop=True)
 )
+pca_sample_df.to_csv(
+    "output/subsampled_biorxiv_preprints_pca.tsv", sep="\t", index=False
+)
 pca_sample_df.head()
 
+# +
 # This is mardown to preserve the code.
 # jupytext is terrible and handling magic cells.
 # This cell needs to be R so I can use cowplot effectivelyfunction:
@@ -157,19 +161,24 @@ pca_sample_df.head()
 #
 # g <- (
 #         ggplot(pca_sample_df)
-#         + aes(x=pca1, y=pca2, color=factor(category))
-#         + theme_bw()
-#         + theme(
+# + aes(x=pca1, y=pca2, color=factor(category))
+
+# + theme_bw()
+
+# + theme(
 #             legend.position="left",
 #             text=element_text(family = "Arial", size=16),
 #             rect=element_rect(color="black"),
 #             panel.grid.major = element_blank(),
 #             panel.grid.minor = element_blank()
 #         )
-#         + geom_point()
-#         + scale_y_continuous(position="right")
-#         + scale_color_manual(values=color_mapper)
-#         + labs(
+# + geom_point()
+
+# + scale_y_continuous(position="right")
+
+# + scale_color_manual(values=color_mapper)
+
+# + labs(
 #             x="PC1",
 #             y="PC2",
 #             color="Article Category",

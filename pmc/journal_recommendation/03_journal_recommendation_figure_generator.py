@@ -117,7 +117,7 @@ result_df = pd.DataFrame.from_records(results)
 result_df["dataset"] = pd.Categorical(
     result_df.dataset.tolist(), categories=["train (cross validation)", "test"]
 )
-
+result_df.to_csv("output/knn_results.tsv", sep="\t", index=False)
 result_df.head()
 
 # +

@@ -168,6 +168,9 @@ preprint_vs_published.to_csv(
 preprint_vs_published
 
 full_plot_df = calculate_confidence_intervals(preprint_vs_published)
+full_plot_df.to_csv(
+    "output/polka_preprint_published_comparison_error_bars.tsv", sep="\t", index=False
+)
 full_plot_df.head()
 
 plot_df = (
@@ -210,6 +213,9 @@ count_plot_df = create_lemma_count_df(plot_df, "published", "preprint").assign(
     repository=lambda x: pd.Categorical(
         x.repository.tolist(), categories=["preprint", "published"]
     )
+)
+count_plot_df.to_csv(
+    "output/polka_preprint_published_comparison_raw_counts.tsv", sep="\t", index=False
 )
 count_plot_df.head()
 
@@ -448,6 +454,7 @@ coordinates = saucie_model.get_embedding(
 )
 
 subset_df = pd.DataFrame(coordinates, columns=["dim1", "dim2"])
+subset_df.to_csv("output/polka_et_al_saucie_coordinates.tsv", sep="\t", index=False)
 subset_df.head()
 
 pmc_data_df = pd.read_csv(
@@ -534,6 +541,9 @@ polka_published_preprint_df["days_to_published"] = polka_published_preprint_df[
     "time_to_published"
 ].dt.days
 print(polka_published_preprint_df.shape)
+polka_published_preprint_df.to_csv(
+    "output/polka_preprint_published_distances.tsv", sep="\t"
+)
 polka_published_preprint_df.head()
 # -
 
