@@ -7,6 +7,18 @@ Each figure heading will have a table that specifies the following information:
 - it's corresponding dataset file
 - the name of the notebook that generated each panel piece
 
+## Quick Links to each Figure
+- [Figure One](#figure-one)
+- [Figure Two](#figure-two)
+- [Figure Three](#figure-three)
+- [Figure Five](#figure-five)
+- [Figure S1](#figure-s1)
+- [Figure S2](#figure-s2)
+- [Figure S3](#figure-s3)
+- [Figure S4](#figure-s4)
+- [Figure S5](#figure-s5)
+- [Figure S6](#figure-s6)
+
 ## Figure One
 
 | Panel | Img Preview | Dataset | Notebook |
