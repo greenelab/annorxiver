@@ -1,11 +1,13 @@
 # Figure Data Map
 
 ## About
-This file is designed to point users and readers to datasets that were used to generate each figure piece.
+This file is designed to point users and readers to datasets that were used to generate each panel for all figures within the [Linguistic Analysis of the bioRxiv Preprint Landscape](https://greenelab.github.io/annorxiver_manuscript) manuscript.
+
 Each figure heading will have a table that specifies the following information: 
-- the panel piece label
-- it's corresponding dataset file
-- the name of the notebook that generated each panel piece
+- The label corresponding to a given panel, e.g., Figure 1A or Figure 2B.
+- The image thumbnail for the particular panel in question.
+- The corresponding dataset attached to the specific panel.
+- The name of the notebook that generated each panel.
 
 ## Quick Links to each Figure
 - [Figure One](#figure-one)
