@@ -179,6 +179,9 @@ print(g)
 category_half_life = pd.DataFrame.from_records(half_life).replace(
     np.inf, (temp_df["time_to_published"].dt.total_seconds() / 60 / 60 / 24).max()
 )
+category_half_life.to_csv(
+    "output/preprint_category_halflife_numbers.tsv", sep="\t", index=False
+)
 category_half_life
 
 g = (
@@ -211,11 +214,11 @@ g = (
         y="Time Until 50% of Preprints are Published",
         title="Preprint Category Half-Life",
     )
-    + p9.theme_seaborn(context="paper", style="white", font_scale=2, font="Arial")
-    + p9.theme(figure_size=(11, 8.5), axis_ticks_minor_x=p9.element_blank())
+    + p9.theme_seaborn(context="paper", style="white", font_scale=1, font="Arial")
+    + p9.theme(axis_ticks_minor_x=p9.element_blank(), text=p9.element_text(size=12))
 )
 g.save("output/preprint_category_halflife.svg")
-g.save("output/preprint_category_halflife.png", dpi=250)
+g.save("output/preprint_category_halflife.png", dpi=600)
 print(g)
 
 # Take home Results:

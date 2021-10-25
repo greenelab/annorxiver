@@ -219,6 +219,7 @@ publish_rate_df = (
     .append(snapshot_wo_links_df.drop("published_closed", axis=1))
     .reset_index(drop=True)
 )
+publish_rate_df.to_csv("output/adjusted_publication_rate.tsv", sep="\t", index=False)
 publish_rate_df.sample(10, random_state=100)
 
 # +

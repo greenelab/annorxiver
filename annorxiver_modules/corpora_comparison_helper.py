@@ -417,13 +417,11 @@ def plot_bargraph(count_plot_df, plot_df):
         )
         + p9.scale_y_continuous(labels=custom_format("{:,.0g}"))
         + p9.labs(x=None)
-        + p9.theme_seaborn(context="paper", style="ticks", font="Arial", font_scale=1.8)
+        + p9.theme_seaborn(context="paper", style="ticks", font="Arial", font_scale=1)
         + p9.theme(
             figure_size=(11, 8.5),
             strip_background=p9.element_rect(fill="white"),
-            strip_text=p9.element_text(size=14),
-            axis_title=p9.element_text(size=14),
-            axis_text_x=p9.element_text(size=12),
+            text=p9.element_text(size=12),
         )
     )
     return graph
@@ -466,3 +464,106 @@ def plot_point_bar_figure(figure_one_path, figure_two_path):
     fig.append([plot1, plot2, text_A, text_B])
 
     return fig
+
+
+def plot_pointgraph(
+    plot_df,
+    x_axis_label,
+    left_arrow_label,
+    right_arrow_label,
+    left_arrow_start=-0.5,
+    left_arrow_height=38.5,
+    right_arrow_start=0.5,
+    right_arrow_height=1.5,
+    arrow_length=2,
+    left_arrow_label_x=-1.5,
+    left_arrow_label_y=-1.5,
+    right_arrow_label_x=-1.5,
+    right_arrow_label_y=-1.5,
+    limits=(-3, 3),
+):
+    """
+    This function is designed to plot the an errorbar graph to show each token's odd ratio.
+    The main idea for this graph is to show which corpora a token is enriched
+    Args:
+        plot_df - the data frame to plot,
+        x_axis_label - the label of the x axis,
+        left_arrow_label - the label for the left arrow,
+        right_arrow_label - the label for the right arrow,
+        left_arrow_start - the start of the left arrow to be plotted
+        left_arrow_height - the height at which the arrow needs to be plotted
+        right_arrow_start -  the start of the right arrow to be plotted
+        right_arrow_height - - the height at which the arrow needs to be plotted
+        arrow_length - the length of the arrow
+        left_arrow_label_x - the x axis position for the label of the left arrow
+        left_arrow_label_y - the y axis position for the label of the left arrow
+        right_arrow_label_x - the x axis position for the label of the right arrow
+        right_arrow_label_y - the y axis position for the label of the right arrow
+        limits=(-3,3)
+    """
+
+    graph = (
+        p9.ggplot(
+            plot_df.assign(lemma=lambda x: pd.Categorical(x.lemma.tolist())),
+            p9.aes(
+                y="lemma",
+                xmin="lower_odds",
+                x="odds_ratio",
+                xmax="upper_odds",
+                yend="lemma",
+            ),
+        )
+        + p9.geom_errorbarh(color="#253494")
+        + p9.scale_y_discrete(
+            limits=(plot_df.sort_values("odds_ratio", ascending=True).lemma.tolist())
+        )
+        + p9.scale_x_continuous(limits=limits)
+        + p9.geom_vline(p9.aes(xintercept=0), linetype="--", color="grey")
+        + p9.annotate(
+            "segment",
+            x=left_arrow_start,
+            xend=left_arrow_start - arrow_length,
+            y=left_arrow_height,
+            yend=left_arrow_height,
+            colour="black",
+            size=0.5,
+            alpha=1,
+            arrow=p9.arrow(length=0.1),
+        )
+        + p9.annotate(
+            "text",
+            label=left_arrow_label,
+            x=left_arrow_label_x,
+            y=left_arrow_label_y,
+            size=12,
+            alpha=0.7,
+        )
+        + p9.annotate(
+            "segment",
+            x=right_arrow_start,
+            xend=right_arrow_start + arrow_length,
+            y=right_arrow_height,
+            yend=right_arrow_height,
+            colour="black",
+            size=0.5,
+            alpha=1,
+            arrow=p9.arrow(length=0.1),
+        )
+        + p9.annotate(
+            "text",
+            label=right_arrow_label,
+            x=right_arrow_label_x,
+            y=right_arrow_label_y,
+            size=12,
+            alpha=0.7,
+        )
+        + p9.theme_seaborn(context="paper", style="ticks", font_scale=1, font="Arial")
+        + p9.theme(
+            figure_size=(11, 8.5),
+            panel_grid_minor=p9.element_blank(),
+            text=p9.element_text(size=12),
+        )
+        + p9.labs(y=None, x=x_axis_label)
+    )
+
+    return graph

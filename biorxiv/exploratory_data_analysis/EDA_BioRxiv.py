@@ -1,9 +1,22 @@
-#!/usr/bin/env python
-# coding: utf-8
+# -*- coding: utf-8 -*-
+# ---
+# jupyter:
+#   jupytext:
+#     formats: ipynb,py
+#     text_representation:
+#       extension: .py
+#       format_name: light
+#       format_version: '1.5'
+#       jupytext_version: 1.9.1+dev
+#   kernelspec:
+#     display_name: Python [conda env:annorxiver]
+#     language: python
+#     name: conda-env-annorxiver-py
+# ---
 
 # # Exploratory Data Analysis-BioRxiv
 
-# This notebook is designed to generate descriptive statistics for a snapshot of the BioRxiv repository. The following information is obtained: 
+# This notebook is designed to generate descriptive statistics for a snapshot of the BioRxiv repository. The following information is obtained:
 # 1. if the article is a research article
 # 2. if the article is a new, contradictory, or confirmatory analysis
 # 3. the category assigned to each research article (pi self assigns)
@@ -11,9 +24,7 @@
 
 # ## Load the environment to parse BioRxiv
 
-# In[1]:
-
-
+# +
 from pathlib import Path
 import re
 from itertools import product
@@ -22,18 +33,12 @@ import lxml.etree as ET
 import pandas as pd
 import plotnine as p9
 from tqdm import tqdm_notebook
-
-
-# In[2]:
-
+# -
 
 biorxiv_files = Path("../biorxiv_articles").rglob("*.xml")
 
 
 # ## Parse BioRxiv
-
-# In[3]:
-
 
 def header_group_mapper(header):
     if re.search("method", header, flags=re.I):
@@ -44,7 +49,11 @@ def header_group_mapper(header):
         return "conclusion"
     if re.search(r"(supplementary|supplemental) material", header, flags=re.I):
         return "supplemental material"
-    if re.search(r"(declaration[s]?( of interest[s]?)?)|(competing (financial )?interest[s]?)", header, flags=re.I):
+    if re.search(
+        r"(declaration[s]?( of interest[s]?)?)|(competing (financial )?interest[s]?)",
+        header,
+        flags=re.I,
+    ):
         return "conflict of interest"
     if re.search("additional information", header, flags=re.I):
         return "supplemental information"
@@ -59,44 +68,44 @@ def header_group_mapper(header):
     return header
 
 
-# In[4]:
-
-
 if (
-    not Path("output/biorxiv_article_metadata.tsv").exists() and 
-    not Path("output/biorxiv_article_sections.tsv").exists()
+    not Path("output/biorxiv_article_metadata.tsv").exists()
+    and not Path("output/biorxiv_article_sections.tsv").exists()
 ):
     article_metadata = []
     article_sections = []
 
     type_mapper = {
-        'author-type':'author_type',
-        'heading':'heading',
-        'hwp-journal-coll':'category'
+        "author-type": "author_type",
+        "heading": "heading",
+        "hwp-journal-coll": "category",
     }
-    xml_parser = ET.XMLParser(encoding='UTF-8', recover=True)
+    xml_parser = ET.XMLParser(encoding="UTF-8", recover=True)
     for file in tqdm_notebook(biorxiv_files):
-        article = file.with_suffix('').name
+        article = file.with_suffix("").name
         root = ET.parse(open(file, "rb"), parser=xml_parser).getroot()
 
         # Grab the subject category
         metadata = {
-            type_mapper[x.attrib['subj-group-type']]:x.getchildren()[0].text.lower()
-            for x in root.xpath('//subj-group')
+            type_mapper[x.attrib["subj-group-type"]]: x.getchildren()[0].text.lower()
+            for x in root.xpath("//subj-group")
         }
 
-        metadata.update({'document':f"{article}.xml", 'doi':root.xpath('//article-id')[0].text})
+        metadata.update(
+            {"document": f"{article}.xml", "doi": root.xpath("//article-id")[0].text}
+        )
         article_metadata.append(metadata)
 
-        # Grab the section titles 
+        # Grab the section titles
         section_objs = list(
             filter(
-                lambda x: "id" in x.attrib and re.search(r"s[\d]+$", x.attrib['id']) is not None,
-                root.xpath('//sec')
+                lambda x: "id" in x.attrib
+                and re.search(r"s[\d]+$", x.attrib["id"]) is not None,
+                root.xpath("//sec"),
             )
         )
 
-        title_objs = list(map(lambda x: x.xpath('title//text()'), section_objs))
+        title_objs = list(map(lambda x: x.xpath("title//text()"), section_objs))
         title_objs = list(filter(lambda x: len(x) > 0, title_objs))
 
         # edge case in the xml where
@@ -106,10 +115,17 @@ if (
 
             # filter out weird characters ⓘ
             # cant think of a better way to handle these types of edge cases
-            title_objs = list(map(lambda headers: list(filter(lambda token: token != 'ⓘ', headers)), title_objs))
-            title_objs = list(map(lambda x: x[0] + x[1] if len(x) > 1 else x, title_objs))
+            title_objs = list(
+                map(
+                    lambda headers: list(filter(lambda token: token != "ⓘ", headers)),
+                    title_objs,
+                )
+            )
+            title_objs = list(
+                map(lambda x: x[0] + x[1] if len(x) > 1 else x, title_objs)
+            )
 
-        abstract_section = root.xpath('//abstract/title//text()')
+        abstract_section = root.xpath("//abstract/title//text()")
         if len(abstract_section) > 0:
 
             # in case of a parse error that splits A from bstract
@@ -122,170 +138,114 @@ if (
 
         article_sections += list(
             map(
-                lambda x: {'section':header_group_mapper(x[0]), 'document':x[1]},
-                product(title_objs, [article])
+                lambda x: {"section": header_group_mapper(x[0]), "document": x[1]},
+                product(title_objs, [article]),
             )
         )
 
-
-# In[5]:
-
-
-if (not Path("output/biorxiv_article_metadata.tsv").exists()):
+# +
+if not Path("output/biorxiv_article_metadata.tsv").exists():
     metadata_df = (
-        pd.DataFrame
-        .from_records(article_metadata)
-        .fillna({"category":'none', 'author_type':'none', 'heading':'none'})
-        .assign(category=lambda x:x.category.apply(lambda x: " ".join(x.split("_")) if "_" in x else x))
+        pd.DataFrame.from_records(article_metadata)
+        .fillna({"category": "none", "author_type": "none", "heading": "none"})
+        .assign(
+            category=lambda x: x.category.apply(
+                lambda x: " ".join(x.split("_")) if "_" in x else x
+            )
+        )
         .replace(
-            {'heading':
-                  {
-                    "bioinformatics":"none",
+            {
+                "heading": {
+                    "bioinformatics": "none",
                     "genomics": "none",
                     "zoology": "none",
                     "evolutionary biology": "none",
                     "animal behavior and cognition": "none",
-                    "ecology":"none",
-                    "genetics":"none"
-                  }
+                    "ecology": "none",
+                    "genetics": "none",
+                }
             }
         )
     )
 
-    metadata_df.to_csv(
-        "output/biorxiv_article_metadata.tsv", 
-        sep="\t", index=False
-    )
+    metadata_df.to_csv("output/biorxiv_article_metadata.tsv", sep="\t", index=False)
 else:
-    metadata_df = pd.read_csv(
-        "output/biorxiv_article_metadata.tsv", 
-        sep="\t"
-    )
+    metadata_df = pd.read_csv("output/biorxiv_article_metadata.tsv", sep="\t")
 
 metadata_df.head()
 
+# +
+if not Path("output/biorxiv_article_sections.tsv").exists():
+    sections_df = pd.DataFrame.from_records(article_sections)
 
-# In[6]:
-
-
-if (not Path("output/biorxiv_article_sections.tsv").exists()):
-    sections_df = (
-        pd.DataFrame
-        .from_records(article_sections)
-    )
-
-    sections_df.to_csv(
-        "output/biorxiv_article_sections.tsv", 
-        sep="\t", index=False
-    )
+    sections_df.to_csv("output/biorxiv_article_sections.tsv", sep="\t", index=False)
 else:
-    sections_df = pd.read_csv(
-        "output/biorxiv_article_sections.tsv", 
-        sep="\t"
-    )
+    sections_df = pd.read_csv("output/biorxiv_article_sections.tsv", sep="\t")
 
 sections_df.head()
-
+# -
 
 # # Regular Research Articles?
 
 # BioRxiv claims that each article should be a research article. The plot below mainly confirms that statement.
 
-# In[7]:
-
-
 g = (
     p9.ggplot(metadata_df, p9.aes(x="author_type"))
-    + p9.geom_bar(size=10, fill="#253494",)
-    + p9.theme_seaborn(
-        context="paper",
-        style="ticks",
-        font="Arial",
-        font_scale=1
+    + p9.geom_bar(
+        size=10,
+        fill="#253494",
     )
+    + p9.theme_seaborn(context="paper", style="ticks", font="Arial", font_scale=1)
 )
 print(g)
 
-
-# In[8]:
-
-
 metadata_df["author_type"].value_counts()
-
 
 # # BioRxiv Research Article Categories
 
 # Categories assigned to each research article. Neuroscience dominates majority of the articles as expected.
 
-# In[9]:
-
-
+# +
 category_list = metadata_df.category.value_counts().index.tolist()[::-1]
 
 # plot nine doesn't implement reverse keyword for scale x discrete
 # ugh...
 g = (
     p9.ggplot(metadata_df, p9.aes(x="category"))
-    + p9.geom_bar(
-        size=10, fill="#253494",
-        position=p9.position_dodge(width=3)
-    )
+    + p9.geom_bar(size=10, fill="#253494", position=p9.position_dodge(width=3))
     + p9.scale_x_discrete(limits=category_list)
     + p9.coord_flip()
-    + p9.theme_seaborn(
-        context="paper",
-        style="ticks",
-        font="Arial",
-        font_scale=1
-    )
+    + p9.theme_seaborn(context="paper", style="ticks", font="Arial", font_scale=1)
+    + p9.theme(text=p9.element_text(size=12))
 )
-g.save("output/figures/preprint_category.png", dpi=500)
+g.save("output/figures/preprint_category.svg")
+g.save("output/figures/preprint_category.png", dpi=300)
 print(g)
-
-
-# In[10]:
-
+# -
 
 metadata_df["category"].value_counts()
 
-
 # # New, Confirmatory, Contradictory Results?
 
-# In[11]:
-
-
+# +
 heading_list = metadata_df.heading.value_counts().index.tolist()[::-1]
 
 g = (
-    p9.ggplot(
-        metadata_df, 
-        p9.aes(x="heading")
-    )
+    p9.ggplot(metadata_df, p9.aes(x="heading"))
     + p9.geom_bar(size=10, fill="#253494")
     + p9.scale_x_discrete(limits=heading_list)
     + p9.coord_flip()
-    + p9.theme_seaborn(
-        context="paper",
-        style="ticks",
-        font="Arial",
-        font_scale=1
-    )
+    + p9.theme_seaborn(context="paper", style="ticks", font="Arial", font_scale=1)
 )
 g.save("output/figures/preprint_headings.png", dpi=500)
 print(g)
-
-
-# In[12]:
-
+# -
 
 metadata_df["heading"].value_counts()
 
-
 # # BioRxiv Section Articles
 
-# In[13]:
-
-
+# +
 section_list = sections_df.section.value_counts()
 section_list = section_list[section_list > 800].index.to_list()[::-1]
 
@@ -295,20 +255,11 @@ g = (
     + p9.geom_bar(position="dodge", fill="#253494")
     + p9.scale_x_discrete(limits=section_list)
     + p9.coord_flip()
-    + p9.theme_seaborn(
-        context="paper",
-        style="ticks",
-        font="Arial",
-        font_scale=1
-    )
+    + p9.theme_seaborn(context="paper", style="ticks", font="Arial", font_scale=1)
 )
 g.save("output/figures/preprint_sections.png", dpi=500)
 print(g)
-
-
-# In[14]:
-
+# -
 
 section_list = sections_df.section.value_counts()
 section_list[section_list > 800]
-

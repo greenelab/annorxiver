@@ -41,7 +41,9 @@ import tqdm
 
 from annorxiver_modules.document_helper import generate_doc_vector
 
-mpl.rcParams["figure.dpi"] = 250
+mpl.rcParams["figure.dpi"] = 600
+mpl.rcParams["font.size"] = 12
+mpl.rcParams["font.family"] = "Arial"
 # -
 
 # # Load the document vectors
@@ -177,8 +179,8 @@ polka_y_line = polka_x_line * results_3.slope + results_3.intercept
 
 # +
 # Graph here?
-plt.figure(figsize=(11, 8.5))
-plt.rcParams.update({"font.size": 22})
+plt.figure(figsize=(11, 8))
+plt.rcParams.update({"font.size": 12})
 g = sns.violinplot(
     x="version_count",
     y="days_to_published",
@@ -200,12 +202,12 @@ _ = g.scatter(
 )
 test_obj = g.annotate(
     f"Y={results_2.slope:.2f}*X+{results_2.intercept:.2f}",
-    (7, 1480),
+    (9, 1480),
     label="background",
 )
 test2_obj = g.annotate(
     f"Y={results_3.slope:.2f}*X+{results_3.intercept:.2f}",
-    (7, 1400),
+    (9, 1400),
     color="red",
     label="test",
 )
@@ -213,13 +215,13 @@ _ = g.set_xlim(-0.5, 11.5)
 _ = g.set_ylim(0, g.get_ylim()[1])
 
 ax = plt.gca()
-for tick in ax.xaxis.get_major_ticks():
-    tick.label.set_fontsize(20)
-ax.xaxis.label.set_size(20)
+# for tick in ax.xaxis.get_major_ticks():
+#    tick.label.set_fontsize(20)
+# ax.xaxis.label.set_size(20)
 
-for tick in ax.yaxis.get_major_ticks():
-    tick.label.set_fontsize(20)
-ax.yaxis.label.set_size(20)
+# for tick in ax.yaxis.get_major_ticks():
+#    tick.label.set_fontsize(20)
+# ax.yaxis.label.set_size(20)
 
 ax.legend(
     handles=[
@@ -228,8 +230,8 @@ ax.legend(
     ],
     fontsize="xx-small",
 )
-plt.savefig("output/figures/version_count_vs_publication_time_violin.svg", dpi=500)
-plt.savefig("output/figures/version_count_vs_publication_time_violin.png", dpi=500)
+plt.savefig("output/figures/version_count_vs_publication_time_violin.svg")
+plt.savefig("output/figures/version_count_vs_publication_time_violin.png", dpi=600)
 # -
 
 # ## Background Filtered
@@ -282,8 +284,8 @@ polka_y_line = polka_x_line * results_3.slope + results_3.intercept
 
 # +
 # Graph here?
-plt.figure(figsize=(11, 8.5))
-plt.rcParams.update({"font.size": 20})
+plt.figure(figsize=(11, 8))
+plt.rcParams.update({"font.size": 12})
 g = sns.violinplot(
     x="version_count",
     y="days_to_published",
@@ -303,21 +305,22 @@ _ = g.scatter(
     c="red",
     s=12,
 )
-_ = g.annotate(f"Y={results_2.slope:.2f}*X+{results_2.intercept:.2f}", (5, 50))
+_ = g.annotate(f"Y={results_2.slope:.2f}*X+{results_2.intercept:.2f}", (7, 50))
 _ = g.annotate(
-    f"Y={results_3.slope:.2f}*X+{results_3.intercept:.2f}", (5, 40), color="red"
+    f"Y={results_3.slope:.2f}*X+{results_3.intercept:.2f}", (7, 40), color="red"
 )
 _ = g.set_xlim(-0.5, 9)
 _ = g.set_ylim(0, g.get_ylim()[1])
 
 ax = plt.gca()
-for tick in ax.xaxis.get_major_ticks():
-    tick.label.set_fontsize(20)
-ax.xaxis.label.set_size(20)
+# for tick in ax.xaxis.get_major_ticks():
+#    tick.label.set_fontsize(20)
+# ax.xaxis.label.set_size(20)
 
-for tick in ax.yaxis.get_major_ticks():
-    tick.label.set_fontsize(20)
-ax.yaxis.label.set_size(20)
+# for tick in ax.yaxis.get_major_ticks():
+#    tick.label.set_fontsize(20)
+# ax.yaxis.label.set_size(20)
+
 ax.legend(
     handles=[
         Patch(color="black", label="bioRxiv"),
@@ -327,11 +330,9 @@ ax.legend(
     loc="lower right",
 )
 
+plt.savefig("output/figures/version_count_vs_publication_time_violin_filtered.svg")
 plt.savefig(
-    "output/figures/version_count_vs_publication_time_violin_filtered.svg", dpi=500
-)
-plt.savefig(
-    "output/figures/version_count_vs_publication_time_violin_filtered.png", dpi=500
+    "output/figures/version_count_vs_publication_time_violin_filtered.png", dpi=600
 )
 # -
 
@@ -400,8 +401,8 @@ polka_y_line = polka_x_line * results_3.slope + results_3.intercept
 
 # +
 # graph here?
-plt.figure(figsize=(11, 8.5))
-plt.rcParams.update({"font.size": 22})
+plt.figure(figsize=(11, 8))
+plt.rcParams.update({"font.size": 12})
 ax = plt.hexbin(
     biorxiv_published_distances["doc_distances"],
     biorxiv_published_distances["days_to_published"],
@@ -416,24 +417,24 @@ plt.xlim([0, 12])
 plt.ylim([0, 1800])
 ax = plt.gca()
 
-for tick in ax.xaxis.get_major_ticks():
-    tick.label.set_fontsize(20)
-ax.xaxis.label.set_size(20)
+# for tick in ax.xaxis.get_major_ticks():
+#    tick.label.set_fontsize(20)
+# ax.xaxis.label.set_size(20)
 
-for tick in ax.yaxis.get_major_ticks():
-    tick.label.set_fontsize(20)
-ax.yaxis.label.set_size(20)
+# for tick in ax.yaxis.get_major_ticks():
+#    tick.label.set_fontsize(20)
+# ax.yaxis.label.set_size(20)
 
 ax.plot(x_line, y_line, "--k")
 ax.plot(polka_x_line, polka_y_line, "--k", color="red")
 ax.annotate(
     f"Y={results_2.slope:.2f}*X+{results_2.intercept:.2f}",
-    (5.5, 1530),
+    (9, 1530),
 )
 _ = ax.annotate(
-    f"Y={results_3.slope:.2f}*X+{results_3.intercept:.2f}", (5.5, 1440), color="red"
+    f"Y={results_3.slope:.2f}*X+{results_3.intercept:.2f}", (9, 1440), color="red"
 )
-_ = ax.set_xlabel("Euclidian Distance of Preprint-Published Versions")
+_ = ax.set_xlabel("Euclidean Distance of Preprint-Published Versions")
 _ = ax.set_ylabel("Time Elapsed Until Preprint is Published (Days)")
 cbar = plt.colorbar()
 _ = cbar.ax.set_ylabel("count", rotation=270)
@@ -450,8 +451,8 @@ ax.legend(
     ],
     fontsize="xx-small",
 )
-plt.savefig("output/figures/article_distance_vs_publication_time_hex.svg", dpi=250)
-plt.savefig("output/figures/article_distance_vs_publication_time_hex.png", dpi=250)
+plt.savefig("output/figures/article_distance_vs_publication_time_hex.svg")
+plt.savefig("output/figures/article_distance_vs_publication_time_hex.png", dpi=600)
 # -
 
 # ## Background Filtered
@@ -502,8 +503,8 @@ polka_y_line = polka_x_line * results_3.slope + results_3.intercept
 
 # +
 # graph here?
-plt.figure(figsize=(11, 8.5))
-plt.rcParams.update({"font.size": 20})
+plt.figure(figsize=(11, 8))
+plt.rcParams.update({"font.size": 12})
 ax = plt.hexbin(
     filtered_biorxiv_published_distances["doc_distances"],
     filtered_biorxiv_published_distances["days_to_published"],
@@ -518,24 +519,24 @@ plt.xlim([0, 15])
 plt.ylim([0, 200])
 ax = plt.gca()
 
-for tick in ax.xaxis.get_major_ticks():
-    tick.label.set_fontsize(20)
-ax.xaxis.label.set_size(20)
+# for tick in ax.xaxis.get_major_ticks():
+#    tick.label.set_fontsize(20)
+# ax.xaxis.label.set_size(20)
 
-for tick in ax.yaxis.get_major_ticks():
-    tick.label.set_fontsize(20)
-ax.yaxis.label.set_size(20)
+# for tick in ax.yaxis.get_major_ticks():
+#    tick.label.set_fontsize(20)
+# ax.yaxis.label.set_size(20)
 
 ax.plot(x_line, y_line, "--k")
 ax.plot(polka_x_line, polka_y_line, "--k", color="red")
 ax.annotate(
     f"Y={results_2.slope:.2f}*X+{results_2.intercept:.2f}",
-    (8, 50),
+    (11, 50),
 )
 _ = ax.annotate(
-    f"Y={results_3.slope:.2f}*X+{results_3.intercept:.2f}", (8, 40), color="red"
+    f"Y={results_3.slope:.2f}*X+{results_3.intercept:.2f}", (11, 40), color="red"
 )
-_ = ax.set_xlabel("Euclidian Distance of Preprint-Published Versions")
+_ = ax.set_xlabel("Euclidean Distance of Preprint-Published Versions")
 _ = ax.set_ylabel("Time Elapsed Until Preprint is Published (Days)")
 cbar = plt.colorbar()
 _ = cbar.ax.set_ylabel("count", rotation=270, labelpad=25)
@@ -555,11 +556,9 @@ ax.legend(
     loc="lower right",
 )
 
+plt.savefig("output/figures/article_distance_vs_publication_time_hex_filtered.svg")
 plt.savefig(
-    "output/figures/article_distance_vs_publication_time_hex_filtered.svg", dpi=250
-)
-plt.savefig(
-    "output/figures/article_distance_vs_publication_time_hex_filtered.png", dpi=250
+    "output/figures/article_distance_vs_publication_time_hex_filtered.png", dpi=600
 )
 # -
 

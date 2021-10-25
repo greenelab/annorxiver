@@ -1,0 +1,11 @@
+value	model	distance	dataset
+1.0	random_baseline	N/A	train (cross validation)
+76.31914893617021	paper_paper	euclidean	train (cross validation)
+69.59767891682785	centroid	euclidean	train (cross validation)
+77.02901353965183	paper_paper	manhattan	train (cross validation)
+77.02901353965183	centroid	manhattan	train (cross validation)
+1.0	random_baseline	N/A	test
+10.170650730411687	paper_paper	euclidean	test
+11.51859229747676	centroid	euclidean	test
+13.53253652058433	paper_paper	manhattan	test
+14.291500664010623	centroid	manhattan	test
