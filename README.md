@@ -2,7 +2,7 @@
 
 ## Citation
 - BioRxiv Citation: [10.1101/2021.03.04.433874](https://doi.org/10.1101/2021.03.04.433874)
-- Publication Citation: (TBD)
+- Publication Citation: [10.1371/journal.pbio.3001470](https://doi.org/10.1371/journal.pbio.3001470)
 
 ## About
 This repository contains code for the annorxiver project.
